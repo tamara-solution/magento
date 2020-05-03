@@ -1,0 +1,27 @@
+<div class="tamara-success-title">
+    <h2>Thank you!</h2>
+</div>
+<?php $orderId = $block->getData('order_id'); ?>
+<div id="success-area" data-bind="scope: 'tamara-success'">
+    <input id="order_id" type="hidden" value="<?php echo $orderId; ?>">
+    <!-- ko template: getTemplate() --><!-- /ko -->
+</div>
+
+<script>
+    window.successTamara = <?php /* @escapeNotVerified */ echo \Zend_Json::encode($block->getTamaraConfig()); ?>;
+</script>
+
+<script type="text/x-magento-init">
+    {
+        "#success-area": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "tamara-success": {
+                        "component": "Tamara_Checkout/js/view/success",
+                        "template" : "Tamara_Checkout/success"
+                    }
+                }
+            }
+        }
+    }
+</script>

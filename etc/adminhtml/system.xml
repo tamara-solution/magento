@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <!--group id="tamara_group" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+	    	<label>tamara Payments</label-->
+            <group id="tamara_checkout" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Tamara Checkout</label>
+
+                <group id="api_configuration" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>API Configuration</label>
+                    <field id="api_url" translate="label" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Api Url</label>
+                        <config_path>payment/tamara_checkout/api_url</config_path>
+                    </field>
+                    <field id="merchant_token" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Merchant Token</label>
+                        <config_path>payment/tamara_checkout/merchant_token</config_path>
+                    </field>
+                    <field id="notification_token" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Notification Token</label>
+                        <config_path>payment/tamara_checkout/notification_token</config_path>
+                    </field>
+                    <field id="link_about_tamara" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Link About Tamara Payment</label>
+                        <config_path>payment/tamara_checkout/link_about_tamara</config_path>
+                    </field>
+                    <field id="link_login_tamara" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Link Login Tamara for Customer</label>
+                        <config_path>payment/tamara_checkout/link_login_tamara</config_path>
+                    </field>
+                    <field id="debug" translate="label" type="select" sortOrder="85" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Debug</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/tamara_checkout/debug</config_path>
+                    </field>
+                    <field id="trigger_actions" translate="label" type="select" sortOrder="95" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Enable trigger to Tamara</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/tamara_checkout/trigger_actions</config_path>
+                    </field>
+                    <field id="send_email_invoice" translate="label" type="select" sortOrder="95" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Enable sending email when creating invoice</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/tamara_checkout/send_email_invoice</config_path>
+                    </field>
+                    <field id="payment_action" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Payment Action</label>
+                        <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
+                        <config_path>payment/tamara_checkout/payment_action</config_path>
+                    </field>
+                    <field id="allowspecific" translate="label" type="allowspecific" sortOrder="160" showInDefault="9"
+                           showInWebsite="1" showInStore="0">
+                        <label>Payment From Applicable Countries</label>
+                        <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                        <config_path>payment/tamara_checkout/allowspecific</config_path>
+                    </field>
+                    <field id="specificcountry" translate="label" type="multiselect" sortOrder="170" showInDefault="1"
+                           showInWebsite="1" showInStore="0">
+                        <label>Payment From Specific Countries</label>
+                        <source_model>Tamara\Checkout\Model\Config\Source\Country</source_model>
+                        <config_path>payment/tamara_checkout/specificcountry</config_path>
+                    </field>
+                </group>
+
+                <group id="payment_types" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Payment Types</label>
+                    <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Enabled Pay by later</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/tamara_pay_later/active</config_path>
+                    </field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Title</label>
+                        <config_path>payment/tamara_pay_later/title</config_path>
+                    </field>
+                    <field id="update_limit_btn" translate="label" type="button" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Update config min/max limit amount of order</label>
+                        <frontend_model>Tamara\Checkout\Block\System\Config\UpdateMinMax</frontend_model>
+                    </field>
+                    <field id="min_limit" translate="label" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Min Limit Amount of Order</label>
+                        <config_path>payment/tamara_pay_later/min_limit</config_path>
+                    </field>
+                    <field id="max_limit" translate="label" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Max Limit Amount of Order</label>
+                        <config_path>payment/tamara_pay_later/max_limit</config_path>
+                    </field>
+                    <field id="sort_order" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
+                           showInStore="0">
+                        <label>Sort Order</label>
+                        <frontend_class>validate-number</frontend_class>
+                        <config_path>payment/tamara_pay_later/sort_order</config_path>
+                    </field>
+                </group>
+
+
+                <group id="checkout_order_statuses" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Checkout Order Statuses</label>
+                    <field id="checkout_success_status" translate="label" type="select" sortOrder="220" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Order status when checkout is success</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                    </field>
+                    <field id="checkout_cancel_status" translate="label" type="select" sortOrder="230" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Order status when checkout is cancelled</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                    </field>
+                    <field id="checkout_failure_status" translate="label" type="select" sortOrder="240" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Order status when checkout is failure</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                    </field>
+                </group>
+            </group>
+            <!--/group-->
+        </section>
+    </system>
+</config>

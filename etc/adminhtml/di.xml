@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Tamara\Checkout\Block\Info">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item xsi:type="string" name="is_secure_mode">0</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Controller\Adminhtml\System\Config\GetPaymentTypes">
+        <arguments>
+            <argument name="resultJsonFactory" xsi:type="object">Magento\Framework\Controller\Result\JsonFactory</argument>
+            <argument name="tamaraAdapterFactory" xsi:type="object">Tamara\Checkout\Model\Adapter\TamaraAdapterFactory</argument>
+        </arguments>
+    </type>
+</config>

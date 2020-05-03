@@ -1,0 +1,53 @@
+<script>
+    require([
+        'jquery',
+        'prototype'
+    ], function(jQuery){
+
+        var collectSpan = jQuery('#collect_span'),
+            minPayByLater = jQuery('#payment_us_tamara_checkout_payment_types_min_limit'),
+            maxPayByLater = jQuery('#payment_us_tamara_checkout_payment_types_max_limit');
+
+
+        jQuery('#update_config').click(function () {
+            var params = {};
+            new Ajax.Request('<?php echo $block->getCustomUrl() ?>', {
+                parameters:     params,
+                loaderArea:     false,
+                asynchronous:   true,
+                onCreate: function() {
+                    collectSpan.find('.collected').hide();
+                    collectSpan.find('.processing').show();
+                    jQuery('#collect_message_span').text('');
+                },
+                onSuccess: function(response) {
+                    collectSpan.find('.processing').hide();
+
+                    var resultText = '';
+                    if (response.status > 200) {
+                        resultText = response.statusText;
+                    } else {
+                        resultText = 'Success';
+                        collectSpan.find('.collected').show();
+                    }
+                    jQuery('#collect_message_span').text(resultText);
+
+                    var json = response.responseJSON;
+
+                    if (typeof json.PAY_BY_LATER != 'undefined') {
+                        minPayByLater.val(json.PAY_BY_LATER.min_limit);
+                        maxPayByLater.val(json.PAY_BY_LATER.max_limit);
+                    }
+                }
+            });
+        });
+
+    });
+</script>
+
+<?php echo $block->getButtonHtml() ?>
+<span class="collect-indicator" id="collect_span">
+    <img class="processing" hidden="hidden" alt="Collecting" style="margin:0 5px" src="<?php echo $block->getViewFileUrl('images/process_spinner.gif') ?>"/>
+    <img class="collected" hidden="hidden" alt="Collected" style="margin:-3px 5px" src="<?php echo $block->getViewFileUrl('images/rule_component_apply.gif') ?>"/>
+    <span id="collect_message_span"></span>
+</span>

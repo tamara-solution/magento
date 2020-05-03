@@ -1,0 +1,236 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Create Tamara Facade -->
+    <virtualType name="TamaraFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE</argument>
+            <argument name="valueHandlerPool" xsi:type="object">TamaraValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">TamaraCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">TamaraValidatorPool</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Tamara\Checkout\Block\Info</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TamaraCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize" xsi:type="string">TamaraAuthorizeCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TamaraAuthorizeCommand" type="Tamara\Checkout\Gateway\Command\AuthorizeCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">TamaraAuthorizeRequest</argument>
+            <argument name="transferFactory" xsi:type="object">Tamara\Checkout\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Tamara\Checkout\Gateway\Http\Client\AuthorizeClient</argument>
+            <argument name="handler" xsi:type="object">Tamara\Checkout\Gateway\Response\AuthorizeResponse</argument>
+            <argument name="validator" xsi:type="object">Tamara\Checkout\Gateway\Validator\ResponseValidator</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TamaraAuthorizeRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="common" xsi:type="string">Tamara\Checkout\Gateway\Request\CommonDataBuilder</item>
+                <item name="address" xsi:type="string">Tamara\Checkout\Gateway\Request\AddressDataBuilder</item>
+                <item name="consumer" xsi:type="string">Tamara\Checkout\Gateway\Request\ConsumerDataBuilder</item>
+                <item name="merchantUrl" xsi:type="string">Tamara\Checkout\Gateway\Request\MerchantUrlDataBuilder</item>
+                <item name="items" xsi:type="string">Tamara\Checkout\Gateway\Request\ItemsDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Tamara\Checkout\Gateway\Request\MerchantUrlDataBuilder">
+        <arguments>
+            <argument name="storeManager" xsi:type="object">Magento\Store\Model\StoreManagerInterface</argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Gateway\Request\ConsumerDataBuilder">
+        <arguments>
+            <argument name="customerRepository" xsi:type="object">Magento\Customer\Api\CustomerRepositoryInterface</argument>
+            <argument name="addressRepository" xsi:type="object">Magento\Customer\Api\AddressRepositoryInterface</argument>
+            <argument name="logger" xsi:type="object">TamaraCheckoutLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Gateway\Request\ItemsDataBuilder">
+        <arguments>
+            <argument name="productRepository" xsi:type="object">Magento\Catalog\Model\ProductRepository</argument>
+            <argument name="imageHelper" xsi:type="object">Magento\Catalog\Helper\Image</argument>
+        </arguments>
+    </type>
+
+<!--     create validator pool-->
+    <virtualType name="TamaraValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="currency" xsi:type="string">TamaraCurrencyValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TamaraCurrencyValidator" type="Tamara\Checkout\Gateway\Validator\CurrencyValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Create Tamara Config -->
+    <virtualType name="TamaraValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">TamaraConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TamaraConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">Tamara\Checkout\Gateway\Config\PayLaterConfig</argument>
+        </arguments>
+    </virtualType>
+
+
+    <!-- Configuration reader -->
+    <type name="Tamara\Checkout\Model\Config\Source\Country">
+        <arguments>
+            <argument name="countryCodes" xsi:type="const">\Tamara\Checkout\Model\Method\Checkout::ALLOWED_COUNTRIES</argument>
+        </arguments>
+    </type>
+    <!-- Configuration reader -->
+    <type name="Tamara\Checkout\Gateway\Config\BaseConfig">
+        <arguments>
+            <argument name="serializer" xsi:type="object">Magento\Framework\Serialize\Serializer\Json</argument>
+            <argument name="methodCode" xsi:type="const">Tamara\Checkout\Gateway\Config\BaseConfig::CODE</argument>
+        </arguments>
+    </type>
+    <type name="Tamara\Checkout\Gateway\Config\PayLaterConfig">
+        <arguments>
+            <argument name="serializer" xsi:type="object">Magento\Framework\Serialize\Serializer\Json</argument>
+            <argument name="methodCode" xsi:type="const">Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE</argument>
+        </arguments>
+    </type>
+    <type name="Tamara\Checkout\Model\Method\Checkout">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE</argument>
+        </arguments>
+    </type>
+
+    <!-- Logger, initialized with Tamara\Checkout\Gateway\Config\BaseConfig -->
+    <virtualType name="TamaraCheckoutLogger" type="Magento\Payment\Model\Method\Logger">
+        <arguments>
+            <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
+        </arguments>
+    </virtualType>
+    <type name="Tamara\Checkout\Model\Method\Checkout">
+        <arguments>
+            <argument name="logger" xsi:type="object">TamaraCheckoutLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Gateway\Command\AuthorizeCommand">
+        <arguments>
+            <argument name="logger" xsi:type="object">TamaraCheckoutLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Model\Adapter\TamaraAdapterFactory">
+        <arguments>
+            <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
+            <argument name="logger" xsi:type="object">TamaraCheckoutLogger</argument>
+            <argument name="orderRepository" xsi:type="object">Tamara\Checkout\Api\OrderRepositoryInterface</argument>
+            <argument name="captureRepository" xsi:type="object">Tamara\Checkout\Api\CaptureRepositoryInterface</argument>
+            <argument name="mageRepository" xsi:type="object">Magento\Sales\Api\OrderRepositoryInterface</argument>
+            <argument name="refundRepository" xsi:type="object">Tamara\Checkout\Api\RefundRepositoryInterface</argument>
+            <argument name="cancelRepository" xsi:type="object">Tamara\Checkout\Api\CancelRepositoryInterface</argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Gateway\Http\Client\AbstractClient">
+        <arguments>
+            <argument name="logger" xsi:type="object">TamaraCheckoutLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Observer\ShipmentSaveAfter">
+        <arguments>
+            <argument name="logger" xsi:type="object">TamaraCheckoutLogger</argument>
+            <argument name="invoiceDocumentFactory" xsi:type="object">Magento\Sales\Model\Order\InvoiceDocumentFactory</argument>
+            <argument name="adapter" xsi:type="object">Tamara\Checkout\Model\Adapter\TamaraAdapterFactory</argument>
+            <argument name="orderRepository" xsi:type="object">Tamara\Checkout\Api\OrderRepositoryInterface</argument>
+            <argument name="invoiceService" xsi:type="object">Magento\Sales\Model\Service\InvoiceService</argument>
+            <argument name="transaction" xsi:type="object">Magento\Framework\DB\Transaction</argument>
+            <argument name="invoiceSender" xsi:type="object">Magento\Sales\Model\Order\Email\Sender\InvoiceSender</argument>
+            <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
+        </arguments>
+    </type>
+
+
+    <type name="Tamara\Checkout\Observer\CreditmemoSaveAfter">
+        <arguments>
+            <argument name="logger" xsi:type="object">TamaraCheckoutLogger</argument>
+            <argument name="adapter" xsi:type="object">Tamara\Checkout\Model\Adapter\TamaraAdapterFactory</argument>
+            <argument name="captureRepository" xsi:type="object">Tamara\Checkout\Api\CaptureRepositoryInterface</argument>
+            <argument name="orderRepository" xsi:type="object">Tamara\Checkout\Api\OrderRepositoryInterface</argument>
+            <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
+            <argument name="transaction" xsi:type="object">Magento\Framework\DB\Transaction</argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Observer\OrderCancelAfter">
+        <arguments>
+            <argument name="logger" xsi:type="object">TamaraCheckoutLogger</argument>
+            <argument name="adapter" xsi:type="object">Tamara\Checkout\Model\Adapter\TamaraAdapterFactory</argument>
+            <argument name="orderRepository" xsi:type="object">Tamara\Checkout\Api\OrderRepositoryInterface</argument>
+            <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
+            <argument name="transaction" xsi:type="object">Magento\Framework\DB\Transaction</argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Block\Info">
+        <arguments>
+            <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Block\PopulateTamara">
+        <arguments>
+            <argument name="assetRepository" xsi:type="object">Magento\Framework\View\Asset\Repository</argument>
+            <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Block\Success">
+        <arguments>
+            <argument name="assetRepository" xsi:type="object">Magento\Framework\View\Asset\Repository</argument>
+            <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Model\Helper\CartHelper">
+        <arguments>
+            <argument name="eventManager" xsi:type="object">Magento\Framework\Event\ManagerInterface</argument>
+            <argument name="quoteRepository" xsi:type="object">Magento\Quote\Api\CartRepositoryInterface</argument>
+            <argument name="checkoutSession" xsi:type="object">\Magento\Checkout\Model\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Model\ConfigRepository">
+        <arguments>
+            <argument name="payLaterConfig" xsi:type="object">Tamara\Checkout\Gateway\Config\PayLaterConfig</argument>
+        </arguments>
+    </type>
+
+    <preference for="Tamara\Checkout\Api\OrderInterface" type="Tamara\Checkout\Model\Order" />
+    <preference for="Tamara\Checkout\Api\OrderRepositoryInterface" type="Tamara\Checkout\Model\OrderRepository" />
+    <preference for="Tamara\Checkout\Api\CaptureRepositoryInterface" type="Tamara\Checkout\Model\CaptureRepository" />
+    <preference for="Tamara\Checkout\Api\RefundRepositoryInterface" type="Tamara\Checkout\Model\RefundRepository" />
+    <preference for="Tamara\Checkout\Api\CancelRepositoryInterface" type="Tamara\Checkout\Model\CancelRepository" />
+    <preference for="Tamara\Checkout\Api\ConfigRepositoryInterface" type="Tamara\Checkout\Model\ConfigRepository" />
+
+</config>

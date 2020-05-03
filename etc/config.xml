@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <tamara_pay_later>
+                <debug>1</debug>
+                <trigger_actions>1</trigger_actions>
+                <send_email_invoice>1</send_email_invoice>
+                <link_about_tamara>https://www.tamara.co/about-us.html</link_about_tamara>
+                <active>0</active>
+                <model>TamaraFacade</model>
+                <order_status>pending_payment</order_status>
+                <payment_action>authorize</payment_action>
+                <title>Pay later in 14 days</title>
+                <currency>SAR</currency>
+                <order_history_use_phone>1</order_history_use_phone>
+                <can_authorize>1</can_authorize>
+                <can_use_checkout>1</can_use_checkout>
+                <is_gateway>1</is_gateway>
+                <sort_order>1</sort_order>
+                <group>tamara</group>
+            </tamara_pay_later>
+        </payment>
+    </default>
+</config>

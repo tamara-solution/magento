@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="checkout_onepage_controller_success_action">
+        <observer name="process_gateway_redirect" instance="Tamara\Checkout\Observer\ProcessGatewayRedirect" />
+    </event>
+    <event name="sales_order_shipment_save_after">
+        <observer name="shipment_save_after" instance="Tamara\Checkout\Observer\ShipmentSaveAfter" />
+    </event>
+    <event name="sales_order_creditmemo_save_after">
+        <observer name="creditmemo_save_after" instance="Tamara\Checkout\Observer\CreditmemoSaveAfter" />
+    </event>
+    <event name="sales_order_invoice_save_after">
+        <observer name="invoice_save_after" instance="Tamara\Checkout\Observer\InvoiceSaveAfter" />
+    </event>
+    <event name="order_cancel_after">
+        <observer name="tamara_order_cancel" instance="Tamara\Checkout\Observer\OrderCancelAfter" />
+    </event>
+</config>
