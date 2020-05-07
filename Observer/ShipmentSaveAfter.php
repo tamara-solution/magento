@@ -4,7 +4,6 @@ namespace Tamara\Checkout\Observer;
 
 use Magento\Framework\DB\Transaction;
 use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\Data\InvoiceItemInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Service\InvoiceService;
@@ -12,7 +11,6 @@ use Tamara\Checkout\Api\OrderRepositoryInterface;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
 use Magento\Payment\Model\Method\Logger;
 use Tamara\Checkout\Model\Adapter\TamaraAdapterFactory;
-use Tamara\Checkout\Model\Ui\ConfigProvider;
 
 class ShipmentSaveAfter extends AbstractObserver
 {

@@ -3,13 +3,11 @@
 namespace Tamara\Checkout\Observer;
 
 use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
 use Magento\Payment\Model\Method\Logger;
 use Magento\Sales\Model\Order;
 use Tamara\Checkout\Api\OrderRepositoryInterface;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
 use Tamara\Checkout\Model\Adapter\TamaraAdapterFactory;
-use Tamara\Checkout\Model\Ui\ConfigProvider;
 
 class OrderCancelAfter extends AbstractObserver
 {

@@ -3,12 +3,10 @@
 namespace Tamara\Checkout\Observer;
 
 use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Model\Order;
 use Magento\Store\Model\StoreManagerInterface;
 use Tamara\Checkout\Api\OrderRepositoryInterface;
 use Magento\Framework\App\ObjectManager;
-use Tamara\Checkout\Model\Ui\ConfigProvider;
 
 class ProcessGatewayRedirect extends AbstractObserver
 {

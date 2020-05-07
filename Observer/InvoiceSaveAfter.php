@@ -3,13 +3,9 @@
 namespace Tamara\Checkout\Observer;
 
 use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\IntegrationException;
-use Magento\Payment\Model\Method\Logger;
 use Magento\Sales\Model\Order\Invoice;
 use Tamara\Checkout\Api\CaptureRepositoryInterface;
-use Tamara\Checkout\Gateway\Config\BaseConfig;
-use Tamara\Checkout\Model\Ui\ConfigProvider;
 
 class InvoiceSaveAfter extends AbstractObserver
 {

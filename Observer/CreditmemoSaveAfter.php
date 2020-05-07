@@ -3,7 +3,6 @@
 namespace Tamara\Checkout\Observer;
 
 use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
 use Magento\Payment\Model\Method\Logger;
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
 use Magento\Sales\Model\Order\Creditmemo;
@@ -11,7 +10,6 @@ use Tamara\Checkout\Api\CaptureRepositoryInterface;
 use Tamara\Checkout\Api\OrderRepositoryInterface;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
 use Tamara\Checkout\Model\Adapter\TamaraAdapterFactory;
-use Tamara\Checkout\Model\Ui\ConfigProvider;
 
 class CreditmemoSaveAfter extends AbstractObserver
 {
