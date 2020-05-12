@@ -3,6 +3,7 @@
 namespace Tamara\Checkout\Model\Helper;
 
 use Exception;
+use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\Data\OrderInterface;
 
 class CartHelper
@@ -36,5 +37,17 @@ class CartHelper
 
         $this->checkoutSession->replaceQuote($quote)->unsLastRealOrderId();
         $this->eventManager->dispatch('restore_quote', ['order' => $order, 'quote' => $quote]);
+    }
+
+    public function removeCartAfterSuccess($quoteId): void
+    {
+        /** @var Quote $quote */
+        $quote = $this->quoteRepository->get($quoteId);
+        $quote->removePayment();
+        $quote->removeAllItems();
+        $this->quoteRepository->save($quote);
+
+        $this->checkoutSession->clearQuote();
+        $this->checkoutSession->clearStorage();
     }
 }

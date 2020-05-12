@@ -95,4 +95,10 @@ class BaseConfig extends MagentoPaymentConfig
     {
         return $this->getValue('link_login_tamara', $storeId);
     }
+
+    public function getIsUseWhitelist($storeId = null)
+    {
+        return $this->getValue('is_email_whitelist_enabled', $storeId);
+    }
+
 }

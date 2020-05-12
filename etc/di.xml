@@ -192,6 +192,18 @@
         </arguments>
     </type>
 
+    <type name="Magento\Payment\Model\MethodList">
+        <plugin name="methodlist" type="Tamara\Checkout\Plugin\Model\Method\Available" sortOrder="1" />
+    </type>
+
+    <type name="Tamara\Checkout\Plugin\Model\Method\Available">
+        <arguments>
+            <argument name="logger" xsi:type="object">TamaraCheckoutLogger</argument>
+            <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
+            <argument name="emailWhiteListRepository" xsi:type="object">Tamara\Checkout\Api\EmailWhiteListRepositoryInterface</argument>
+        </arguments>
+    </type>
+
     <type name="Tamara\Checkout\Block\Info">
         <arguments>
             <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
@@ -232,5 +244,6 @@
     <preference for="Tamara\Checkout\Api\RefundRepositoryInterface" type="Tamara\Checkout\Model\RefundRepository" />
     <preference for="Tamara\Checkout\Api\CancelRepositoryInterface" type="Tamara\Checkout\Model\CancelRepository" />
     <preference for="Tamara\Checkout\Api\ConfigRepositoryInterface" type="Tamara\Checkout\Model\ConfigRepository" />
+    <preference for="Tamara\Checkout\Api\EmailWhiteListRepositoryInterface" type="Tamara\Checkout\Model\EmailWhiteListRepository" />
 
 </config>

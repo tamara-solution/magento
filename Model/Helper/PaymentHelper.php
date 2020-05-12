@@ -3,6 +3,7 @@
 namespace Tamara\Checkout\Model\Helper;
 
 use Magento\Sales\Model\Order\Item;
+use Tamara\Checkout\Gateway\Config\PayLaterConfig;
 use Tamara\Checkout\Model\CaptureItem;
 use Tamara\Model\Money;
 use Tamara\Model\Order\OrderItem;
@@ -13,12 +14,15 @@ use Tamara\Model\ShippingInfo;
 use Tamara\Request\Order\CancelOrderRequest;
 use Tamara\Request\Payment\CaptureRequest;
 use Tamara\Checkout\Model\Capture as CaptureCheckout;
-use Magento\Payment\Model\Method\Logger;
 use Tamara\Request\Payment\RefundRequest;
 use Tamara\Response\Payment\CancelResponse;
 
 class PaymentHelper
 {
+    public const ALLOWED_PAYMENTS = [
+        PayLaterConfig::PAYMENT_TYPE_CODE
+    ];
+
     public static function createCaptureRequestFromArray(array $data): CaptureRequest
     {
         $totalAmount = new Money($data['total_amount'], $data['currency']);
@@ -222,6 +226,11 @@ class PaymentHelper
             - $item->getDiscountAmount()
             + $item->getTaxAmount()
             + $item->getDiscountTaxCompensationAmount();
+    }
+
+    public static function isTamaraPayment($method)
+    {
+        return in_array($method, self::ALLOWED_PAYMENTS, true);
     }
 
 }

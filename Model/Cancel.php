@@ -6,7 +6,7 @@ use Zend\Json\Json;
 
 class Cancel extends AbstractModel
 {
-    const CACHE_TAG = 'tamara_refunds';
+    const CACHE_TAG = 'tamara_cancels';
 
     public function getIdentities()
     {

@@ -45,6 +45,13 @@
         </arguments>
     </type>
 
+    <type name="Tamara\Checkout\Controller\Payment\Success">
+        <arguments>
+            <argument name="cartHelper" xsi:type="object">Tamara\Checkout\Model\Helper\CartHelper</argument>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session</argument>
+        </arguments>
+    </type>
+
     <type name="Magento\Framework\App\RouterList">
         <arguments>
             <argument name="routerList" xsi:type="array">

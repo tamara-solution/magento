@@ -6,6 +6,7 @@
                 <debug>1</debug>
                 <trigger_actions>1</trigger_actions>
                 <send_email_invoice>1</send_email_invoice>
+                <is_email_whitelist_enabled>0</is_email_whitelist_enabled>
                 <link_about_tamara>https://www.tamara.co/about-us.html</link_about_tamara>
                 <active>0</active>
                 <model>TamaraFacade</model>
