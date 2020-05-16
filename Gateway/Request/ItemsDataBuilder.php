@@ -3,7 +3,6 @@
 namespace Tamara\Checkout\Gateway\Request;
 
 use Magento\Catalog\Model\ProductRepository;
-use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Tamara\Model\Money;

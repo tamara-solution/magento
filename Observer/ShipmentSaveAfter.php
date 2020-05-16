@@ -11,6 +11,7 @@ use Tamara\Checkout\Api\OrderRepositoryInterface;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
 use Magento\Payment\Model\Method\Logger;
 use Tamara\Checkout\Model\Adapter\TamaraAdapterFactory;
+use Tamara\Checkout\Model\Helper\ProductHelper;
 
 class ShipmentSaveAfter extends AbstractObserver
 {
@@ -30,6 +31,8 @@ class ShipmentSaveAfter extends AbstractObserver
 
     protected $config;
 
+    protected $productHelper;
+
     public function __construct(
         Logger $logger,
         Order\InvoiceDocumentFactory $invoiceDocumentFactory,
@@ -38,7 +41,8 @@ class ShipmentSaveAfter extends AbstractObserver
         InvoiceService $invoiceService,
         Transaction $transaction,
         Order\Email\Sender\InvoiceSender $invoiceSender,
-        BaseConfig $config
+        BaseConfig $config,
+        ProductHelper $productHelper
     )
     {
         $this->logger = $logger;
@@ -49,6 +53,7 @@ class ShipmentSaveAfter extends AbstractObserver
         $this->transaction = $transaction;
         $this->invoiceSender = $invoiceSender;
         $this->config = $config;
+        $this->productHelper = $productHelper;
     }
 
     public function execute(Observer $observer)
@@ -104,6 +109,7 @@ class ShipmentSaveAfter extends AbstractObserver
             $itemTemp['name'] = $invoiceItem->getName();
             $itemTemp['sku'] = $invoiceItem->getSku();
             $itemTemp['quantity'] = $invoiceItem->getQty();
+            $itemTemp['image_url'] = $this->productHelper->getImageFromProductId($invoiceItem->getProductId());
 
             if (!empty($itemTemp['total_amount'])) {
                 $data['items'][] = $itemTemp;

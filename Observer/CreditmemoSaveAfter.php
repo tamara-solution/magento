@@ -188,7 +188,8 @@ class CreditmemoSaveAfter extends AbstractObserver
             'unit_price' => 0,
             'total_amount' => $totalAmount,
             'tax_amount' => 0,
-            'discount_amount' => 0
+            'discount_amount' => 0,
+            'image_url' => '',
         ];
     }
 }

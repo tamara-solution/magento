@@ -10,17 +10,31 @@ use Magento\Framework\Setup\UpgradeSchemaInterface;
 
 class UpgradeSchema implements UpgradeSchemaInterface
 {
-    const TAMARA_WHITELIST = 'tamara_email_whitelist';
+    const TAMARA_WHITELIST = 'tamara_email_whitelist',
+          TAMARA_CAPTURE_ITEMS = 'tamara_capture_items';
 
     public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
+        $setup->startSetup();
         if (version_compare($context->getVersion(), '1.0.1', '<')) {
-            $setup->startSetup();
-
             $this->createTamaraWhitelistTable($setup);
-
-            $setup->endSetup();
         }
+
+        if (version_compare($context->getVersion(), '1.0.2', '<')) {
+            $setup->getConnection()->addColumn(
+                $setup->getTable(self::TAMARA_CAPTURE_ITEMS ),
+                'image_url',
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'nullable' => true,
+                    'length' => '255',
+                    'comment' => 'store image url of item',
+                    'after' => 'name'
+                ]
+            );
+        }
+
+        $setup->endSetup();
     }
 
     private function createTamaraWhitelistTable(SchemaSetupInterface $setup)

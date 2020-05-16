@@ -89,6 +89,23 @@ class CaptureItem extends AbstractModel
     /**
      * {@inheritdoc}
      */
+    public function getImageUrl()
+    {
+        return $this->_getData('image_url');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setImageUrl($imageUrl)
+    {
+        $this->setData('image_url', $imageUrl);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getSku()
     {
         return $this->_getData('sku');

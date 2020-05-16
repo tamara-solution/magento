@@ -101,6 +101,7 @@ class PaymentHelper
         $captureItem->setSku($data['sku']);
         $captureItem->setQuantity($data['quantity']);
         $captureItem->setType($data['type']);
+        $captureItem->setImageUrl($data['image_url']);
 
         return $captureItem;
     }
@@ -212,6 +213,7 @@ class PaymentHelper
         $orderItem->setTaxAmount(new Money($item['tax_amount'] ?? 0, $data['currency']));
         $orderItem->setDiscountAmount(new Money($item['discount_amount'] ?? 0, $data['currency']));
         $orderItem->setQuantity($item['quantity']);
+        $orderItem->setImageUrl($item['image_url'] ?? '');
 
         return $orderItem;
     }

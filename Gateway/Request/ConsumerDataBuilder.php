@@ -61,13 +61,18 @@ class ConsumerDataBuilder implements BuilderInterface
         $consumer = new Consumer();
 
         try {
-            $customer = $this->customerRepository->getById($order->getCustomerId());
-            $address = $customer->getDefaultShipping() ?? $customer->getDefaultBilling();
+            $customer = $order->getBillingAddress();
+            $isFirstOrder = true;
+            if ($order->getCustomerId() !== null) {
+                $customer = $this->customerRepository->getById($order->getCustomerId());
+                $addressId = $customer->getDefaultShipping() ?? $customer->getDefaultBilling();
+                $isFirstOrder = $this->isFirstOrder($customer->getId());
+            }
 
-            if (empty($address)) {
+            if (empty($addressId)) {
                 $telephone = $order->getShippingAddress()->getTelephone();
             } else {
-                $addressData = $this->addressRepository->getById($address);
+                $addressData = $this->addressRepository->getById($addressId);
                 $telephone = $addressData->getTelephone();
             }
 
@@ -75,10 +80,9 @@ class ConsumerDataBuilder implements BuilderInterface
             $consumer->setLastName($customer->getLastname());
             $consumer->setEmail($customer->getEmail());
             $consumer->setPhoneNumber($telephone);
-            $consumer->setIsFirstOrder($this->isFirstOrder($customer->getId()));
+            $consumer->setIsFirstOrder($isFirstOrder);
         } catch (\Exception $e) {
             $this->logger->debug([$e->getMessage()]);
-            return [self::CONSUMER => ''];
         }
 
         return [self::CONSUMER => $consumer];

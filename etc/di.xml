@@ -167,6 +167,7 @@
             <argument name="transaction" xsi:type="object">Magento\Framework\DB\Transaction</argument>
             <argument name="invoiceSender" xsi:type="object">Magento\Sales\Model\Order\Email\Sender\InvoiceSender</argument>
             <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
+            <argument name="productHelper" xsi:type="object">Tamara\Checkout\Model\Helper\ProductHelper</argument>
         </arguments>
     </type>
 
@@ -214,6 +215,7 @@
         <arguments>
             <argument name="assetRepository" xsi:type="object">Magento\Framework\View\Asset\Repository</argument>
             <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
+            <argument name="resolver" xsi:type="object">Magento\Framework\Locale\Resolver</argument>
         </arguments>
     </type>
 
@@ -229,6 +231,13 @@
             <argument name="eventManager" xsi:type="object">Magento\Framework\Event\ManagerInterface</argument>
             <argument name="quoteRepository" xsi:type="object">Magento\Quote\Api\CartRepositoryInterface</argument>
             <argument name="checkoutSession" xsi:type="object">\Magento\Checkout\Model\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Model\Helper\ProductHelper">
+        <arguments>
+            <argument name="productRepository" xsi:type="object">Magento\Catalog\Model\ProductRepository</argument>
+            <argument name="imageHelper" xsi:type="object">Magento\Catalog\Helper\Image</argument>
         </arguments>
     </type>
 
