@@ -5,6 +5,7 @@ namespace Tamara\Checkout\Block;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Framework\View\Element\Template;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
+use Tamara\Checkout\Model\Helper\LocaleHelper;
 
 class Success extends Template
 {
@@ -23,7 +24,8 @@ class Success extends Template
     }
 
     public function getTamaraConfig() {
-        $output['tamaraSuccessLogo'] = $this->getViewFileUrl('Tamara_Checkout::images/success.svg');
+        $successLogo = sprintf('Tamara_Checkout::images/success_%s.svg', LocaleHelper::getCurrentLanguage());
+        $output['tamaraSuccessLogo'] = $this->getViewFileUrl($successLogo);
         $output['tamaraLoginLink'] = $this->config->getLinkLoginTamara();
         return $output;
     }

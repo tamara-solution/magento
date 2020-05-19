@@ -215,7 +215,6 @@
         <arguments>
             <argument name="assetRepository" xsi:type="object">Magento\Framework\View\Asset\Repository</argument>
             <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
-            <argument name="resolver" xsi:type="object">Magento\Framework\Locale\Resolver</argument>
         </arguments>
     </type>
 

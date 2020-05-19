@@ -11,6 +11,7 @@ class AddressDataBuilder implements BuilderInterface
 {
     private const
         SHIPPING_ADDRESS = 'shipping_address',
+        EMPTY = "N/A",
         BILLING_ADDRESS = 'billing_address';
 
     public function build(array $buildSubject): array
@@ -34,20 +35,24 @@ class AddressDataBuilder implements BuilderInterface
             throw new \InvalidArgumentException('The address should be provided');
         }
 
+        $regionBilling = empty($billingAddress->getRegionCode()) ? self::EMPTY : $billingAddress->getRegionCode();
+        $regionShipping = empty($shippingAddress->getRegionCode()) ? self::EMPTY : $shippingAddress->getRegionCode();
+
         $shipping->setFirstName($shippingAddress->getFirstname());
         $shipping->setLastName($shippingAddress->getLastname());
         $shipping->setLine1($shippingAddress->getStreetLine1());
         $shipping->setLine2($shippingAddress->getStreetLine2() ?? '');
-        $shipping->setRegion($shippingAddress->getRegionCode());
+        $shipping->setRegion($regionShipping);
         $shipping->setCity($shippingAddress->getCity());
         $shipping->setPhoneNumber($shippingAddress->getTelephone());
         $shipping->setCountryCode($shippingAddress->getCountryId());
 
-        $billing->setFirstName($billingAddress->getFirstname());
+
         $billing->setLastName($billingAddress->getLastname());
         $billing->setLine1($billingAddress->getStreetLine1());
+        $billing->setFirstName($billingAddress->getFirstname());
         $billing->setLine2($billingAddress->getStreetLine2() ?? '');
-        $billing->setRegion($billingAddress->getRegionCode());
+        $billing->setRegion($regionBilling);
         $billing->setCity($billingAddress->getCity());
         $billing->setPhoneNumber($billingAddress->getTelephone());
         $billing->setCountryCode($billingAddress->getCountryId());
