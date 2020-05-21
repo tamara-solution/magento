@@ -13,11 +13,11 @@
                         <label>Api Url</label>
                         <config_path>payment/tamara_checkout/api_url</config_path>
                     </field>
-                    <field id="merchant_token" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="merchant_token" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Merchant Token</label>
                         <config_path>payment/tamara_checkout/merchant_token</config_path>
                     </field>
-                    <field id="notification_token" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="notification_token" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Notification Token</label>
                         <config_path>payment/tamara_checkout/notification_token</config_path>
                     </field>

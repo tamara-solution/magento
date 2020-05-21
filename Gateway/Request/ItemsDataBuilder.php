@@ -12,7 +12,7 @@ use Magento\Catalog\Helper\Image as ImageHelper;
 
 class ItemsDataBuilder implements BuilderInterface
 {
-    private const
+    public const
         ITEMS = 'items';
 
     /**

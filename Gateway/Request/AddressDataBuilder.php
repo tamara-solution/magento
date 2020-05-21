@@ -9,7 +9,7 @@ use Tamara\Model\Order\Address;
 
 class AddressDataBuilder implements BuilderInterface
 {
-    private const
+    public const
         SHIPPING_ADDRESS = 'shipping_address',
         EMPTY = "N/A",
         BILLING_ADDRESS = 'billing_address';

@@ -16,6 +16,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
     public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         $setup->startSetup();
+
         if (version_compare($context->getVersion(), '1.0.1', '<')) {
             $this->createTamaraWhitelistTable($setup);
         }
@@ -31,6 +32,44 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'comment' => 'store image url of item',
                     'after' => 'name'
                 ]
+            );
+        }
+
+        if (version_compare($context->getVersion(), '1.0.3', '<')) {
+            $setup->getConnection()->addIndex(
+                'tamara_orders',
+                'tamara_orders_tamara_order_id',
+                ['tamara_order_id']
+            );
+
+            $setup->getConnection()->addIndex(
+                'tamara_orders',
+                'tamara_orders_order_id',
+                ['order_id']
+            );
+
+            $setup->getConnection()->addIndex(
+                'tamara_captures',
+                'tamara_captures_order_id',
+                ['order_id']
+            );
+
+            $setup->getConnection()->addIndex(
+                'tamara_capture_items',
+                'tamara_capture_items_order_id',
+                ['order_id']
+            );
+
+            $setup->getConnection()->addIndex(
+                'tamara_cancels',
+                'tamara_cancels_order_id',
+                ['order_id']
+            );
+
+            $setup->getConnection()->addIndex(
+                'tamara_refunds',
+                'tamara_refunds_order_id',
+                ['order_id']
             );
         }
 

@@ -13,8 +13,9 @@ use Tamara\Model\Order\Discount;
 
 class CommonDataBuilder implements BuilderInterface
 {
-    private const
+    public const
         ORDER_ID = 'order_id',
+        ORDER_REFERENCE_ID = 'order_reference_id',
         LOCALE = 'locale',
         CURRENCY = 'currency',
         TOTAL_AMOUNT = 'total_amount',
@@ -65,6 +66,7 @@ class CommonDataBuilder implements BuilderInterface
 
         return [
             self::ORDER_ID => $order->getEntityId(),
+            self::ORDER_REFERENCE_ID => $order->getIncrementId(),
             self::LOCALE => LocaleHelper::getLocale(),
             self::CURRENCY => $currencyCode,
             self::TOTAL_AMOUNT => new Money($order->getGrandTotal(), $currencyCode),

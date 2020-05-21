@@ -21,4 +21,10 @@ interface OrderRepositoryInterface
      * @return Order
      */
     public function getTamaraOrderByOrderId($id);
+
+    /**
+     * @param $tamaraOrderId
+     * @return Order
+     */
+    public function getTamaraOrderByTamaraOrderId($tamaraOrderId);
 }

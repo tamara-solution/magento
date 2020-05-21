@@ -59,7 +59,18 @@ class OrderRepository implements OrderRepositoryInterface
         $order = $this->orderFactory->create();
         $orderId = $this->resourceModel->getByOrderId($id);
         if (!$orderId) {
-            throw new NoSuchEntityException(__('Requested order doesn\'t exist: ' . $orderId));
+            throw new NoSuchEntityException(__('Requested order doesn\'t exist: ' . $id));
+        }
+        $this->resourceModel->load($order, $orderId);
+        return $order;
+    }
+
+    public function getTamaraOrderByTamaraOrderId($tamaraOrderId)
+    {
+        $order = $this->orderFactory->create();
+        $orderId = $this->resourceModel->getByTamaraOrderId($tamaraOrderId);
+        if (!$orderId) {
+            throw new NoSuchEntityException(__('Requested order doesn\'t exist: ' . $tamaraOrderId));
         }
         $this->resourceModel->load($order, $orderId);
         return $order;

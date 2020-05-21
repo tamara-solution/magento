@@ -28,4 +28,16 @@ class Order extends AbstractDb
 
         return $connection->fetchOne($select, $bind);
     }
+
+    public function getByTamaraOrderId($tamaraOrderId)
+    {
+        $connection = $this->getConnection();
+
+        $select = $connection->select()->from($this->getMainTable(), 'tamara_id')
+            ->where('tamara_order_id = :tamara_order_id');
+
+        $bind = [':tamara_order_id' => $tamaraOrderId];
+
+        return $connection->fetchOne($select, $bind);
+    }
 }

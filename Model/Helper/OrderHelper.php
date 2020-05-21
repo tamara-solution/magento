@@ -2,6 +2,11 @@
 
 namespace Tamara\Checkout\Model\Helper;
 
+use Tamara\Checkout\Gateway\Request\AddressDataBuilder;
+use Tamara\Checkout\Gateway\Request\CommonDataBuilder;
+use Tamara\Checkout\Gateway\Request\ConsumerDataBuilder;
+use Tamara\Checkout\Gateway\Request\ItemsDataBuilder;
+use Tamara\Checkout\Gateway\Request\MerchantUrlDataBuilder;
 use Tamara\Model\Money;
 use Tamara\Model\Order\Address;
 use Tamara\Model\Order\Consumer;
@@ -14,22 +19,22 @@ class OrderHelper
     {
         $order = new Order();
 
-        $order->setOrderReferenceId($data['order_id']);
-        $order->setLocale($data['locale']);
-        $order->setCurrency($data['currency']);
-        $order->setTotalAmount($data['total_amount']);
-        $order->setTaxAmount($data['tax_amount']);
-        $order->setShippingAmount($data['shipping_amount']);
-        $order->setDiscount($data['discount_amount']);
-        $order->setCountryCode($data['country_code']);
-        $order->setPaymentType($data['payment_type']);
-        $order->setPlatform($data['platform']);
-        $order->setDescription($data['description']);
-        $order->setShippingAddress($data['shipping_address']);
-        $order->setBillingAddress($data['billing_address']);
-        $order->setMerchantUrl($data['merchant_url']);
-        $order->setConsumer($data['consumer']);
-        $order->setItems($data['items']);
+        $order->setOrderReferenceId($data[CommonDataBuilder::ORDER_REFERENCE_ID]);
+        $order->setLocale($data[CommonDataBuilder::LOCALE]);
+        $order->setCurrency($data[CommonDataBuilder::CURRENCY]);
+        $order->setTotalAmount($data[CommonDataBuilder::TOTAL_AMOUNT]);
+        $order->setTaxAmount($data[CommonDataBuilder::TAX_AMOUNT]);
+        $order->setShippingAmount($data[CommonDataBuilder::TAX_AMOUNT]);
+        $order->setDiscount($data[CommonDataBuilder::DISCOUNT_AMOUNT]);
+        $order->setCountryCode($data[CommonDataBuilder::COUNTRY_CODE]);
+        $order->setPaymentType($data[CommonDataBuilder::PAYMENT_TYPE]);
+        $order->setPlatform($data[CommonDataBuilder::PLATFORM]);
+        $order->setDescription($data[CommonDataBuilder::DESCRIPTION]);
+        $order->setShippingAddress($data[AddressDataBuilder::SHIPPING_ADDRESS]);
+        $order->setBillingAddress($data[AddressDataBuilder::BILLING_ADDRESS]);
+        $order->setMerchantUrl($data[MerchantUrlDataBuilder::MERCHANT_URL]);
+        $order->setConsumer($data[ConsumerDataBuilder::CONSUMER]);
+        $order->setItems($data[ItemsDataBuilder::ITEMS]);
 
         return $order;
     }

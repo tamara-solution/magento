@@ -173,13 +173,13 @@ class TamaraAdapter
                 return false;
             }
 
-            $orderId = $authoriseMessage->getOrderReferenceId();
-            $order = $this->orderRepository->getTamaraOrderByOrderId((int) $orderId);
+            $tamaraOrderId = $authoriseMessage->getOrderId();
+            $order = $this->orderRepository->getTamaraOrderByTamaraOrderId($tamaraOrderId);
             $order->setIsAuthorised(1);
             $this->orderRepository->save($order);
 
             if (!empty($this->checkoutSuccessStatus)) {
-                $mageOrder = $this->mageRepository->get((int) $orderId);
+                $mageOrder = $this->mageRepository->get($order->getOrderId());
                 $mageOrder->setStatus($this->checkoutSuccessStatus)->setState($this->checkoutSuccessStatus);
                 $this->mageRepository->save($mageOrder);
             }

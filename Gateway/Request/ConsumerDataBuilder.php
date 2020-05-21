@@ -11,7 +11,7 @@ use Tamara\Model\Order\Consumer;
 
 class ConsumerDataBuilder implements BuilderInterface
 {
-    private const
+    public const
         CONSUMER = 'consumer';
 
     /**
