@@ -36,7 +36,8 @@ class Notification extends Action
 
     public function execute()
     {
-        $tamaraAdapter = $this->tamaraAdapterFactory->create();
+        $storeId = $this->_request->getParam('storeId', null);
+        $tamaraAdapter = $this->tamaraAdapterFactory->create($storeId);
         $success = $tamaraAdapter->notification();
 
         /** @var \Magento\Framework\Controller\Result\Json $resultJson */

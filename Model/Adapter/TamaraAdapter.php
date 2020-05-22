@@ -18,6 +18,7 @@ use Tamara\Model\Checkout\PaymentType;
 use Tamara\Notification\NotificationService;
 use Tamara\Request\Checkout\CreateCheckoutRequest;
 use Tamara\Request\Order\AuthoriseOrderRequest;
+use Tamara\Response\Checkout\CreateCheckoutResponse;
 
 class TamaraAdapter
 {
@@ -137,8 +138,9 @@ class TamaraAdapter
 
         if (!$result->isSuccess()) {
             $errorLogs = [$result->getContent()];
+            $message = $this->getErrorMessageFromResponse($result);
             $this->logger->debug($errorLogs);
-            throw new IntegrationException(__($result->getMessage()));
+            throw new IntegrationException(__($message));
         }
 
         $checkoutResponse = $result->getCheckoutResponse();
@@ -308,5 +310,21 @@ class TamaraAdapter
         }
 
         $this->logger->debug(['End to cancel']);
+    }
+
+    /**
+     * @param CreateCheckoutResponse $errorResponse
+     *
+     * @return string
+     */
+    private function getErrorMessageFromResponse($errorResponse): string
+    {
+        $message = $errorResponse->getMessage();
+
+        foreach ($errorResponse->getErrors() as $error) {
+            $message = isset($error['error_code']) ? sprintf('%s, %s', $message, $error['error_code']) : $message;
+        }
+
+        return $message;
     }
 }

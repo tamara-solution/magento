@@ -54,18 +54,20 @@ class ItemsDataBuilder implements BuilderInterface
         $orderItemCollection = new OrderItemCollection();
 
         foreach ($order->getItems() as $item) {
-            $orderItem = new OrderItem();
-            $orderItem->setName($item->getName());
-            $orderItem->setQuantity($item->getQtyOrdered());
-            $orderItem->setUnitPrice(new Money($item->getPrice(), $currencyCode));
-            $orderItem->setType($item->getProductType());
-            $orderItem->setSku($item->getSku());
-            $orderItem->setTotalAmount(new Money($this->calculatePriceItem($item), $currencyCode));
-            $orderItem->setTaxAmount(new Money($item->getTaxAmount(), $currencyCode));
-            $orderItem->setDiscountAmount(new Money($item->getDiscountAmount(), $currencyCode));
-            $orderItem->setReferenceId($item->getItemId());
-            $orderItem->setImageUrl($this->getImageUrlFromProductId($item->getProductId()));
-            $orderItemCollection->append($orderItem);
+            if ($item->getRowTotal() > 0) {
+                $orderItem = new OrderItem();
+                $orderItem->setName($item->getName());
+                $orderItem->setQuantity($item->getQtyOrdered());
+                $orderItem->setUnitPrice(new Money($item->getPrice(), $currencyCode));
+                $orderItem->setType($item->getProductType());
+                $orderItem->setSku($item->getSku());
+                $orderItem->setTotalAmount(new Money($this->calculatePriceItem($item), $currencyCode));
+                $orderItem->setTaxAmount(new Money($item->getTaxAmount(), $currencyCode));
+                $orderItem->setDiscountAmount(new Money($item->getDiscountAmount(), $currencyCode));
+                $orderItem->setReferenceId($item->getItemId());
+                $orderItem->setImageUrl($this->getImageUrlFromProductId($item->getProductId()));
+                $orderItemCollection->append($orderItem);
+            }
         }
 
         return [self::ITEMS => $orderItemCollection];

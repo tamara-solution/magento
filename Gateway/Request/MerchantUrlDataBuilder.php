@@ -35,16 +35,18 @@ class MerchantUrlDataBuilder implements BuilderInterface
 
         try {
             $baseUrl = $this->storeManager->getStore()->getBaseUrl(UrlInterface::URL_TYPE_WEB);
+            $storeId = $this->storeManager->getStore()->getId();
         } catch (NoSuchEntityException $e) {
             return [self::MERCHANT_URL => $merchantUrl];
         }
 
         $urlPattern = '%s%s/%d/%s';
+        $notificationUrl = sprintf('%s%s/%s%s', $baseUrl, self::TAMARA_PAYMENT, 'notification', '?storeId=' . $storeId);
 
         $merchantUrl->setSuccessUrl(sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'success'));
         $merchantUrl->setFailureUrl(sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'failure'));
         $merchantUrl->setCancelUrl(sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'cancel'));
-        $merchantUrl->setNotificationUrl(sprintf('%s%s/%s', $baseUrl, self::TAMARA_PAYMENT, 'notification'));
+        $merchantUrl->setNotificationUrl($notificationUrl);
 
         return [self::MERCHANT_URL => $merchantUrl];
     }
