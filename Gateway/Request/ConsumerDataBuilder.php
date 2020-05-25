@@ -4,6 +4,7 @@ namespace Tamara\Checkout\Gateway\Request;
 
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Payment\Gateway\Data\AddressAdapterInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Payment\Model\Method\Logger;
@@ -61,26 +62,15 @@ class ConsumerDataBuilder implements BuilderInterface
         $consumer = new Consumer();
 
         try {
-            $customer = $order->getBillingAddress();
-            $isFirstOrder = true;
-            if ($order->getCustomerId() !== null) {
-                $customer = $this->customerRepository->getById($order->getCustomerId());
-                $addressId = $customer->getDefaultShipping() ?? $customer->getDefaultBilling();
-                $isFirstOrder = $this->isFirstOrder($customer->getId());
-            }
+            /** @var AddressAdapterInterface $address */
+            $address = $order->getShippingAddress() ?? $order->getBillingAddress();
 
-            if (empty($addressId)) {
-                $telephone = $order->getShippingAddress()->getTelephone();
-            } else {
-                $addressData = $this->addressRepository->getById($addressId);
-                $telephone = $addressData->getTelephone();
-            }
+            $consumer->setFirstName($address->getFirstname());
+            $consumer->setLastName($address->getLastname());
+            $consumer->setEmail($address->getEmail());
+            $consumer->setPhoneNumber($address->getTelephone());
+            $consumer->setIsFirstOrder($this->isFirstOrder($order->getCustomerId()));
 
-            $consumer->setFirstName($customer->getFirstname());
-            $consumer->setLastName($customer->getLastname());
-            $consumer->setEmail($customer->getEmail());
-            $consumer->setPhoneNumber($telephone);
-            $consumer->setIsFirstOrder($isFirstOrder);
         } catch (\Exception $e) {
             $this->logger->debug([$e->getMessage()]);
         }
@@ -90,6 +80,10 @@ class ConsumerDataBuilder implements BuilderInterface
 
     private function isFirstOrder($customerId): bool
     {
+        if ($customerId === null) {
+            return true;
+        }
+
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $order = $objectManager->create('Magento\Sales\Model\Order')
             ->getCollection()
