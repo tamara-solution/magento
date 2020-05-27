@@ -86,10 +86,12 @@
                     <field id="min_limit" translate="label" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Min Limit Amount of Order</label>
                         <config_path>payment/tamara_pay_later/min_limit</config_path>
+                        <frontend_class>pay_later_min_limit</frontend_class>
                     </field>
                     <field id="max_limit" translate="label" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Max Limit Amount of Order</label>
                         <config_path>payment/tamara_pay_later/max_limit</config_path>
+                        <frontend_class>pay_later_max_limit</frontend_class>
                     </field>
                     <field id="sort_order" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
                            showInStore="0">
