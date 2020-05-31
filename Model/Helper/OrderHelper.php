@@ -24,7 +24,7 @@ class OrderHelper
         $order->setCurrency($data[CommonDataBuilder::CURRENCY]);
         $order->setTotalAmount($data[CommonDataBuilder::TOTAL_AMOUNT]);
         $order->setTaxAmount($data[CommonDataBuilder::TAX_AMOUNT]);
-        $order->setShippingAmount($data[CommonDataBuilder::TAX_AMOUNT]);
+        $order->setShippingAmount($data[CommonDataBuilder::SHIPPING_AMOUNT]);
         $order->setDiscount($data[CommonDataBuilder::DISCOUNT_AMOUNT]);
         $order->setCountryCode($data[CommonDataBuilder::COUNTRY_CODE]);
         $order->setPaymentType($data[CommonDataBuilder::PAYMENT_TYPE]);

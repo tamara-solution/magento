@@ -49,8 +49,6 @@ abstract class AbstractClient implements ClientInterface
             'client' => static::class
         ];
 
-        $response = [];
-
         try {
             $response = $this->process($data);
         } catch (\Exception $e) {
