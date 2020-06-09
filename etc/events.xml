@@ -10,9 +10,6 @@
     <event name="controller_action_predispatch_checkout_onepage_success">
         <observer name="pre_onepage_success" instance="Tamara\Checkout\Observer\PreOnepageSuccess" />
     </event>
-    <event name="checkout_onepage_controller_success_action">
-        <observer name="process_gateway_redirect" instance="Tamara\Checkout\Observer\ProcessGatewayRedirect" />
-    </event>
     <event name="sales_order_shipment_save_after">
         <observer name="shipment_save_after" instance="Tamara\Checkout\Observer\ShipmentSaveAfter" />
     </event>

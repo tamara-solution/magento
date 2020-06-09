@@ -65,13 +65,13 @@ class TamaraAdapter
     /**
      * @var string
      */
-    private $checkoutSuccessStatus;
+    private $checkoutAuthoriseStatus;
 
     public function __construct(
         $apiUrl,
         $merchantToken,
         $notificationToken,
-        $checkoutSuccessStatus,
+        $checkoutAuthoriseStatus,
         $orderRepository,
         $captureRepository,
         $mageRepository,
@@ -89,7 +89,7 @@ class TamaraAdapter
         $this->mageRepository = $mageRepository;
         $this->refundRepository = $refundRepository;
         $this->cancelRepository = $cancelRepository;
-        $this->checkoutSuccessStatus = $checkoutSuccessStatus;
+        $this->checkoutAuthoriseStatus = $checkoutAuthoriseStatus;
     }
 
     /**
@@ -180,9 +180,9 @@ class TamaraAdapter
             $order->setIsAuthorised(1);
             $this->orderRepository->save($order);
 
-            if (!empty($this->checkoutSuccessStatus)) {
+            if (!empty($this->checkoutAuthoriseStatus)) {
                 $mageOrder = $this->mageRepository->get($order->getOrderId());
-                $mageOrder->setStatus($this->checkoutSuccessStatus)->setState($this->checkoutSuccessStatus);
+                $mageOrder->setStatus($this->checkoutAuthoriseStatus)->setState($this->checkoutAuthoriseStatus);
                 $this->mageRepository->save($mageOrder);
             }
 
@@ -320,6 +320,10 @@ class TamaraAdapter
     private function getErrorMessageFromResponse($errorResponse): string
     {
         $message = $errorResponse->getMessage();
+
+        if ($errorResponse->getErrors() === null) {
+            return $message;
+        }
 
         foreach ($errorResponse->getErrors() as $error) {
             $message = isset($error['error_code']) ? sprintf('%s, %s', $message, $error['error_code']) : $message;

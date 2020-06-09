@@ -105,7 +105,7 @@
                 <group id="checkout_order_statuses" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Checkout Order Statuses</label>
                     <field id="checkout_success_status" translate="label" type="select" sortOrder="220" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Order status when checkout is success</label>
+                        <label>Order status when checkout is success (after redirect)</label>
                         <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
                     </field>
                     <field id="checkout_cancel_status" translate="label" type="select" sortOrder="230" showInDefault="1" showInWebsite="1" showInStore="0">
@@ -114,6 +114,10 @@
                     </field>
                     <field id="checkout_failure_status" translate="label" type="select" sortOrder="240" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Order status when checkout is failure</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                    </field>
+                    <field id="checkout_authorise_status" translate="label" type="select" sortOrder="250" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Order status when order is authorised</label>
                         <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
                     </field>
                 </group>

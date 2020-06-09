@@ -99,7 +99,7 @@ class TamaraAdapterFactory
                 'apiUrl' => $this->config->getApiUrl($storeId),
                 'merchantToken' => $this->config->getMerchantToken($storeId),
                 'notificationToken' => $this->config->getNotificationToken($storeId),
-                'checkoutSuccessStatus' => $this->config->getCheckoutSuccessStatus(),
+                'checkoutAuthoriseStatus' => $this->config->getCheckoutAuthoriseStatus(),
                 'orderRepository' => $this->orderRepository,
                 'captureRepository' => $this->captureRepository,
                 'mageRepository' => $this->mageRepository,
