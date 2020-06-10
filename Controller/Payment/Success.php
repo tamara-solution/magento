@@ -51,7 +51,6 @@ class Success extends Action
             $order = $this->orderRepository->get($orderId);
             $order->setState($successStatus)->setStatus($successStatus);
             $this->orderRepository->save($order);
-            $this->cartHelper->restoreCartFromOrder($order);
 
         } catch (\Exception $e) {
             $logger->debug(['Success has error' => $e->getMessage()]);
