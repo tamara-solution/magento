@@ -7,6 +7,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
 use Tamara\Checkout\Model\Helper\CartHelper;
+use Tamara\Checkout\Api\OrderRepositoryInterface as TamaraOrderRepository;
 
 class Success extends Action
 {
@@ -21,6 +22,8 @@ class Success extends Action
 
     protected $config;
 
+    protected $tamaraOrderRepository;
+
     /**
      * @var Session
      */
@@ -32,7 +35,8 @@ class Success extends Action
         CartHelper $cartHelper,
         OrderRepositoryInterface $orderRepository,
         BaseConfig $config,
-        Session $checkoutSession
+        Session $checkoutSession,
+        TamaraOrderRepository $tamaraOrderRepository
     ) {
         $this->_pageFactory = $pageFactory;
         parent::__construct($context);
@@ -40,6 +44,7 @@ class Success extends Action
         $this->checkoutSession = $checkoutSession;
         $this->orderRepository = $orderRepository;
         $this->config = $config;
+        $this->tamaraOrderRepository = $tamaraOrderRepository;
     }
 
     public function execute()
@@ -48,10 +53,14 @@ class Success extends Action
         try {
             $orderId = $this->_request->getParam('order_id', 0);
             $successStatus = $this->config->getCheckoutSuccessStatus();
-            $order = $this->orderRepository->get($orderId);
-            $order->setState($successStatus)->setStatus($successStatus);
-            $this->orderRepository->save($order);
 
+            $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);
+
+            if (!$tamaraOrder->getIsAuthorised()) {
+                $order = $this->orderRepository->get($orderId);
+                $order->setState($successStatus)->setStatus($successStatus);
+                $this->orderRepository->save($order);
+            }
         } catch (\Exception $e) {
             $logger->debug(['Success has error' => $e->getMessage()]);
         }
