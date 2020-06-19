@@ -46,6 +46,7 @@ class AddressDataBuilder implements BuilderInterface
         $shipping->setCity($shippingAddress->getCity());
         $shipping->setPhoneNumber($shippingAddress->getTelephone());
         $shipping->setCountryCode($shippingAddress->getCountryId());
+        $shipping->setPostalCode($shippingAddress->getPostcode());
 
 
         $billing->setLastName($billingAddress->getLastname());
@@ -56,6 +57,7 @@ class AddressDataBuilder implements BuilderInterface
         $billing->setCity($billingAddress->getCity());
         $billing->setPhoneNumber($billingAddress->getTelephone());
         $billing->setCountryCode($billingAddress->getCountryId());
+        $billing->setPostalCode($billingAddress->getPostcode());
 
 
         return [
