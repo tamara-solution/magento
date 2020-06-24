@@ -22,4 +22,7 @@
     <event name="order_cancel_after">
         <observer name="tamara_order_cancel" instance="Tamara\Checkout\Observer\OrderCancelAfter" />
     </event>
+    <event name="sales_order_payment_place_end">
+        <observer name="tamara_order_payment_place_end" instance="Tamara\Checkout\Observer\OrderPaymentPlaceEnd" />
+    </event>
 </config>

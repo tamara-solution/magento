@@ -12,13 +12,10 @@ use Magento\Payment\Gateway\Http\TransferFactoryInterface;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Payment\Model\Method\Logger;
-use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
 
 class AuthorizeCommand implements CommandInterface
 {
-    public const STATUS_PENDING = 'pending';
-
     /**
      * @var \Tamara\Checkout\Model\OrderFactory
      */
@@ -105,7 +102,6 @@ class AuthorizeCommand implements CommandInterface
         $payment = $commandSubject['payment']->getPayment();
         /** @var \Magento\Sales\Api\Data\OrderInterface $order */
         $order = $payment->getOrder();
-        $order->setState(Order::STATE_NEW)->setStatus(self::STATUS_PENDING);
 
         $orderResult = $this->orderRepository->save($order);
         $entityId = $orderResult->getEntityId();
