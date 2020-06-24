@@ -10,7 +10,7 @@
                 <link_about_tamara>https://www.tamara.co/about-us.html</link_about_tamara>
                 <active>0</active>
                 <model>TamaraFacade</model>
-                <order_status>pending_payment</order_status>
+                <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
                 <title>Pay later in 14 days</title>
                 <currency>SAR</currency>

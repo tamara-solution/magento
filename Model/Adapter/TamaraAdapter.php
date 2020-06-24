@@ -4,6 +4,7 @@ namespace Tamara\Checkout\Model\Adapter;
 
 use Magento\Framework\Exception\IntegrationException;
 use Magento\Payment\Model\Method\Logger;
+use Magento\Sales\Model\Order;
 use Magento\Setup\Exception;
 use Tamara\Checkout\Api\CancelRepositoryInterface;
 use Tamara\Checkout\Api\CaptureRepositoryInterface;
@@ -182,7 +183,7 @@ class TamaraAdapter
 
             if (!empty($this->checkoutAuthoriseStatus)) {
                 $mageOrder = $this->mageRepository->get($order->getOrderId());
-                $mageOrder->setStatus($this->checkoutAuthoriseStatus)->setState($this->checkoutAuthoriseStatus);
+                $mageOrder->setState(Order::STATE_PROCESSING)->setStatus($this->checkoutAuthoriseStatus);
                 $this->mageRepository->save($mageOrder);
             }
 

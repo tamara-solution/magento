@@ -166,6 +166,7 @@
             <argument name="invoiceService" xsi:type="object">Magento\Sales\Model\Service\InvoiceService</argument>
             <argument name="transaction" xsi:type="object">Magento\Framework\DB\Transaction</argument>
             <argument name="invoiceSender" xsi:type="object">Magento\Sales\Model\Order\Email\Sender\InvoiceSender</argument>
+            <argument name="shipmentSender" xsi:type="object">Magento\Sales\Model\Order\Email\Sender\ShipmentSender</argument>
             <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
             <argument name="productHelper" xsi:type="object">Tamara\Checkout\Model\Helper\ProductHelper</argument>
         </arguments>
