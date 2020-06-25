@@ -33,6 +33,8 @@ class ShipmentSaveAfter extends AbstractObserver
 
     protected $productHelper;
 
+    protected $shipmentSender;
+
     public function __construct(
         Logger $logger,
         Order\InvoiceDocumentFactory $invoiceDocumentFactory,
@@ -41,6 +43,7 @@ class ShipmentSaveAfter extends AbstractObserver
         InvoiceService $invoiceService,
         Transaction $transaction,
         Order\Email\Sender\InvoiceSender $invoiceSender,
+        Order\Email\Sender\ShipmentSender $shipmentSender,
         BaseConfig $config,
         ProductHelper $productHelper
     )
@@ -54,6 +57,7 @@ class ShipmentSaveAfter extends AbstractObserver
         $this->invoiceSender = $invoiceSender;
         $this->config = $config;
         $this->productHelper = $productHelper;
+        $this->shipmentSender = $shipmentSender;
     }
 
     public function execute(Observer $observer)
@@ -100,6 +104,7 @@ class ShipmentSaveAfter extends AbstractObserver
         $data['items'] = [];
         $itemInvoices = [];
         foreach ($invoice->getItems() as $invoiceItem) {
+            $itemTemp = [];
             $itemTemp['order_item_id'] = $invoiceItem->getOrderItemId();
             $itemTemp['type'] = $productTypes[$invoiceItem->getOrderItemId()];
             $itemTemp['total_amount'] = $this->getRowTotalItem($invoiceItem);
@@ -146,6 +151,18 @@ class ShipmentSaveAfter extends AbstractObserver
 
         $transactionSave = $this->transaction->addObject($invoiceReady)->addObject($invoiceReady->getOrder());
         $transactionSave->save();
+
+        try {
+            $this->shipmentSender->send($shipment);
+
+            $order->addCommentToStatusHistory(
+                __('Notified customer about shipment #%1.', $shipment->getId())
+            )
+                ->setIsCustomerNotified(true)
+                ->save();
+        } catch (\Throwable $exception) {
+            $this->logger->debug([$exception->getMessage()]);
+        }
 
         if ($this->config->getSendEmailInvoice()) {
             $this->invoiceSender->send($invoiceReady);

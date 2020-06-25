@@ -166,6 +166,7 @@
             <argument name="invoiceService" xsi:type="object">Magento\Sales\Model\Service\InvoiceService</argument>
             <argument name="transaction" xsi:type="object">Magento\Framework\DB\Transaction</argument>
             <argument name="invoiceSender" xsi:type="object">Magento\Sales\Model\Order\Email\Sender\InvoiceSender</argument>
+            <argument name="shipmentSender" xsi:type="object">Magento\Sales\Model\Order\Email\Sender\ShipmentSender</argument>
             <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
             <argument name="productHelper" xsi:type="object">Tamara\Checkout\Model\Helper\ProductHelper</argument>
         </arguments>
@@ -244,6 +245,10 @@
         <arguments>
             <argument name="payLaterConfig" xsi:type="object">Tamara\Checkout\Gateway\Config\PayLaterConfig</argument>
         </arguments>
+    </type>
+
+    <type name="Magento\Framework\App\Request\CsrfValidator">
+        <plugin name="csrf_validator_skip" type="Tamara\Checkout\Plugin\CsrfValidatorSkip" />
     </type>
 
     <preference for="Tamara\Checkout\Api\OrderInterface" type="Tamara\Checkout\Model\Order" />

@@ -12,6 +12,7 @@ use Magento\Payment\Gateway\Http\TransferFactoryInterface;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Payment\Model\Method\Logger;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
 
 class AuthorizeCommand implements CommandInterface
@@ -102,6 +103,7 @@ class AuthorizeCommand implements CommandInterface
         $payment = $commandSubject['payment']->getPayment();
         /** @var \Magento\Sales\Api\Data\OrderInterface $order */
         $order = $payment->getOrder();
+        $order->setStatus(Order::STATE_NEW)->setStatus('pending');
 
         $orderResult = $this->orderRepository->save($order);
         $entityId = $orderResult->getEntityId();

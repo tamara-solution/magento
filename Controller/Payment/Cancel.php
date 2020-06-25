@@ -7,6 +7,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
 use Tamara\Checkout\Model\Helper\CartHelper;
 
@@ -47,7 +48,7 @@ class Cancel extends Action
         try {
             $orderId = $this->_request->getParam('order_id', 0);
             $order = $this->orderRepository->get($orderId);
-            $order->setState($this->config->getCheckoutCancelStatus())->setStatus($this->config->getCheckoutCancelStatus());
+            $order->setState(Order::STATE_CANCELED)->setStatus($this->config->getCheckoutCancelStatus());
             $this->orderRepository->save($order);
             $this->cartHelper->restoreCartFromOrder($order);
 

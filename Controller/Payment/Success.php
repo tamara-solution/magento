@@ -5,6 +5,7 @@ namespace Tamara\Checkout\Controller\Payment;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
 use Tamara\Checkout\Model\Helper\CartHelper;
 use Tamara\Checkout\Api\OrderRepositoryInterface as TamaraOrderRepository;
@@ -58,7 +59,7 @@ class Success extends Action
 
             if (!$tamaraOrder->getIsAuthorised()) {
                 $order = $this->orderRepository->get($orderId);
-                $order->setState($successStatus)->setStatus($successStatus);
+                $order->setState(Order::STATE_PROCESSING)->setStatus($successStatus);
                 $this->orderRepository->save($order);
             }
         } catch (\Exception $e) {
