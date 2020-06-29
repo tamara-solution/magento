@@ -17,6 +17,8 @@ use Magento\Sales\Model\OrderRepository;
 
 class AuthorizeCommand implements CommandInterface
 {
+    private const STATUS_PENDING = 'pending';
+
     /**
      * @var \Tamara\Checkout\Model\OrderFactory
      */
@@ -103,7 +105,7 @@ class AuthorizeCommand implements CommandInterface
         $payment = $commandSubject['payment']->getPayment();
         /** @var \Magento\Sales\Api\Data\OrderInterface $order */
         $order = $payment->getOrder();
-        $order->setStatus(Order::STATE_NEW)->setStatus('pending');
+        $order->setState(Order::STATE_NEW)->setStatus(self::STATUS_PENDING);
 
         $orderResult = $this->orderRepository->save($order);
         $entityId = $orderResult->getEntityId();
@@ -117,9 +119,8 @@ class AuthorizeCommand implements CommandInterface
             $this->requestBuilder->build($commandSubject)
         );
 
-        $response = $this->client->placeRequest($transferO);
-
         try {
+            $response = $this->client->placeRequest($transferO);
             $tamaraOrder = $this->tamaraOrderFactory->create();
             $tamaraOrder->setData([
                 'order_id' => $entityId,
@@ -129,10 +130,11 @@ class AuthorizeCommand implements CommandInterface
 
             $this->tamaraOrderRepository->save($tamaraOrder);
         } catch (Exception $e) {
+            $orderResult->setState(Order::STATE_CANCELED)->setStatus(Order::STATE_CANCELED);
+            $this->orderRepository->save($orderResult);
             $this->logger->debug([$e->getMessage()]);
             throw $e;
         }
-
 
         if ($this->handler) {
             $this->handler->handle(

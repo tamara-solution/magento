@@ -37,11 +37,7 @@ class Available
 
         $email = $quote->getCustomer()->getEmail();
 
-        if ($email === null) {
-            return $availableMethods;
-        }
-
-        if ($this->emailWhiteListRepository->isEmailWhitelisted($email)) {
+        if ($email && $this->emailWhiteListRepository->isEmailWhitelisted($email)) {
             return $availableMethods;
         }
 
@@ -50,6 +46,7 @@ class Available
                 unset($availableMethods[$key]);
             }
         }
+
         return $availableMethods;
     }
 }
