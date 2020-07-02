@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Backend/etc/menu.xsd">
+    <menu>
+        <add id="Tamara_Checkout::tamara_whitelist" title="Tamara Whitelist" module="Tamara_Checkout" sortOrder="60" parent="Magento_Customer::customer" action="config/whitelist/" resource="Tamara_Checkout::tamara_whitelist"/>
+    </menu>
+</config>

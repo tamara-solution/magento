@@ -16,7 +16,7 @@ class Refund extends AbstractModel
 
     protected function _construct()
     {
-        $this->_init(\Tamara\Checkout\Model\ResouceModel\Refund::class);
+        $this->_init(\Tamara\Checkout\Model\ResourceModel\Refund::class);
     }
 
     /**

@@ -20,12 +20,12 @@ class CaptureRepository implements CaptureRepositoryInterface
     protected $captureItemFactory;
 
     /**
-     * @var \Tamara\Checkout\Model\ResouceModel\Capture
+     * @var \Tamara\Checkout\Model\ResourceModel\Capture
      */
     protected $captureResource;
 
     /**
-     * @var \Tamara\Checkout\Model\ResouceModel\CaptureItem
+     * @var \Tamara\Checkout\Model\ResourceModel\CaptureItem
      */
     protected $captureItemResource;
 
@@ -33,14 +33,14 @@ class CaptureRepository implements CaptureRepositoryInterface
      * CaptureRepository constructor.
      * @param CaptureFactory $captureFactory
      * @param CaptureItemFactory $captureItemFactory
-     * @param ResouceModel\Capture $captureResource
-     * @param ResouceModel\CaptureItem $captureItemResource
+     * @param ResourceModel\Capture $captureResource
+     * @param ResourceModel\CaptureItem $captureItemResource
      */
     public function __construct(
         CaptureFactory $captureFactory,
         CaptureItemFactory $captureItemFactory,
-        ResouceModel\Capture $captureResource,
-        ResouceModel\CaptureItem $captureItemResource
+        ResourceModel\Capture $captureResource,
+        ResourceModel\CaptureItem $captureItemResource
     )
     {
         $this->captureFactory = $captureFactory;

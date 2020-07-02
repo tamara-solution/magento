@@ -3,21 +3,21 @@
 namespace Tamara\Checkout\Model;
 
 use Tamara\Checkout\Api\EmailWhiteListRepositoryInterface;
-use Tamara\Checkout\Model\ResouceModel\EmailWhiteList as WhitelistResouce;
+use Tamara\Checkout\Model\ResourceModel\EmailWhiteList as WhitelistResource;
 
 class EmailWhiteListRepository implements EmailWhiteListRepositoryInterface
 {
     /**
-     * @var WhitelistResouce
+     * @var WhitelistResource
      */
     private $resourceModel;
 
     /**
      * WhitelistRepository constructor.
-     * @param WhitelistResouce $resourceModel
+     * @param WhitelistResource $resourceModel
      */
     public function __construct(
-        WhitelistResouce $resourceModel
+        WhitelistResource $resourceModel
     ) {
         $this->resourceModel = $resourceModel;
     }

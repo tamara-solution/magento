@@ -251,6 +251,31 @@
         <plugin name="csrf_validator_skip" type="Tamara\Checkout\Plugin\CsrfValidatorSkip" />
     </type>
 
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="whitelist_listing_data_source" xsi:type="string">Tamara\Checkout\Model\ResourceModel\EmailWhiteList\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Ui\DataProvider\Whitelist\DataProvider">
+        <arguments>
+            <argument name="pool" xsi:type="object">Tamara\Checkout\Ui\DataProvider\Whitelist\Modifier\Pool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Tamara\Checkout\Ui\DataProvider\Whitelist\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="template" xsi:type="array">
+                    <item name="class" xsi:type="string">Tamara\Checkout\Ui\DataProvider\Whitelist\Modifier\Template</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
     <preference for="Tamara\Checkout\Api\OrderInterface" type="Tamara\Checkout\Model\Order" />
     <preference for="Tamara\Checkout\Api\OrderRepositoryInterface" type="Tamara\Checkout\Model\OrderRepository" />
     <preference for="Tamara\Checkout\Api\CaptureRepositoryInterface" type="Tamara\Checkout\Model\CaptureRepository" />

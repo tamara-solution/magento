@@ -16,7 +16,7 @@ class Order extends AbstractModel implements OrderInterface, IdentityInterface
 
     protected function _construct()
     {
-        $this->_init(\Tamara\Checkout\Model\ResouceModel\Order::class);
+        $this->_init(\Tamara\Checkout\Model\ResourceModel\Order::class);
     }
 
     /**

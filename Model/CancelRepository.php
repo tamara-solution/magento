@@ -8,11 +8,11 @@ use Tamara\Checkout\Api\CancelRepositoryInterface;
 class CancelRepository implements CancelRepositoryInterface
 {
     /**
-     * @var \Tamara\Checkout\Model\ResouceModel\Cancel
+     * @var \Tamara\Checkout\Model\ResourceModel\Cancel
      */
     private $resourceModel;
 
-    public function __construct(ResouceModel\Cancel $resourceModel)
+    public function __construct(ResourceModel\Cancel $resourceModel)
     {
         $this->resourceModel = $resourceModel;
     }
