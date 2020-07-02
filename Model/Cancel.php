@@ -15,7 +15,7 @@ class Cancel extends AbstractModel
 
     protected function _construct()
     {
-        $this->_init(\Tamara\Checkout\Model\ResouceModel\Cancel::class);
+        $this->_init(\Tamara\Checkout\Model\ResourceModel\Cancel::class);
     }
 
     /**

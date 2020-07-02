@@ -18,7 +18,7 @@ class EmailWhiteList extends AbstractModel
 
     protected function _construct()
     {
-        $this->_init(\Tamara\Checkout\Model\ResouceModel\EmailWhiteList::class);
+        $this->_init(\Tamara\Checkout\Model\ResourceModel\EmailWhiteList::class);
     }
 
     /**

@@ -19,7 +19,7 @@ class Capture extends AbstractModel
 
     protected function _construct()
     {
-        $this->_init(\Tamara\Checkout\Model\ResouceModel\Capture::class);
+        $this->_init(\Tamara\Checkout\Model\ResourceModel\Capture::class);
     }
 
     /**

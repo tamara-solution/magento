@@ -6,7 +6,7 @@ use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Tamara\Checkout\Api\OrderInterface;
 use Tamara\Checkout\Api\OrderRepositoryInterface;
-use Tamara\Checkout\Model\ResouceModel\Order as OrderResource;
+use Tamara\Checkout\Model\ResourceModel\Order as OrderResource;
 
 class OrderRepository implements OrderRepositoryInterface
 {

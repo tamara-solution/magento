@@ -11,6 +11,7 @@ use Magento\Framework\Setup\UpgradeSchemaInterface;
 class UpgradeSchema implements UpgradeSchemaInterface
 {
     const TAMARA_WHITELIST = 'tamara_email_whitelist',
+          TAMARA_CUSTOMER_WHITELIST = 'tamara_customer_whitelist',
           TAMARA_CAPTURE_ITEMS = 'tamara_capture_items';
 
     public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
@@ -73,6 +74,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
         }
 
+        if (version_compare($context->getVersion(), '1.0.4', '<')) {
+            $this->createTamaraCustomerWhitelistTable($setup);
+            $setup->getConnection()->query('DROP TABLE ' . self::TAMARA_WHITELIST);
+        }
+
         $setup->endSetup();
     }
 
@@ -103,5 +109,62 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
 
         $setup->getConnection()->createTable($table);
+    }
+
+    private function createTamaraCustomerWhitelistTable(SchemaSetupInterface $setup)
+    {
+        if ($setup->tableExists(self::TAMARA_CUSTOMER_WHITELIST)) {
+            return;
+        }
+
+        $table = $setup->getConnection()->newTable($setup->getTable(self::TAMARA_CUSTOMER_WHITELIST));
+
+        $table->addColumn(
+            'whitelist_id',
+            Table::TYPE_INTEGER,
+            null,
+            [
+                'identity' => true,
+                'unsigned' => true,
+                'primary'  => true,
+                'nullable' => false
+            ]
+        )
+            ->addColumn(
+                'customer_email',
+                Table::TYPE_TEXT,
+                255,
+                [
+                    'primary' => true,
+                    'nullable' => false
+                ]
+            )
+            ->addColumn(
+                'created_at',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                null,
+                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
+                'Created At'
+            )->addColumn(
+                'updated_at',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                null,
+                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT_UPDATE],
+                'Updated At')
+            ->addIndex(
+                $setup->getIdxName(
+                    self::TAMARA_CUSTOMER_WHITELIST,
+                    ['customer_email'],
+                    AdapterInterface::INDEX_TYPE_UNIQUE
+                ),
+                ['customer_email'],
+                ['type' => AdapterInterface::INDEX_TYPE_UNIQUE]
+            );
+
+        $setup->getConnection()->createTable($table);
+
+        $sql = 'insert into ' . self::TAMARA_CUSTOMER_WHITELIST . '(customer_email) select customer_email from ' . self::TAMARA_WHITELIST;
+
+        $setup->getConnection()->query($sql);
     }
 }

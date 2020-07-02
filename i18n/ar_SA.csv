@@ -9,3 +9,4 @@
 "Your order information is invalid, consumer_invalid_phone_number","معلومات طلبك غير صحيحة ، رقم الجوال خاطئ"
 "We do not support your delivery country", "خدماتنا لا تدعم البلد في عنوان الشحن"
 "We do not support cross currencies. Please select the correct currency for your country.", "خدماتنا لا تدعم تحويل العملات. يرجى تحديد العملة الصحيحة لبلدك."
+"The grand total of order is over/under limit of Tamara.", "المبلغ الإجمالي أعلى من الحد المسموح أو أقل من الحد الأدنى"

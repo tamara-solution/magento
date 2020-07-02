@@ -4,7 +4,7 @@ namespace Tamara\Checkout\Model;
 
 use Magento\Framework\Exception\CouldNotSaveException;
 use Tamara\Checkout\Api\RefundRepositoryInterface;
-use Tamara\Checkout\Model\ResouceModel\Refund as RefundResource;
+use Tamara\Checkout\Model\ResourceModel\Refund as RefundResource;
 
 class RefundRepository implements RefundRepositoryInterface
 {

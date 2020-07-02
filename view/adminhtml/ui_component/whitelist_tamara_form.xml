@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">whitelist_tamara_form.whitelist_tamara_form_data_source</item>
+            <item name="deps" xsi:type="string">whitelist_tamara_form.whitelist_tamara_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">General Information</item>
+        <item name="config" xsi:type="array">
+            <item name="dataScope" xsi:type="string">data</item>
+            <item name="namespace" xsi:type="string">whitelist_tamara_form</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+        <item name="buttons" xsi:type="array">
+            <item name="back" xsi:type="string">Tamara\Checkout\Block\Adminhtml\Form\Button\BackButton</item>
+            <item name="delete" xsi:type="string">Tamara\Checkout\Block\Adminhtml\Form\Button\DeleteButton</item>
+            <item name="save" xsi:type="string">Tamara\Checkout\Block\Adminhtml\Form\Button\SaveButton</item>
+        </item>
+    </argument>
+    <dataSource name="whitelist_tamara_form_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Tamara\Checkout\Ui\DataProvider\Whitelist\DataProvider</argument>
+            <argument name="name" xsi:type="string">whitelist_tamara_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">whitelist_id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="submit_url" xsi:type="url" path="config/whitelist/save"/>
+                </item>
+            </argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+    </dataSource>
+    <fieldset name="general">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="label" xsi:type="string"/>
+            </item>
+        </argument>
+        <field name="whitelist_id">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="visible" xsi:type="boolean">false</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="source" xsi:type="string">whitelist_code</item>
+                    <item name="dataScope" xsi:type="string">whitelist_id</item>
+                    <item name="sortOrder" xsi:type="number">100</item>
+                </item>
+            </argument>
+        </field>
+        <field name="customer_email">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">whitelist_code</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="dataScope" xsi:type="string">customer_email</item>
+                    <item name="label" xsi:type="string" translate="true">Customer Email</item>
+                    <item name="sortOrder" xsi:type="number">400</item>
+                </item>
+            </argument>
+       </field>
+            <!--<field name="created_at">-->
+            <!--<argument name="data" xsi:type="array">-->
+                <!--<item name="config" xsi:type="array">-->
+                    <!--<item name="source" xsi:type="string">whitelist_code</item>-->
+                    <!--<item name="formElement" xsi:type="string">input</item>-->
+                    <!--<item name="dataType" xsi:type="string">text</item>-->
+                    <!--<item name="dataScope" xsi:type="string">created_at</item>-->
+                    <!--<item name="label" xsi:type="string" translate="true">Created At</item>-->
+                    <!--<item name="sortOrder" xsi:type="number">800</item>-->
+                <!--</item>-->
+            <!--</argument>-->
+        <!--</field>-->
+        <!--<field name="updated_at">-->
+            <!--<argument name="data" xsi:type="array">-->
+                <!--<item name="config" xsi:type="array">-->
+                    <!--<item name="source" xsi:type="string">whitelist_code</item>-->
+                    <!--<item name="formElement" xsi:type="string">input</item>-->
+                    <!--<item name="dataType" xsi:type="string">text</item>-->
+                    <!--<item name="dataScope" xsi:type="string">updated_at</item>-->
+                    <!--<item name="label" xsi:type="string" translate="true">Update At</item>-->
+                    <!--<item name="sortOrder" xsi:type="number">800</item>-->
+                <!--</item>-->
+            <!--</argument>-->
+        <!--</field>-->
+    </fieldset>
+</form>
