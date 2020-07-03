@@ -4,6 +4,7 @@ namespace Tamara\Checkout\Model\Adapter;
 
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Payment\Model\Method\Logger;
+use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Tamara\Checkout\Api\CancelRepositoryInterface;
 use Tamara\Checkout\Api\CaptureRepositoryInterface;
 use Tamara\Checkout\Api\OrderRepositoryInterface;
@@ -53,14 +54,14 @@ class TamaraAdapterFactory
     private $cancelRepository;
 
     /**
-     * @param ObjectManagerInterface $objectManager
-     * @param BaseConfig $config
-     * @param Logger $logger
-     * @param OrderRepositoryInterface $orderRepository
-     * @param CaptureRepositoryInterface $captureRepository
+     * @param ObjectManagerInterface                      $objectManager
+     * @param BaseConfig                                  $config
+     * @param Logger                                      $logger
+     * @param OrderRepositoryInterface                    $orderRepository
+     * @param CaptureRepositoryInterface                  $captureRepository
      * @param \Magento\Sales\Api\OrderRepositoryInterface $mageRepository
-     * @param RefundRepositoryInterface $refundRepository
-     * @param CancelRepositoryInterface $cancelRepository
+     * @param RefundRepositoryInterface                   $refundRepository
+     * @param CancelRepositoryInterface                   $cancelRepository
      */
     public function __construct(
         ObjectManagerInterface $objectManager,
@@ -71,8 +72,7 @@ class TamaraAdapterFactory
         \Magento\Sales\Api\OrderRepositoryInterface $mageRepository,
         RefundRepositoryInterface $refundRepository,
         CancelRepositoryInterface $cancelRepository
-    )
-    {
+    ) {
         $this->config = $config;
         $this->objectManager = $objectManager;
         $this->logger = $logger;
@@ -89,6 +89,7 @@ class TamaraAdapterFactory
      * @param int $storeId if null is provided as an argument, then current scope will be resolved
      * by \Magento\Framework\App\Config\ScopeCodeResolver (useful for most cases) but for adminhtml area the store
      * should be provided as the argument for correct config settings loading.
+     *
      * @return TamaraAdapter
      */
     public function create($storeId = null): TamaraAdapter
@@ -105,7 +106,8 @@ class TamaraAdapterFactory
                 'mageRepository' => $this->mageRepository,
                 'refundRepository' => $this->refundRepository,
                 'cancelRepository' => $this->cancelRepository,
-                'logger' => $this->logger
+                'logger' => $this->logger,
+                'orderSender' => $this->objectManager->create(OrderSender::class),
             ]
         );
     }

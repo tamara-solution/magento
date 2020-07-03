@@ -101,11 +101,13 @@ class AuthorizeCommand implements CommandInterface
     public function execute(array $commandSubject)
     {
         $this->logger->debug(['Start authorize command']);
-        /** @var \Magento\Payment\Model\InfoInterface $payment */
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $commandSubject['payment']->getPayment();
-        /** @var \Magento\Sales\Api\Data\OrderInterface $order */
+        /** @var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
         $order->setState(Order::STATE_NEW)->setStatus(self::STATUS_PENDING);
+        // disable sending confirmation email
+        $order->setCanSendNewEmailFlag(false);
 
         $orderResult = $this->orderRepository->save($order);
         $entityId = $orderResult->getEntityId();
