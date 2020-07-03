@@ -12,7 +12,14 @@
                 <item name="label" xsi:type="string" translate="true">Add New Email</item>
                 <item name="class" xsi:type="string">primary</item>
                 <item name="url" xsi:type="string">*/*/new</item>
-                <item name="sort_order" xsi:type="number">90</item>
+                <item name="sort_order" xsi:type="number">10</item>
+            </item>
+            <item name="import" xsi:type="array">
+                <item name="name" xsi:type="string">import</item>
+                <item name="label" xsi:type="string" translate="true">Import Whitelist Email</item>
+                <item name="class" xsi:type="string">primary</item>
+                <item name="url" xsi:type="string">*/*/import</item>
+                <item name="sort_order" xsi:type="number">20</item>
             </item>
         </item>
     </argument>

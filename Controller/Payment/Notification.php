@@ -3,7 +3,6 @@
 namespace Tamara\Checkout\Controller\Payment;
 
 use Magento\Framework\App\Action\Action;
-use Magento\Framework\App\ResponseInterface;
 use Tamara\Checkout\Model\Adapter\TamaraAdapterFactory;
 
 class Notification extends Action

@@ -4,6 +4,7 @@ namespace Tamara\Checkout\Model\Adapter;
 
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Payment\Model\Method\Logger;
+use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Tamara\Checkout\Api\CancelRepositoryInterface;
 use Tamara\Checkout\Api\CaptureRepositoryInterface;
 use Tamara\Checkout\Api\OrderRepositoryInterface;
@@ -63,16 +64,15 @@ class TamaraAdapterFactory
      * @param CancelRepositoryInterface $cancelRepository
      */
     public function __construct(
-        ObjectManagerInterface $objectManager,
-        BaseConfig $config,
-        Logger $logger,
-        OrderRepositoryInterface $orderRepository,
-        CaptureRepositoryInterface $captureRepository,
+        ObjectManagerInterface                      $objectManager,
+        BaseConfig                                  $config,
+        Logger                                      $logger,
+        OrderRepositoryInterface                    $orderRepository,
+        CaptureRepositoryInterface                  $captureRepository,
         \Magento\Sales\Api\OrderRepositoryInterface $mageRepository,
-        RefundRepositoryInterface $refundRepository,
-        CancelRepositoryInterface $cancelRepository
-    )
-    {
+        RefundRepositoryInterface                   $refundRepository,
+        CancelRepositoryInterface                   $cancelRepository
+    ) {
         $this->config = $config;
         $this->objectManager = $objectManager;
         $this->logger = $logger;
@@ -105,7 +105,8 @@ class TamaraAdapterFactory
                 'mageRepository' => $this->mageRepository,
                 'refundRepository' => $this->refundRepository,
                 'cancelRepository' => $this->cancelRepository,
-                'logger' => $this->logger
+                'logger' => $this->logger,
+                'orderSender' => $this->objectManager->create(OrderSender::class),
             ]
         );
     }

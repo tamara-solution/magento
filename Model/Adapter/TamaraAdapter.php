@@ -5,7 +5,6 @@ namespace Tamara\Checkout\Model\Adapter;
 use Magento\Framework\Exception\IntegrationException;
 use Magento\Payment\Model\Method\Logger;
 use Magento\Sales\Model\Order;
-use Magento\Setup\Exception;
 use Tamara\Checkout\Api\CancelRepositoryInterface;
 use Tamara\Checkout\Api\CaptureRepositoryInterface;
 use Tamara\Checkout\Api\OrderRepositoryInterface;
@@ -20,6 +19,7 @@ use Tamara\Notification\NotificationService;
 use Tamara\Request\Checkout\CreateCheckoutRequest;
 use Tamara\Request\Order\AuthoriseOrderRequest;
 use Tamara\Response\Checkout\CreateCheckoutResponse;
+use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 
 class TamaraAdapter
 {
@@ -68,6 +68,8 @@ class TamaraAdapter
      */
     private $checkoutAuthoriseStatus;
 
+    private $orderSender;
+
     public function __construct(
         $apiUrl,
         $merchantToken,
@@ -78,7 +80,8 @@ class TamaraAdapter
         $mageRepository,
         $refundRepository,
         $cancelRepository,
-        $logger
+        $logger,
+        OrderSender $orderSender
     )
     {
         $this->logger = $logger;
@@ -91,6 +94,7 @@ class TamaraAdapter
         $this->refundRepository = $refundRepository;
         $this->cancelRepository = $cancelRepository;
         $this->checkoutAuthoriseStatus = $checkoutAuthoriseStatus;
+        $this->orderSender = $orderSender;
     }
 
     /**
@@ -185,6 +189,8 @@ class TamaraAdapter
                 $mageOrder = $this->mageRepository->get($order->getOrderId());
                 $mageOrder->setState(Order::STATE_PROCESSING)->setStatus($this->checkoutAuthoriseStatus);
                 $this->mageRepository->save($mageOrder);
+
+                $this->orderSender->send($mageOrder);
             }
 
         } catch (\Exception $exception) {
