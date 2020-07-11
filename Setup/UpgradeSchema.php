@@ -7,12 +7,21 @@ use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
+use Magento\Cms\Model\BlockFactory;
 
 class UpgradeSchema implements UpgradeSchemaInterface
 {
     const TAMARA_WHITELIST = 'tamara_email_whitelist',
           TAMARA_CUSTOMER_WHITELIST = 'tamara_customer_whitelist',
           TAMARA_CAPTURE_ITEMS = 'tamara_capture_items';
+
+    private $blockFactory;
+
+    public function __construct(BlockFactory $blockFactory)
+    {
+        $this->blockFactory = $blockFactory;
+    }
+
 
     public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
@@ -78,6 +87,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->createTamaraCustomerWhitelistTable($setup);
             $setup->getConnection()->query('DROP TABLE ' . self::TAMARA_WHITELIST);
         }
+
+        if (version_compare($context->getVersion(), '1.0.5', '<')) {
+            $this->createCmsBlock();
+        }
+
 
         $setup->endSetup();
     }
@@ -167,4 +181,52 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         $setup->getConnection()->query($sql);
     }
+
+    private function createCmsBlock(){
+        $content = '<div class="modal">
+                    <div class="modal-overlay modal-toggle">&nbsp;</div>
+                    <div class="modal-wrapper modal-transition">
+                    <div class="modal-header"><button class="modal-close modal-toggle"></button>
+                    <div class="modal-heading"><img class="title" src="{{view url=\'Tamara_Checkout::images/logo.svg\'}}" alt="Tamara - buy now pay later">
+                    <p style="padding: 8px 0">{{trans "Buy now pay later in 30 days"}}</p>
+                    </div>
+                    </div>
+                    <div class="modal-body">
+                    <div class="modal-content one-block">
+                    <div class="left-content"><img src="{{view url=\'Tamara_Checkout::images/icon1.svg\'}}" alt=""></div>
+                    <div class="right-content">
+                    <p class="sub-title">{{trans "No fees"}}</p>
+                    <p class="sub-description">{{trans "Zero interest and no hidden fees."}}</p>
+                    </div>
+                    </div>
+                    <div class="modal-content one-block">
+                    <div class="left-content"><img src="{{view url=\'Tamara_Checkout::images/icon2.svg\'}}" alt=""></div>
+                    <div class="right-content">
+                    <p class="sub-title">{{trans "No credit card? No problem!"}}</p>
+                    <p class="sub-description">{{trans "Use any debit card or bank transfer to repay."}}</p>
+                    </div>
+                    </div>
+                    <div class="modal-content one-block">
+                    <div class="left-content"><img src="{{view url=\'Tamara_Checkout::images/icon3.svg\'}}" alt=""></div>
+                    <div class="right-content">
+                    <p class="sub-title">{{trans "Quick and easy"}}</p>
+                    <p class="sub-description">{{trans "Simple use your phone number and complete your checkout."}}</p>
+                    </div>
+                    </div>
+                    <div style="text-align: center">{{trans "Sounds good? Just select tamara at checkout."}}</div>
+                    </div>
+                    </div>
+                    </div>';
+        $cmsBlockData = [
+            'title' => 'Tamara Checkout Info',
+            'identifier' => 'tamara_cms_block_info',
+            'content' => $content,
+            'is_active' => 1,
+            'stores' => [0],
+            'sort_order' => 0
+        ];
+
+        $this->blockFactory->create()->setData($cmsBlockData)->save();
+    }
+
 }
