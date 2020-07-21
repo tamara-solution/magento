@@ -201,6 +201,7 @@
     <type name="Tamara\Checkout\Plugin\Model\Method\Available">
         <arguments>
             <argument name="logger" xsi:type="object">TamaraCheckoutLogger</argument>
+            <argument name="httpHeader" xsi:type="object">Magento\Framework\HTTP\Header</argument>
             <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
             <argument name="emailWhiteListRepository" xsi:type="object">Tamara\Checkout\Api\EmailWhiteListRepositoryInterface</argument>
         </arguments>
