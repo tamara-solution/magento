@@ -148,6 +148,7 @@
             <argument name="mageRepository" xsi:type="object">Magento\Sales\Api\OrderRepositoryInterface</argument>
             <argument name="refundRepository" xsi:type="object">Tamara\Checkout\Api\RefundRepositoryInterface</argument>
             <argument name="cancelRepository" xsi:type="object">Tamara\Checkout\Api\CancelRepositoryInterface</argument>
+            <argument name="resourceConfig" xsi:type="object">Magento\Config\Model\ResourceModel\Config</argument>
         </arguments>
     </type>
 
@@ -194,6 +195,16 @@
         </arguments>
     </type>
 
+    <type name="Tamara\Checkout\Observer\ConfigChange">
+        <arguments>
+            <argument name="request" xsi:type="object">Magento\Framework\App\RequestInterface</argument>
+            <argument name="configWriter" xsi:type="object">Magento\Framework\App\Config\Storage\WriterInterface</argument>
+            <argument name="logger" xsi:type="object">TamaraCheckoutLogger</argument>
+            <argument name="adapter" xsi:type="object">Tamara\Checkout\Model\Adapter\TamaraAdapterFactory</argument>
+            <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
+        </arguments>
+    </type>
+
     <type name="Magento\Payment\Model\MethodList">
         <plugin name="methodlist" type="Tamara\Checkout\Plugin\Model\Method\Available" sortOrder="1" />
     </type>
@@ -201,6 +212,7 @@
     <type name="Tamara\Checkout\Plugin\Model\Method\Available">
         <arguments>
             <argument name="logger" xsi:type="object">TamaraCheckoutLogger</argument>
+            <argument name="httpHeader" xsi:type="object">Magento\Framework\HTTP\Header</argument>
             <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
             <argument name="emailWhiteListRepository" xsi:type="object">Tamara\Checkout\Api\EmailWhiteListRepositoryInterface</argument>
         </arguments>

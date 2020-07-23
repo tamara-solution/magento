@@ -80,7 +80,9 @@ class Router implements RouterInterface
             return $this->actionFactory->create(\Magento\Framework\App\Action\Forward::class);
         }
 
-        $request->setModuleName('tamara')->setControllerName('payment')->setActionName($urlParts[3])
+        $request->setModuleName(self::MODULE_NAME)
+                ->setControllerName(self::CONTROLLER_NAME)
+                ->setActionName($urlParts[3])
                 ->setParam('order_id', $urlParts[2]);
 
         $request->setAlias(\Magento\Framework\Url::REWRITE_REQUEST_PATH_ALIAS, $identifier);

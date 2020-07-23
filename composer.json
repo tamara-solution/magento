@@ -2,7 +2,7 @@
   "name": "tamara-solution/magento",
   "description": "A Magento 2 module that creates tamara payment methods",
   "type": "magento2-module",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "minimum-stability": "stable",
   "license": "MIT",
   "authors": [
@@ -14,7 +14,7 @@
   "require": {
     "php": "~7.1.0",
     "magento/framework": "~101.0.6",
-    "tamara-solution/php-sdk": "^1.0.4"
+    "tamara-solution/php-sdk": "^1.1.0"
   },
   "autoload": {
     "psr-4": {

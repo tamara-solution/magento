@@ -2,6 +2,7 @@
 
 namespace Tamara\Checkout\Model\Adapter;
 
+use Magento\Config\Model\ResourceModel\Config;
 use Magento\Framework\Exception\IntegrationException;
 use Magento\Payment\Model\Method\Logger;
 use Magento\Sales\Model\Order;
@@ -11,6 +12,7 @@ use Tamara\Checkout\Api\OrderRepositoryInterface;
 use Tamara\Checkout\Api\RefundRepositoryInterface;
 use Tamara\Checkout\Model\Helper\OrderHelper;
 use Tamara\Checkout\Model\Helper\PaymentHelper;
+use Tamara\Checkout\Model\Helper\StoreHelper;
 use Tamara\Client;
 use Tamara\Configuration;
 use Tamara\Exception\RequestDispatcherException;
@@ -18,11 +20,16 @@ use Tamara\Model\Checkout\PaymentType;
 use Tamara\Notification\NotificationService;
 use Tamara\Request\Checkout\CreateCheckoutRequest;
 use Tamara\Request\Order\AuthoriseOrderRequest;
+use Tamara\Request\Webhook\RegisterWebhookRequest;
+use Tamara\Request\Webhook\RemoveWebhookRequest;
 use Tamara\Response\Checkout\CreateCheckoutResponse;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 
 class TamaraAdapter
 {
+    private const
+        WEBHOOK_URL = 'tamara/payment/webhook',
+        ORDER_EXPIRED = 'order_expired';
     /**
      * @var Client
      */
@@ -70,6 +77,11 @@ class TamaraAdapter
 
     private $orderSender;
 
+    /**
+     * @var Config
+     */
+    private $resourceConfig;
+
     public function __construct(
         $apiUrl,
         $merchantToken,
@@ -81,7 +93,8 @@ class TamaraAdapter
         $refundRepository,
         $cancelRepository,
         $logger,
-        OrderSender $orderSender
+        OrderSender $orderSender,
+        Config $resourceConfig
     )
     {
         $this->logger = $logger;
@@ -95,6 +108,7 @@ class TamaraAdapter
         $this->cancelRepository = $cancelRepository;
         $this->checkoutAuthoriseStatus = $checkoutAuthoriseStatus;
         $this->orderSender = $orderSender;
+        $this->resourceConfig = $resourceConfig;
     }
 
     /**
@@ -186,8 +200,10 @@ class TamaraAdapter
             $this->orderRepository->save($order);
 
             if (!empty($this->checkoutAuthoriseStatus)) {
+                /** @var \Magento\Sales\Model\Order $mageOrder */
                 $mageOrder = $this->mageRepository->get($order->getOrderId());
                 $mageOrder->setState(Order::STATE_PROCESSING)->setStatus($this->checkoutAuthoriseStatus);
+                $mageOrder->addCommentToStatusHistory(__('Tamara - order was authorised. Order ID: ' . $tamaraOrderId));
                 $this->mageRepository->save($mageOrder);
 
                 $this->orderSender->send($mageOrder);
@@ -317,6 +333,92 @@ class TamaraAdapter
         }
 
         $this->logger->debug(['End to cancel']);
+    }
+
+    public function registerWebhook(): void
+    {
+        $this->logger->debug(['Start to register webhook']);
+        $baseUrl = StoreHelper::getBaseUrl();
+        $webhookUrl = $baseUrl . self::WEBHOOK_URL;
+
+        $request = new RegisterWebhookRequest(
+            $webhookUrl,
+            ['order_expired']
+        );
+
+        $response = $this->client->registerWebhook($request);
+
+        if (!$response->isSuccess()) {
+            $errorLogs = [$response->getContent()];
+            $this->logger->debug($errorLogs);
+            throw new IntegrationException(__($response->getMessage()));
+        }
+
+        $webhookId = $response->getWebhookId();
+
+        $this->resourceConfig->saveConfig(
+            'payment/tamara_checkout/webhook_id',
+            $webhookId
+        );
+
+        $this->logger->debug(['End of register webhook']);
+    }
+
+    public function deleteWebhook($webhookId): void
+    {
+        $this->logger->debug(['Start to delete webhook']);
+
+        $request = new RemoveWebhookRequest($webhookId);
+
+        $response = $this->client->removeWebhook($request);
+
+        if (!$response->isSuccess()) {
+            $errorLogs = [$response->getContent()];
+            $this->logger->debug($errorLogs);
+            throw new IntegrationException(__($response->getMessage()));
+        }
+
+        $this->resourceConfig->deleteConfig(
+            'payment/tamara_checkout/webhook_id'
+        );
+
+        $this->logger->debug(['End of delete webhook']);
+    }
+
+    public function webhook(): bool
+    {
+        $this->logger->debug(['Start to webhook']);
+
+        try {
+            $webhookMessage = $this->notificationService->processWebhook();
+            $eventType = $webhookMessage->getEventType();
+
+            if ($eventType !== self::ORDER_EXPIRED) {
+                $this->logger->debug([
+                    'Event type: ' => $eventType,
+                    'Webhook tamara order id: ' => $webhookMessage->getOrderId(),
+                    'Webhook reference order id: ' => $webhookMessage->getOrderReferenceId(),
+                ]);
+
+                return false;
+            }
+
+            $tamaraOrderId = $webhookMessage->getOrderId();
+            $order = $this->orderRepository->getTamaraOrderByTamaraOrderId($tamaraOrderId);
+
+            /** @var \Magento\Sales\Model\Order $mageOrder */
+            $mageOrder = $this->mageRepository->get($order->getOrderId());
+            $mageOrder->setState(Order::STATE_CANCELED)->setStatus(Order::STATE_CANCELED);
+            $mageOrder->addCommentToStatusHistory(__('Tamara - order was expired by webhook'));
+            $this->mageRepository->save($mageOrder);
+
+        } catch (\Exception $exception) {
+            $this->logger->debug([$exception->getMessage()]);
+            return false;
+        }
+
+        $this->logger->debug(['End Webhook']);
+        return true;
     }
 
     /**

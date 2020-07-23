@@ -66,6 +66,23 @@
                         <source_model>Tamara\Checkout\Model\Config\Source\Country</source_model>
                         <config_path>payment/tamara_checkout/specificcountry</config_path>
                     </field>
+                    <field id="block_web_view" translate="label" type="select" sortOrder="180" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Block Web View</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/tamara_checkout/block_web_view</config_path>
+                        <comment>Enable it if you want to block the Tamara checkout from native mobile app.</comment>
+                    </field>
+                    <field id="enable_webhook" translate="label" type="select" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Enable Webhook</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/tamara_checkout/enable_webhook</config_path>
+                        <comment>Enable it if you want register webhook from tamara payment</comment>
+                    </field>
+                    <field id="webhook_id" translate="label" type="select" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Webhook Id</label>
+                        <config_path>payment/tamara_checkout/webhook_id</config_path>
+                        <frontend_model>Tamara\Checkout\Block\Adminhtml\System\Config\Form\WebhookId</frontend_model>
+                    </field>
                 </group>
 
                 <group id="payment_types" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">

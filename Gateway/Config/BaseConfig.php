@@ -106,4 +106,13 @@ class BaseConfig extends MagentoPaymentConfig
         return $this->getValue('is_email_whitelist_enabled', $storeId);
     }
 
+    public function isBlockWebViewEnabled($storeId = null): bool
+    {
+        return (bool) $this->getValue('block_web_view', $storeId);
+    }
+
+    public function getWebhookId($storeId = null): string
+    {
+        return $this->getValue('webhook_id', $storeId) ?? '';
+    }
 }

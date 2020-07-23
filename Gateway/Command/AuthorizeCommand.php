@@ -106,6 +106,7 @@ class AuthorizeCommand implements CommandInterface
         /** @var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
         $order->setState(Order::STATE_NEW)->setStatus(self::STATUS_PENDING);
+        $order->addCommentToStatusHistory(__('Tamara - order was created'));
         // disable sending confirmation email
         $order->setCanSendNewEmailFlag(false);
 
