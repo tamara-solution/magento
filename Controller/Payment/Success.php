@@ -58,8 +58,10 @@ class Success extends Action
             $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);
 
             if (!$tamaraOrder->getIsAuthorised()) {
+                /** @var \Magento\Sales\Model\Order $order */
                 $order = $this->orderRepository->get($orderId);
                 $order->setState(Order::STATE_PROCESSING)->setStatus($successStatus);
+                $order->addCommentToStatusHistory(__('Tamara - order was processing'));
                 $this->orderRepository->save($order);
             }
         } catch (\Exception $e) {

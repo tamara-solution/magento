@@ -148,6 +148,7 @@
             <argument name="mageRepository" xsi:type="object">Magento\Sales\Api\OrderRepositoryInterface</argument>
             <argument name="refundRepository" xsi:type="object">Tamara\Checkout\Api\RefundRepositoryInterface</argument>
             <argument name="cancelRepository" xsi:type="object">Tamara\Checkout\Api\CancelRepositoryInterface</argument>
+            <argument name="resourceConfig" xsi:type="object">Magento\Config\Model\ResourceModel\Config</argument>
         </arguments>
     </type>
 
@@ -191,6 +192,16 @@
             <argument name="orderRepository" xsi:type="object">Tamara\Checkout\Api\OrderRepositoryInterface</argument>
             <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
             <argument name="transaction" xsi:type="object">Magento\Framework\DB\Transaction</argument>
+        </arguments>
+    </type>
+
+    <type name="Tamara\Checkout\Observer\ConfigChange">
+        <arguments>
+            <argument name="request" xsi:type="object">Magento\Framework\App\RequestInterface</argument>
+            <argument name="configWriter" xsi:type="object">Magento\Framework\App\Config\Storage\WriterInterface</argument>
+            <argument name="logger" xsi:type="object">TamaraCheckoutLogger</argument>
+            <argument name="adapter" xsi:type="object">Tamara\Checkout\Model\Adapter\TamaraAdapterFactory</argument>
+            <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
         </arguments>
     </type>
 

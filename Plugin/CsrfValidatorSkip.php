@@ -4,6 +4,11 @@ namespace Tamara\Checkout\Plugin;
 
 class CsrfValidatorSkip
 {
+    private const SKIP_CSRF_URLS = [
+        '/tamara/payment/notification',
+        '/tamara/payment/webhook',
+    ];
+
     /**
      * @param \Magento\Framework\App\Request\CsrfValidator $subject
      * @param \Closure $proceed
@@ -22,7 +27,7 @@ class CsrfValidatorSkip
         }
 
         /* Magento 2.3.x */
-        if (strpos($request->getOriginalPathInfo(), '/tamara/payment/notification') !== false) {
+        if (in_array($request->getOriginalPathInfo(), self::SKIP_CSRF_URLS)) {
             return; // Skip CSRF check
         }
 

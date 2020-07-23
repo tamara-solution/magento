@@ -25,4 +25,7 @@
     <event name="sales_order_payment_place_end">
         <observer name="tamara_order_payment_place_end" instance="Tamara\Checkout\Observer\OrderPaymentPlaceEnd" />
     </event>
+    <event name="admin_system_config_changed_section_payment">
+        <observer name="custom_admin_system_config_changed_section_payment" instance="Tamara\Checkout\Observer\ConfigChange"/>
+    </event>
 </config>

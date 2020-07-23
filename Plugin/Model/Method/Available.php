@@ -21,11 +21,6 @@ class Available
 
     private $httpHeader;
 
-    private $notAllowAreaCode = [
-        \Magento\Framework\App\Area::AREA_WEBAPI_REST,
-        \Magento\Framework\App\Area::AREA_WEBAPI_SOAP,
-    ];
-
     public function __construct(
         Logger $logger,
         BaseConfig $config,

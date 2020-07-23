@@ -108,6 +108,11 @@ class BaseConfig extends MagentoPaymentConfig
 
     public function isBlockWebViewEnabled($storeId = null): bool
     {
-        return $this->getValue('block_web_view', $storeId);
+        return (bool) $this->getValue('block_web_view', $storeId);
+    }
+
+    public function getWebhookId($storeId = null): string
+    {
+        return $this->getValue('webhook_id', $storeId) ?? '';
     }
 }

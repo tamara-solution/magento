@@ -47,9 +47,13 @@ class Cancel extends Action
     {
         try {
             $orderId = $this->_request->getParam('order_id', 0);
+
+            /** @var \Magento\Sales\Model\Order $order */
             $order = $this->orderRepository->get($orderId);
             $order->setState(Order::STATE_CANCELED)->setStatus($this->config->getCheckoutCancelStatus());
+            $order->addCommentToStatusHistory(__('Tamara - order was canceled'));
             $this->orderRepository->save($order);
+
             $this->cartHelper->restoreCartFromOrder($order);
 
         } catch (\Exception $e) {

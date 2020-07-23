@@ -47,9 +47,13 @@ class Failure extends Action
     {
         try {
             $orderId = $this->_request->getParam('order_id', 0);
+
+            /** @var \Magento\Sales\Model\Order $order */
             $order = $this->orderRepository->get($orderId);
             $order->setState(Order::STATE_CLOSED)->setStatus($this->config->getCheckoutFailureStatus());
+            $order->addCommentToStatusHistory(__('Tamara - order was failure'));
             $this->orderRepository->save($order);
+
             $this->cartHelper->restoreCartFromOrder($order);
 
         } catch (\Exception $e) {
