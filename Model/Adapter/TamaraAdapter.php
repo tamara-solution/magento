@@ -203,7 +203,7 @@ class TamaraAdapter
                 /** @var \Magento\Sales\Model\Order $mageOrder */
                 $mageOrder = $this->mageRepository->get($order->getOrderId());
                 $mageOrder->setState(Order::STATE_PROCESSING)->setStatus($this->checkoutAuthoriseStatus);
-                $mageOrder->addCommentToStatusHistory(__('Tamara - order was authorised'));
+                $mageOrder->addCommentToStatusHistory(__('Tamara - order was authorised. Order ID: ' . $tamaraOrderId));
                 $this->mageRepository->save($mageOrder);
 
                 $this->orderSender->send($mageOrder);
