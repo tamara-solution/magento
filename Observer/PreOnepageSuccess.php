@@ -40,7 +40,7 @@ class PreOnepageSuccess extends AbstractObserver
         /** @var Order $order */
         $order = $objectManager->create('\Magento\Sales\Model\Order')->load($orderId);
 
-        if ($order instanceof Order) {
+        if (!$order instanceof Order) {
             return;
         }
 
