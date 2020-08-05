@@ -29,7 +29,7 @@ class TamaraAdapter
 {
     private const
         WEBHOOK_URL = 'tamara/payment/webhook',
-        ORDER_EXPIRED = 'order_expired';
+        ALLOWED_WEBHOOKS = ['order_expired', 'order_declined'];
     /**
      * @var Client
      */
@@ -343,7 +343,7 @@ class TamaraAdapter
 
         $request = new RegisterWebhookRequest(
             $webhookUrl,
-            ['order_expired']
+            self::ALLOWED_WEBHOOKS
         );
 
         $response = $this->client->registerWebhook($request);
@@ -393,7 +393,7 @@ class TamaraAdapter
             $webhookMessage = $this->notificationService->processWebhook();
             $eventType = $webhookMessage->getEventType();
 
-            if ($eventType !== self::ORDER_EXPIRED) {
+            if (!in_array($eventType, self::ALLOWED_WEBHOOKS)) {
                 $this->logger->debug([
                     'Event type: ' => $eventType,
                     'Webhook tamara order id: ' => $webhookMessage->getOrderId(),
@@ -409,7 +409,8 @@ class TamaraAdapter
             /** @var \Magento\Sales\Model\Order $mageOrder */
             $mageOrder = $this->mageRepository->get($order->getOrderId());
             $mageOrder->setState(Order::STATE_CANCELED)->setStatus(Order::STATE_CANCELED);
-            $mageOrder->addCommentToStatusHistory(__('Tamara - order was expired by webhook'));
+            $comment = sprintf('Tamara - order was %s by webhook', $eventType);
+            $mageOrder->addCommentToStatusHistory(__($comment));
             $this->mageRepository->save($mageOrder);
 
         } catch (\Exception $exception) {
