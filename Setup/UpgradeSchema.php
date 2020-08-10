@@ -2,6 +2,7 @@
 
 namespace Tamara\Checkout\Setup;
 
+use Magento\Cms\Api\BlockRepositoryInterface;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\ModuleContextInterface;
@@ -16,10 +17,12 @@ class UpgradeSchema implements UpgradeSchemaInterface
           TAMARA_CAPTURE_ITEMS = 'tamara_capture_items';
 
     private $blockFactory;
+    private $blockRepository;
 
-    public function __construct(BlockFactory $blockFactory)
+    public function __construct(BlockFactory $blockFactory, BlockRepositoryInterface $blockRepository)
     {
         $this->blockFactory = $blockFactory;
+        $this->blockRepository = $blockRepository;
     }
 
 
@@ -92,6 +95,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->createCmsBlock();
         }
 
+        if (version_compare($context->getVersion(), '1.0.6', '<')) {
+            $this->updateCmsBlock();
+        }
 
         $setup->endSetup();
     }
@@ -228,5 +234,50 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         $this->blockFactory->create()->setData($cmsBlockData)->save();
     }
+
+    private function updateCmsBlock() {
+        $cmsBlock = $this->blockRepository->getById('tamara_cms_block_info');
+        $content = '<div class="modal">
+                    <div class="modal-overlay modal-toggle">&nbsp;</div>
+                    <div class="modal-wrapper modal-transition">
+                    <div class="modal-header"><button class="modal-close modal-toggle"></button>
+                    <div class="modal-heading"><img class="title" src="{{view url=\'Tamara_Checkout::images/logo.svg\'}}" alt="Tamara - buy now pay later">
+                    <p class="sub-title-head">{{trans "Receive the good before you pay for it"}}</p>
+                    <p style="padding: 8px 0">{{trans "Pay within 30 days after shipping."}}</p>
+                    </div>
+                    </div>
+                    <div class="modal-body">
+                    <div class="modal-content one-block">
+                    <div class="left-content"><img src="{{view url=\'Tamara_Checkout::images/zero-percent.svg\'}}" alt=""></div>
+                    <div class="right-content">
+                    <p class="sub-title">{{trans "Zero Interest"}}</p>
+                    <p class="sub-description">{{trans "No hidden fees."}}</p>
+                    </div>
+                    </div>
+                    <div class="modal-content one-block">
+                    <div class="left-content"><img src="{{view url=\'Tamara_Checkout::images/debit-card.svg\'}}" alt=""></div>
+                    <div class="right-content">
+                    <p class="sub-title">{{trans "No credit card needed"}}</p>
+                    <p class="sub-description">{{trans "Use any debit card or bank transfer or even Apple pay to repay."}}</p>
+                    </div>
+                    </div>
+                    <div class="modal-content one-block">
+                    <div class="left-content"><img src="{{view url=\'Tamara_Checkout::images/mobile.svg\'}}" alt=""></div>
+                    <div class="right-content">
+                    <p class="sub-title">{{trans "Quick and easy"}}</p>
+                    <p class="sub-description">{{trans "Simply, use your phone number once you complete your checkout."}}</p>
+                    </div>
+                    </div>
+                    <div style="text-align: center">{{trans "Sounds good? Just select Tamara at checkout."}}</div>
+                    <div style="text-align: center">{{trans "For more information about"}} <a target="_blank" href="https://tamara.co"> {{trans "Tamara"}} </a></div>
+                    </div>
+                    </div>
+                    </div>
+        ';
+
+        $cmsBlock['content'] = $content;
+        $this->blockRepository->save($cmsBlock);
+    }
+
 
 }

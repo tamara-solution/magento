@@ -26,7 +26,7 @@ class Success extends Template
     public function getTamaraConfig() {
         $successLogo = sprintf('Tamara_Checkout::images/success_%s.svg', LocaleHelper::getCurrentLanguage());
         $output['tamaraSuccessLogo'] = $this->getViewFileUrl($successLogo);
-        $output['tamaraLoginLink'] = $this->config->getLinkLoginTamara();
+        $output['tamaraLoginLink'] = $this->config->getLinkLoginTamara(). '?locale=' . LocaleHelper::getLocale();
         return $output;
     }
 
