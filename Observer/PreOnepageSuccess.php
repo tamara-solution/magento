@@ -5,6 +5,7 @@ namespace Tamara\Checkout\Observer;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Event\Observer;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Model\Order;
 use Magento\Store\Model\StoreManagerInterface;
 use Tamara\Checkout\Api\OrderRepositoryInterface;
@@ -44,10 +45,16 @@ class PreOnepageSuccess extends AbstractObserver
             return;
         }
 
-        $logger->debug(['orderId' => $orderId]);
-        $logger->debug(['payment' => $order->getPayment()->getMethod()]);
+        $payment = $order->getPayment();
 
-        if (!$this->isTamaraPayment($order->getPayment()->getMethod())) {
+        if (!$payment instanceof OrderPaymentInterface) {
+            return;
+        }
+
+        $logger->debug(['orderId' => $orderId]);
+        $logger->debug(['payment' => $payment->getMethod()]);
+
+        if (!$this->isTamaraPayment($payment->getMethod())) {
             return;
         }
 
