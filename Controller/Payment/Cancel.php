@@ -52,17 +52,17 @@ class Cancel extends Action
             $order = $this->orderRepository->get($orderId);
             $order->setState(Order::STATE_CANCELED)->setStatus($this->config->getCheckoutCancelStatus());
             $order->addCommentToStatusHistory(__('Tamara - order was canceled'));
-
             $this->orderRepository->save($order);
+
             $this->cartHelper->restoreCartFromOrder($order);
 
         } catch (\Exception $e) {
-
         }
-        $page = $this->pageFactory->create();
-        $block = $page->getLayout()->getBlock('tamara_cancel');
-        $block->setData('checkout_url', sprintf('%s%s', $this->_url->getBaseUrl(), 'checkout/cart'));
 
-        return $page;
+        $message = __('Your order was cancelled.');
+        $this->messageManager->addErrorMessage($message);
+
+        $this->_redirect('checkout/cart');
+        $this->getResponse()->sendResponse();
     }
 }
