@@ -241,7 +241,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     <div class="modal-overlay modal-toggle">&nbsp;</div>
                     <div class="modal-wrapper modal-transition">
                     <div class="modal-header"><button class="modal-close modal-toggle"></button>
-                    <div class="modal-heading"><img class="title" src="{{view url=\'Tamara_Checkout::images/logo.svg\'}}" alt="Tamara - buy now pay later">
+                    <div class="modal-heading"><img class="title" src="{{view url=\'Tamara_Checkout::images/\'}}/{{trans \'logo.svg\'}}" alt="Tamara - buy now pay later">
                     <p class="sub-title-head">{{trans "Receive the good before you pay for it"}}</p>
                     <p style="padding: 8px 0">{{trans "Pay within 30 days after shipping."}}</p>
                     </div>
