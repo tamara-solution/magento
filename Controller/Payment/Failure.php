@@ -57,12 +57,12 @@ class Failure extends Action
             $this->cartHelper->restoreCartFromOrder($order);
 
         } catch (\Exception $e) {
-
         }
-        $page = $this->pageFactory->create();
-        $block = $page->getLayout()->getBlock('tamara_failure');
-        $block->setData('checkout_url', sprintf('%s%s', $this->_url->getBaseUrl(), 'checkout/cart'));
 
-        return $page;
+        $message = __('Your order was failed.');
+        $this->messageManager->addErrorMessage($message);
+
+        $this->_redirect('checkout/cart');
+        $this->getResponse()->sendResponse();
     }
 }
