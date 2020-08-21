@@ -36,7 +36,8 @@ class ConfigChange extends AbstractObserver
     public function execute(Observer $observer)
     {
         $paymentParams = $this->request->getParam('groups');
-        $webhookEnabled = $paymentParams['tamara_checkout']['groups']['api_configuration']['fields']['enable_webhook']['value'];
+        $webhookEnabled = $paymentParams['tamara_checkout']['groups']['api_configuration']['fields']['enable_webhook']['value']
+                          ?? $paymentParams['tamara_checkout']['groups']['api_configuration']['fields']['enable_webhook']['inherit'];
         $webhookId = $this->config->getWebhookId();
         $adapter = $this->adapter->create();
 
