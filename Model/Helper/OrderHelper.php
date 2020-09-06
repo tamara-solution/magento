@@ -7,10 +7,6 @@ use Tamara\Checkout\Gateway\Request\CommonDataBuilder;
 use Tamara\Checkout\Gateway\Request\ConsumerDataBuilder;
 use Tamara\Checkout\Gateway\Request\ItemsDataBuilder;
 use Tamara\Checkout\Gateway\Request\MerchantUrlDataBuilder;
-use Tamara\Model\Money;
-use Tamara\Model\Order\Address;
-use Tamara\Model\Order\Consumer;
-use Tamara\Model\Order\MerchantUrl;
 use Tamara\Model\Order\Order;
 
 class OrderHelper

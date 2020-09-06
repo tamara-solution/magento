@@ -3,10 +3,8 @@
 namespace Tamara\Checkout\Gateway\Request;
 
 use Magento\Framework\App\ProductMetadata;
-use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Api\OrderRepositoryInterface;
 use Tamara\Checkout\Model\Helper\LocaleHelper;
 use Tamara\Model\Money;
 use Tamara\Model\Order\Discount;
@@ -28,26 +26,18 @@ class CommonDataBuilder implements BuilderInterface
         SHIPPING_AMOUNT = 'shipping_amount';
 
     /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
      * @var ProductMetadata
      */
     private $productMetaData;
 
     /**
      * CommonDataBuilder constructor.
-     * @param OrderRepositoryInterface $orderRepository
      * @param ProductMetadata $productMetaData
      */
-    public function __construct(OrderRepositoryInterface $orderRepository, ProductMetadata $productMetaData)
+    public function __construct(ProductMetadata $productMetaData)
     {
-        $this->orderRepository = $orderRepository;
         $this->productMetaData = $productMetaData;
     }
-
 
     public function build(array $buildSubject)
     {

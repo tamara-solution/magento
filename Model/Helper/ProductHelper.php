@@ -18,7 +18,7 @@ class ProductHelper
         $this->imageHelper = $imageHelper;
     }
 
-    public function getImageFromProductId($productId)
+    public function getImageFromProductId($productId): string
     {
         $product = $this->productRepository->getById($productId);
         return $this->imageHelper->init($product, 'small_image')

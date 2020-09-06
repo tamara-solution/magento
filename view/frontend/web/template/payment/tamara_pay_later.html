@@ -19,6 +19,9 @@
     </div>
 
     <div class="payment-method-content">
+        <div class="message error message-error hidden-error-iframe" id="error-iframe">
+            <span data-bind="i18n: 'An error was occurred, please try again or select another payment methods.'"></span>
+        </div>
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
@@ -48,6 +51,10 @@
 
         <div class="message error message-error" data-bind="visible: shouldShowError()">
             <span data-bind="i18n: 'The grand total of order is over/under limit of Tamara.'"></span>
+        </div>
+
+        <div class="params">
+            <input type="hidden" id="order-id" value="0" />
         </div>
 
         <div class="actions-toolbar">

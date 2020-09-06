@@ -115,4 +115,9 @@ class BaseConfig extends MagentoPaymentConfig
     {
         return $this->getValue('webhook_id', $storeId) ?? '';
     }
+
+    public function getEnableIframeCheckout($storeId = null): bool
+    {
+        return (bool) $this->getValue('enable_iframe_checkout', $storeId);
+    }
 }
