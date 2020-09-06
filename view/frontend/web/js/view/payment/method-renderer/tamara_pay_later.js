@@ -35,6 +35,7 @@ define(
             tamaraImageSrc: window.populateTamara.tamaraLogoImageUrl,
             tamaraLink: window.populateTamara.tamaraAboutLink,
             redirectAfterPlaceOrder: true,
+            preventPlaceOrderWhenError: false,
 
             /**
              * After place order callback
@@ -44,7 +45,6 @@ define(
             },
 
             initObservable: function () {
-                console.log(window.checkoutConfig);
                 this._super()
                     .observe([
                         'tamaraPayLater'
@@ -58,47 +58,47 @@ define(
                 return this;
             },
 
-            success: function() {
+            success: function () {
                 let orderId = jQuery('#order-id').val()
                 window.location.replace(url.build('tamara/payment/' + orderId + '/success'));
             },
 
-            failed: function() {
+            failed: function () {
                 let orderId = jQuery('#order-id').val()
                 window.location.replace(url.build('tamara/payment/' + orderId + '/failure'));
             },
 
-            cancel: function() {
+            cancel: function () {
                 let orderId = jQuery('#order-id').val()
                 window.location.replace(url.build('tamara/payment/' + orderId + '/cancel'));
             },
 
-            getCode: function() {
+            getCode: function () {
                 return 'tamara_pay_later';
             },
 
-            getData: function() {
+            getData: function () {
                 return {
                     'method': this.item.method
                 };
             },
 
-            getMinLimit: function() {
+            getMinLimit: function () {
                 return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_later.min_limit);
             },
 
-            getMaxLimit: function() {
+            getMaxLimit: function () {
                 return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_later.max_limit);
             },
 
-            isTotalAmountInLimit: function() {
+            isTotalAmountInLimit: function () {
                 var tamaraConfig = window.checkoutConfig.payment.tamara_pay_later;
                 var grandTotal = window.checkoutConfig.totalsData.grand_total;
 
                 return !(grandTotal < parseFloat(tamaraConfig.min_limit) || grandTotal > parseFloat(tamaraConfig.max_limit));
             },
 
-            shouldShowError: function() {
+            shouldShowError: function () {
                 return !this.isTotalAmountInLimit();
             },
 
@@ -116,10 +116,17 @@ define(
                     event.preventDefault();
                 }
 
+                jQuery('#error-iframe').addClass('hidden-error-iframe');
+
                 if (this.validate() && additionalValidators.validate()) {
+                    this.preventPlaceOrderWhenError = false;
 
                     if (this.handleIframeCheckout()) {
                         return true;
+                    }
+
+                    if (this.preventPlaceOrderWhenError) {
+                        return false;
                     }
 
                     this.isPlaceOrderActionAllowed(false);
@@ -154,7 +161,7 @@ define(
                 );
             },
 
-            handleIframeCheckout: function() {
+            handleIframeCheckout: function () {
                 if (!window.checkoutConfig.payment.tamara_iframe_checkout) {
                     return false;
                 }
@@ -162,6 +169,7 @@ define(
                 fullScreenLoader.startLoader();
 
                 let selectedPaymentMethod = $('input[name="payment[method]"]:checked').val();
+                let that = this;
 
                 $.ajax({
                     url: url.build('tamara/payment/iframeCheckout'),
@@ -173,11 +181,15 @@ define(
                             jQuery('#order-id').val(response.orderId);
                             TamaraCheckoutFrame.checkout(response.redirectUrl);
                         } else {
-                            jQuery('#error-iframe').removeClass('hidden-error-iframe');
-                            window.location.replace(url.build('checkout/cart'));
+                            jQuery('#error-iframe').removeClass('hidden-error-iframe').text(response.error);
+                            that.preventPlaceOrderWhenError = true;
+
+                            setTimeout(() => jQuery('#error-iframe').addClass('hidden-error-iframe').text(''), 10000);
+
+                            return false;
                         }
                     },
-                    fail: function(){
+                    fail: function () {
                         fullScreenLoader.stopLoader(true);
                     }
                 });
