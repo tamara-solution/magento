@@ -67,19 +67,19 @@ class IframeCheckout extends Action
             $orderQuote = $this->quoteManagement->submit($quote);
         } catch (Exception $e) {
             $logger->debug(['Error when convert from quote to order' => $e->getMessage()]);
-            return $result->setData(['error' => 'Cannot get order from session']);
+            return $result->setData(['error' => $e->getMessage()]);
         }
 
         if (!$orderQuote instanceof Order) {
             $logger->debug(['Order was invalid: ' => $orderQuote->toArray()]);
-            return $result->setData(['error' => 'Order was invalid']);
+            return $result->setData(['error' => __('An error was occurred, please try again or select another payment methods.')]);
         }
 
         try {
             $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderQuote->getEntityId());
         } catch (NoSuchEntityException $e) {
             $logger->debug(['Cannot find Tamara order with id : ' => $orderQuote->getId()]);
-            return $result->setData(['error' => 'Cannot find order']);
+            return $result->setData(['error' => __('An error was occurred, please try again or select another payment methods.')]);
         }
 
         $response['orderId'] = $orderQuote->getEntityId();
