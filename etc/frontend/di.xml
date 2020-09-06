@@ -22,6 +22,15 @@
         </arguments>
     </type>
 
+    <type name="Tamara\Checkout\Controller\Payment\IframeCheckout">
+        <arguments>
+            <argument name="resultJsonFactory" xsi:type="object">Magento\Framework\Controller\Result\JsonFactory</argument>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session</argument>
+            <argument name="quoteManagement" xsi:type="object">Magento\Quote\Model\QuoteManagement</argument>
+            <argument name="tamaraOrderRepository" xsi:type="object">Tamara\Checkout\Model\OrderRepository</argument>
+        </arguments>
+    </type>
+
     <type name="Tamara\Checkout\Controller\Payment\Check">
         <arguments>
             <argument name="resultJsonFactory" xsi:type="object">Magento\Framework\Controller\Result\JsonFactory</argument>

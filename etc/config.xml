@@ -8,6 +8,7 @@
                 <send_email_invoice>1</send_email_invoice>
                 <is_email_whitelist_enabled>0</is_email_whitelist_enabled>
                 <link_about_tamara>https://www.tamara.co/about-us.html</link_about_tamara>
+                <enable_iframe_checkout>1</enable_iframe_checkout>
                 <active>0</active>
                 <model>TamaraFacade</model>
                 <order_status>pending</order_status>

@@ -3,24 +3,28 @@
 namespace Tamara\Checkout\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
+use Tamara\Checkout\Gateway\Config\BaseConfig;
 use Tamara\Checkout\Gateway\Config\PayLaterConfig;
 
 class ConfigProvider implements ConfigProviderInterface
 {
+    private const TAMARA_IFRAME_CHECKOUT = 'tamara_iframe_checkout';
     /**
      * @var PayLaterConfig
      */
     private $config;
 
     /**
-     * Constructor
-     *
-     * @param PayLaterConfig $config
+     * @var BaseConfig
      */
+    private $baseConfig;
+
     public function __construct(
-        PayLaterConfig $config
+        PayLaterConfig $config,
+        BaseConfig $baseConfig
     ) {
         $this->config = $config;
+        $this->baseConfig = $baseConfig;
     }
 
     /**
@@ -33,7 +37,8 @@ class ConfigProvider implements ConfigProviderInterface
 
         return [
             'payment' => [
-                PayLaterConfig::PAYMENT_TYPE_CODE => $this->getMinMaxOrder()
+                PayLaterConfig::PAYMENT_TYPE_CODE => $this->getMinMaxOrder(),
+                self::TAMARA_IFRAME_CHECKOUT => $this->baseConfig->getEnableIframeCheckout()
             ]
         ];
     }
@@ -42,7 +47,7 @@ class ConfigProvider implements ConfigProviderInterface
     {
         return [
             'min_limit' => $this->config->getMinLimit(),
-            'max_limit' => $this->config->getMaxLimit()
+            'max_limit' => $this->config->getMaxLimit(),
         ];
     }
 }

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tamara\Checkout\Observer;
 
+use Magento\Config\Model\ResourceModel\Config as ResourceConfig;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\App\RequestInterface;
-use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Payment\Model\Method\Logger;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
 use Tamara\Checkout\Model\Adapter\TamaraAdapterFactory;
@@ -24,7 +24,7 @@ class ConfigChange extends AbstractObserver
         Logger $logger,
         TamaraAdapterFactory $adapter,
         BaseConfig $config,
-        \Magento\Config\Model\ResourceModel\Config $resourceConfig
+        ResourceConfig $resourceConfig
     ) {
         $this->request = $request;
         $this->logger = $logger;
@@ -37,7 +37,8 @@ class ConfigChange extends AbstractObserver
     {
         $paymentParams = $this->request->getParam('groups');
         $webhookEnabled = $paymentParams['tamara_checkout']['groups']['api_configuration']['fields']['enable_webhook']['value']
-                          ?? $paymentParams['tamara_checkout']['groups']['api_configuration']['fields']['enable_webhook']['inherit'];
+                        ?? $paymentParams['tamara_checkout']['groups']['api_configuration']['fields']['enable_webhook']['inherit'];
+
         $webhookId = $this->config->getWebhookId();
         $adapter = $this->adapter->create();
 

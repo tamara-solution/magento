@@ -82,7 +82,7 @@ class ItemsDataBuilder implements BuilderInterface
         return $item->getPrice() * $item->getQtyOrdered() + $item->getTaxAmount() - $item->getDiscountAmount();
     }
 
-    private function getImageUrlFromProductId($productId)
+    private function getImageUrlFromProductId($productId): string
     {
         $product = $this->productRepository->getById($productId);
         return $this->imageHelper->init($product, 'small_image')

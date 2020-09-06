@@ -39,7 +39,6 @@ class Notification extends Action
         $tamaraAdapter = $this->tamaraAdapterFactory->create($storeId);
         $success = $tamaraAdapter->notification();
 
-        /** @var \Magento\Framework\Controller\Result\Json $resultJson */
         $resultJson = $this->resultJsonFactory->create();
         $response = ['success' => $success];
 

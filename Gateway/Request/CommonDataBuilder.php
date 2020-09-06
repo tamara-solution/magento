@@ -28,28 +28,19 @@ class CommonDataBuilder implements BuilderInterface
         SHIPPING_AMOUNT = 'shipping_amount';
 
     /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
      * @var ProductMetadata
      */
     private $productMetaData;
 
     /**
-     * CommonDataBuilder constructor.
-     * @param OrderRepositoryInterface $orderRepository
      * @param ProductMetadata $productMetaData
      */
-    public function __construct(OrderRepositoryInterface $orderRepository, ProductMetadata $productMetaData)
+    public function __construct(ProductMetadata $productMetaData)
     {
-        $this->orderRepository = $orderRepository;
         $this->productMetaData = $productMetaData;
     }
 
-
-    public function build(array $buildSubject)
+    public function build(array $buildSubject): array
     {
         if (!isset($buildSubject['order'])
             || !$buildSubject['order'] instanceof OrderInterface
