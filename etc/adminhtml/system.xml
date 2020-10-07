@@ -39,11 +39,6 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/tamara_checkout/trigger_actions</config_path>
                     </field>
-                    <field id="send_email_invoice" translate="label" type="select" sortOrder="95" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Enable sending email when creating invoice</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <config_path>payment/tamara_checkout/send_email_invoice</config_path>
-                    </field>
                     <field id="is_email_whitelist_enabled" translate="label" type="select" sortOrder="95" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Enabled whitelist function for Tamara</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -144,6 +139,15 @@
                         <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
                     </field>
                 </group>
+
+                <group id="capture_payment" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Capture payment</label>
+                    <field id="order_status_should_be_captured" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>What order status do you want to capture?</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                    </field>
+                </group>
+
             </group>
             <!--/group-->
         </section>

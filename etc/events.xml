@@ -10,14 +10,8 @@
     <event name="controller_action_predispatch_checkout_onepage_success">
         <observer name="pre_onepage_success" instance="Tamara\Checkout\Observer\PreOnepageSuccess" />
     </event>
-    <event name="sales_order_shipment_save_after">
-        <observer name="shipment_save_after" instance="Tamara\Checkout\Observer\ShipmentSaveAfter" />
-    </event>
     <event name="sales_order_creditmemo_save_after">
         <observer name="creditmemo_save_after" instance="Tamara\Checkout\Observer\CreditmemoSaveAfter" />
-    </event>
-    <event name="sales_order_invoice_save_after">
-        <observer name="invoice_save_after" instance="Tamara\Checkout\Observer\InvoiceSaveAfter" />
     </event>
     <event name="order_cancel_after">
         <observer name="tamara_order_cancel" instance="Tamara\Checkout\Observer\OrderCancelAfter" />
@@ -27,5 +21,8 @@
     </event>
     <event name="admin_system_config_changed_section_payment">
         <observer name="custom_admin_system_config_changed_section_payment" instance="Tamara\Checkout\Observer\ConfigChange"/>
+    </event>
+    <event name="sales_order_save_after">
+        <observer name="tamada_capture_payment_when_order_status_change" instance="Tamara\Checkout\Observer\OrderSaveAfter"/>
     </event>
 </config>

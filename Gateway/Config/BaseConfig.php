@@ -120,4 +120,21 @@ class BaseConfig extends MagentoPaymentConfig
     {
         return (bool) $this->getValue('enable_iframe_checkout', $storeId);
     }
+
+    /**
+     * @param null $storeId
+     * @return string
+     */
+    public function getOrderStatusShouldBeCaptured($storeId = null): string
+    {
+        return $this->getValue('capture_payment/order_status_should_be_captured', $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return bool
+     */
+    public function enabledDebug($storeId = null): bool {
+        return (bool) $this->getValue('debug', $storeId);
+    }
 }
