@@ -219,7 +219,7 @@ class TamaraAdapter
         return true;
     }
 
-    public function capture(array $data): void
+    public function capture(array $data, Order $order): void
     {
         $this->logger->debug(['Start to capture']);
 
@@ -234,6 +234,8 @@ class TamaraAdapter
             }
 
             $captureId = $response->getCaptureId();
+            $order->addCommentToStatusHistory(sprintf("Tamara - order was captured. Capture ID:  %s", $captureId), true);
+            $order->getResource()->save($order);
             $data['capture_id'] = $captureId;
             $capture = PaymentHelper::createCaptureFromArray($data);
             $this->captureRepository->saveCapture($capture);
