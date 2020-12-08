@@ -54,6 +54,18 @@ class CommonDataBuilder implements BuilderInterface
 
         $discountName = $order->getCouponCode() ?? 'N/A';
         $discountAmount = new Discount($discountName, new Money($order->getDiscountAmount(), $currencyCode));
+        $paymentMethod = $order->getPayment()->getMethod();
+        $paymentType = "";
+        switch ($paymentMethod) {
+            case "tamara_pay_by_instalments":
+                $paymentType = "PAY_BY_INSTALMENTS";
+                break;
+            case "tamara_pay_later":
+                $paymentType = "PAY_BY_LATER";
+                break;
+            default:
+                throw new \InvalidArgumentException("Tamara payment method is not supported");
+        }
 
         return [
             self::ORDER_ID => $order->getEntityId(),
@@ -65,7 +77,7 @@ class CommonDataBuilder implements BuilderInterface
             self::SHIPPING_AMOUNT => new Money($order->getShippingAmount(), $currencyCode),
             self::DISCOUNT_AMOUNT => $discountAmount,
             self::COUNTRY_CODE => $order->getBillingAddress()->getCountryId(),
-            self::PAYMENT_TYPE => 'PAY_BY_LATER',
+            self::PAYMENT_TYPE => $paymentType,
             self::PLATFORM => 'Magento Version: ' . $this->productMetaData->getVersion(),
             self::DESCRIPTION => 'Description'
         ];

@@ -6,6 +6,7 @@ use Magento\Framework\Event\Observer;
 use Magento\Payment\Model\Method\Logger;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Api\OrderRepositoryInterface as MagentoOrderRepository;
 use Tamara\Checkout\Api\OrderRepositoryInterface;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
 use Tamara\Checkout\Model\Adapter\TamaraAdapterFactory;
@@ -17,6 +18,11 @@ class OrderSaveAfter extends AbstractObserver
      * @var Logger
      */
     protected $logger;
+
+    /**
+     * @var MagentoOrderRepository
+     */
+    protected $magentoOrderRepository;
 
     /**
      * @var TamaraAdapterFactory
@@ -45,6 +51,7 @@ class OrderSaveAfter extends AbstractObserver
 
     public function __construct(
         Logger $logger,
+        MagentoOrderRepository $magentoOrderRepository,
         TamaraAdapterFactory $adapter,
         OrderRepositoryInterface $orderRepository,
         ProductHelper $productHelper,
@@ -52,6 +59,7 @@ class OrderSaveAfter extends AbstractObserver
         \Tamara\Checkout\Helper\Capture $captureHelper
     ) {
         $this->logger = $logger;
+        $this->magentoOrderRepository = $magentoOrderRepository;
         $this->adapter = $adapter;
         $this->orderRepository = $orderRepository;
         $this->productHelper = $productHelper;
@@ -84,11 +92,6 @@ class OrderSaveAfter extends AbstractObserver
      */
     protected function captureOrderWhenChangeStatus(Order $order): void
     {
-        if (!$this->captureHelper->canCapture($order)) {
-            $this->logger->debug(['Order cannot capture'], null, $this->config->enabledDebug());
-            return;
-        }
-
         if (empty($this->config->getOrderStatusShouldBeCaptured())) {
             $this->logger->debug(['Capture when order status change is not set, skip capture'], null,
                 $this->config->enabledDebug());
@@ -96,6 +99,14 @@ class OrderSaveAfter extends AbstractObserver
         }
 
         if ($order->getStatus() != $this->config->getOrderStatusShouldBeCaptured()) {
+            return;
+        }
+
+        //Get order from magento repository, avoid order from event
+        $order = $this->magentoOrderRepository->get($order->getEntityId());
+
+        if (!$this->captureHelper->canCapture($order)) {
+            $this->logger->debug(['Order cannot capture'], null, $this->config->enabledDebug());
             return;
         }
 

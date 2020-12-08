@@ -32,7 +32,7 @@ define(
 
         return Component.extend({
             defaults: {
-                template: 'Tamara_Checkout/payment/tamara_pay_later',
+                template: 'Tamara_Checkout/payment/tamara_pay_by_instalments',
             },
             tamaraImageSrc: window.populateTamara.tamaraLogoImageUrl,
             tamaraLink: window.populateTamara.tamaraAboutLink,
@@ -50,34 +50,34 @@ define(
             initObservable: function () {
                 this._super()
                     .observe([
-                        'tamaraPayLater'
+                        'tamaraPayByInstalments'
                     ]);
 
                 TamaraCheckoutFrame.init();
-                TamaraCheckoutFrame.addEventHandlers(TamaraCheckoutFrame.Events.SUCCESS, this.successPayLater);
-                TamaraCheckoutFrame.addEventHandlers(TamaraCheckoutFrame.Events.FAILED, this.failedPayLater);
-                TamaraCheckoutFrame.addEventHandlers(TamaraCheckoutFrame.Events.CANCELED, this.cancelPayLater);
+                TamaraCheckoutFrame.addEventHandlers(TamaraCheckoutFrame.Events.SUCCESS, this.successPayByInstalments);
+                TamaraCheckoutFrame.addEventHandlers(TamaraCheckoutFrame.Events.FAILED, this.failedPayByInstalments);
+                TamaraCheckoutFrame.addEventHandlers(TamaraCheckoutFrame.Events.CANCELED, this.cancelPayByInstalments);
 
                 return this;
             },
 
-            successPayLater: function () {
+            successPayByInstalments: function () {
                 let orderId = window.magentoOrderId;
                 window.location.replace(url.build('tamara/payment/' + orderId + '/success'));
             },
 
-            failedPayLater: function () {
+            failedPayByInstalments: function () {
                 let orderId = window.magentoOrderId;
                 window.location.replace(url.build('tamara/payment/' + orderId + '/failure'));
             },
 
-            cancelPayLater: function () {
+            cancelPayByInstalments: function () {
                 let orderId = window.magentoOrderId;
                 window.location.replace(url.build('tamara/payment/' + orderId + '/cancel'));
             },
 
             getCode: function () {
-                return 'tamara_pay_later';
+                return 'tamara_pay_by_instalments';
             },
 
             getData: function () {
@@ -87,11 +87,11 @@ define(
             },
 
             getMinLimit: function () {
-                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_later.min_limit);
+                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_by_instalments.min_limit);
             },
 
             getMaxLimit: function () {
-                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_later.max_limit);
+                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_by_instalments.max_limit);
             },
 
             getGrandTotal: function () {
@@ -105,8 +105,9 @@ define(
             },
 
             isTotalAmountInLimit: function () {
-                var tamaraConfig = window.checkoutConfig.payment.tamara_pay_later;
+                var tamaraConfig = window.checkoutConfig.payment.tamara_pay_by_instalments;
                 var grandTotal = this.getGrandTotal();
+
                 return !(grandTotal < parseFloat(tamaraConfig.min_limit) || grandTotal > parseFloat(tamaraConfig.max_limit));
             },
 
@@ -128,7 +129,7 @@ define(
                     event.preventDefault();
                 }
 
-                jQuery('#error-iframe').addClass('hidden-error-iframe');
+                jQuery('#error-iframe-pay-by-instalments').addClass('hidden-error-iframe');
 
                 if (this.validate() && additionalValidators.validate()) {
                     this.preventPlaceOrderWhenError = false;
@@ -190,14 +191,14 @@ define(
                     success: function (response) {
                         fullScreenLoader.stopLoader(true);
                         if (response.success) {
-                            jQuery('#order-id').val(response.orderId);
+                            jQuery('#order-id-pay-by-instalments').val(response.orderId);
                             window.magentoOrderId = response.orderId;
                             TamaraCheckoutFrame.checkout(response.redirectUrl);
                         } else {
-                            jQuery('#error-iframe').removeClass('hidden-error-iframe').text(response.error);
+                            jQuery('#error-iframe-pay-by-instalments').removeClass('hidden-error-iframe').text(response.error);
                             that.preventPlaceOrderWhenError = true;
 
-                            setTimeout(() => jQuery('#error-iframe').addClass('hidden-error-iframe').text(''), 10000);
+                            setTimeout(() => jQuery('#error-iframe-pay-by-instalments').addClass('hidden-error-iframe').text(''), 10000);
 
                             return false;
                         }
@@ -208,6 +209,51 @@ define(
                 });
 
                 return true;
+            },
+
+            getNumberOfInstalments: function() {
+              return  window.checkoutConfig.payment.tamara_pay_by_instalments.number_of_instalments;
+            },
+
+            getInstalmentPeriods: function () {
+                let periods = [];
+                let numberOfInstalments = this.getNumberOfInstalments();
+                let grandTotal = this.getGrandTotal();
+                let precision = 10000;
+                let totalAmountAsInt = grandTotal * precision;
+                let mod = totalAmountAsInt % numberOfInstalments;
+                let modAsInt = mod * precision;
+                let subtractedTotalAmountAsInt = totalAmountAsInt - modAsInt;
+                let payForEachMonth = Math.round (subtractedTotalAmountAsInt / numberOfInstalments) / precision;
+                let dueToDay = grandTotal - (payForEachMonth * (numberOfInstalments - 1));
+                periods.push({'label': $.mage.__('Due today'), 'amount': dueToDay, 'formatted_amount': priceUtils.formatPrice(dueToDay)});
+                for(let i = 1; i < numberOfInstalments; i++) {
+                    let label = i;
+                    if (i > 1) {
+                        if (i == 2) {
+                            label = $.mage.__("2 months later");
+                        } else {
+                            let labelTmpl = i + ' months later';
+                            label = $.mage.__(labelTmpl);
+                        }
+                    } else {
+                        label = $.mage.__('1 month later');
+                    }
+                    periods.push({'label': label, 'amount': payForEachMonth, 'formatted_amount': priceUtils.formatPrice(payForEachMonth)});
+                }
+                return periods;
+            },
+
+            getInstalmentPeriodsForArabic: function () {
+                return this.getInstalmentPeriods().reverse();
+            },
+
+            getPeriodTitle: function () {
+                return $.mage.__('3 interest-free installments');
+            },
+
+            isArabicLanguage: function () {
+                return (window.checkoutConfig.payment.tamara_pay_by_instalments.locale_code).includes("ar_");
             }
         });
     }

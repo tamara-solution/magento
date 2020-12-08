@@ -13,6 +13,7 @@ use Tamara\Checkout\Api\ConfigRepositoryInterface;
 use Tamara\Checkout\Api\Data\ConfigInterface;
 use Tamara\Checkout\Gateway\Config\BaseConfig as GatewayConfig;
 use Tamara\Checkout\Gateway\Config\PayLaterConfig;
+use Tamara\Checkout\Gateway\Config\InstalmentConfig;
 use Tamara\Checkout\Gateway\Request\MerchantUrlDataBuilder;
 
 class ConfigRepository extends GatewayConfig implements ConfigRepositoryInterface
@@ -27,17 +28,24 @@ class ConfigRepository extends GatewayConfig implements ConfigRepositoryInterfac
      */
     private $payLaterConfig;
 
+    /**
+     * @var InstalmentConfig
+     */
+    private $instalmentConfig;
+
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         Json $serializer,
         StoreManagerInterface $storeManager,
         PayLaterConfig $payLaterConfig,
+        InstalmentConfig $instalmentConfig,
         $methodCode = self::CODE,
         $pathPattern = MagentoPaymentConfig::DEFAULT_PATH_PATTERN
     ) {
         GatewayConfig::__construct($scopeConfig, $serializer, $methodCode, $pathPattern);
         $this->storeManager = $storeManager;
         $this->payLaterConfig = $payLaterConfig;
+        $this->instalmentConfig = $instalmentConfig;
     }
 
     /**
@@ -67,7 +75,12 @@ class ConfigRepository extends GatewayConfig implements ConfigRepositoryInterfac
                 'name' => $this->payLaterConfig->getPayLaterTitle(),
                 'min_limit' => (float)$this->payLaterConfig->getMinLimit(),
                 'max_limit' => (float)$this->payLaterConfig->getMaxLimit()
-            ]
+            ],
+            [
+                'name' => $this->instalmentConfig->getPayByInstalmentsTitle(),
+                'min_limit' => (float)$this->instalmentConfig->getMinLimit(),
+                'max_limit' => (float)$this->instalmentConfig->getMaxLimit()
+            ],
         ];
 
         return json_encode($data);

@@ -21,6 +21,25 @@
                 <sort_order>1</sort_order>
                 <group>tamara</group>
             </tamara_pay_later>
+            <tamara_pay_by_instalments>
+                <debug>1</debug>
+                <trigger_actions>1</trigger_actions>
+                <send_email_invoice>1</send_email_invoice>
+                <is_email_whitelist_enabled>0</is_email_whitelist_enabled>
+                <link_about_tamara>https://www.tamara.co/about-us.html</link_about_tamara>
+                <enable_iframe_checkout>1</enable_iframe_checkout>
+                <active>0</active>
+                <model>Tamara\Checkout\Model\PayByInstalments</model>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <title>Pay in 3 instalments</title>
+                <currency>SAR</currency>
+                <order_history_use_phone>1</order_history_use_phone>
+                <can_authorize>1</can_authorize>
+                <can_use_checkout>1</can_use_checkout>
+                <sort_order>1</sort_order>
+                <group>tamara</group>
+            </tamara_pay_by_instalments>
         </payment>
     </default>
 </config>
