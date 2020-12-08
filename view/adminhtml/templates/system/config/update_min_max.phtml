@@ -3,51 +3,87 @@
         'jquery',
         'prototype'
     ], function(jQuery){
+        jQuery(document).on("click",".update_config", function () {
+            if (jQuery(this).closest("tr").attr("id").includes("type_pay_later")) {
+                var updateButton = jQuery(this);
+                var collectSpanPayByLater = updateButton.next();
+                var minPayByLater = jQuery('input[name ="groups[tamara_checkout][groups][payment_types][groups][type_pay_later][fields][min_limit][value]"]');
+                var maxPayByLater = jQuery('input[name ="groups[tamara_checkout][groups][payment_types][groups][type_pay_later][fields][max_limit][value]"]');
+                var params = {};
+                new Ajax.Request('<?php echo $block->getCustomUrl() ?>', {
+                    parameters:     params,
+                    loaderArea:     false,
+                    asynchronous:   true,
+                    onCreate: function() {
+                        collectSpanPayByLater.find('.collected').hide();
+                        collectSpanPayByLater.find('.processing').show();
+                        collectSpanPayByLater.find(".collect_message_span").text('');
+                    },
+                    onSuccess: function(response) {
+                        collectSpanPayByLater.find('.processing').hide();
 
-        var collectSpan = jQuery('#collect_span'),
-            minPayByLater = jQuery('.pay_later_min_limit'),
-            maxPayByLater = jQuery('.pay_later_max_limit');
+                        var resultText = '';
+                        if (response.status > 200) {
+                            resultText = response.statusText;
+                        } else {
+                            resultText = 'Success';
+                            collectSpanPayByLater.find('.collected').show();
+                        }
+                        collectSpanPayByLater.find('.collect_message_span').text(resultText);
 
+                        var json = response.responseJSON;
 
-        jQuery('#update_config').click(function () {
-            var params = {};
-            new Ajax.Request('<?php echo $block->getCustomUrl() ?>', {
-                parameters:     params,
-                loaderArea:     false,
-                asynchronous:   true,
-                onCreate: function() {
-                    collectSpan.find('.collected').hide();
-                    collectSpan.find('.processing').show();
-                    jQuery('#collect_message_span').text('');
-                },
-                onSuccess: function(response) {
-                    collectSpan.find('.processing').hide();
-
-                    var resultText = '';
-                    if (response.status > 200) {
-                        resultText = response.statusText;
-                    } else {
-                        resultText = 'Success';
-                        collectSpan.find('.collected').show();
+                        if (typeof json.PAY_BY_LATER != 'undefined') {
+                            minPayByLater.val(json.PAY_BY_LATER.min_limit);
+                            maxPayByLater.val(json.PAY_BY_LATER.max_limit);
+                        }
                     }
-                    jQuery('#collect_message_span').text(resultText);
+                });
+            }
 
-                    var json = response.responseJSON;
+            if (jQuery(this).closest("tr").attr("id").includes("type_pay_by_instalments")) {
+                var updateButton = jQuery(this);
+                var collectSpanPayByInstalments = updateButton.next();
+                var minPayByInstalments = jQuery('input[name ="groups[tamara_checkout][groups][payment_types][groups][type_pay_by_instalments][fields][min_limit][value]"]');
+                var maxPayByInstalments = jQuery('input[name ="groups[tamara_checkout][groups][payment_types][groups][type_pay_by_instalments][fields][max_limit][value]"]');
+                var params = {};
+                new Ajax.Request('<?php echo $block->getCustomUrl() ?>', {
+                    parameters:     params,
+                    loaderArea:     false,
+                    asynchronous:   true,
+                    onCreate: function() {
+                        collectSpanPayByInstalments.find('.collected').hide();
+                        collectSpanPayByInstalments.find('.processing').show();
+                        collectSpanPayByInstalments.find(".collect_message_span").text('');
+                    },
+                    onSuccess: function(response) {
+                        collectSpanPayByInstalments.find('.processing').hide();
 
-                    if (typeof json.PAY_BY_LATER != 'undefined') {
-                        minPayByLater.val(json.PAY_BY_LATER.min_limit);
-                        maxPayByLater.val(json.PAY_BY_LATER.max_limit);
+                        var resultText = '';
+                        if (response.status > 200) {
+                            resultText = response.statusText;
+                        } else {
+                            resultText = 'Success';
+                            collectSpanPayByInstalments.find('.collected').show();
+                        }
+                        collectSpanPayByInstalments.find('.collect_message_span').text(resultText);
+
+                        var json = response.responseJSON;
+
+                        if (typeof json.PAY_BY_INSTALMENTS != 'undefined') {
+                            minPayByInstalments.val(json.PAY_BY_INSTALMENTS.min_limit);
+                            maxPayByInstalments.val(json.PAY_BY_INSTALMENTS.max_limit);
+                        }
                     }
-                }
-            });
+                });
+            }
         });
-
     });
 </script>
 
 <?php echo $block->getButtonHtml() ?>
-<span class="collect-indicator" id="collect_span">
+<span class="collect-indicator">
     <img class="processing" hidden="hidden" alt="Collecting" style="margin:0 5px" src="<?php echo $block->getViewFileUrl('images/process_spinner.gif') ?>"/>
     <img class="collected" hidden="hidden" alt="Collected" style="margin:-3px 5px" src="<?php echo $block->getViewFileUrl('images/rule_component_apply.gif') ?>"/>
-    <span id="collect_message_span"></span>
+    <span class="collect_message_span"></span>
 </span>

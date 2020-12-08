@@ -4,6 +4,7 @@ namespace Tamara\Checkout\Model\Helper;
 
 use Magento\Sales\Model\Order\Item;
 use Tamara\Checkout\Gateway\Config\PayLaterConfig;
+use Tamara\Checkout\Gateway\Config\InstalmentConfig;
 use Tamara\Checkout\Model\CaptureItem;
 use Tamara\Model\Money;
 use Tamara\Model\Order\OrderItem;
@@ -20,7 +21,8 @@ use Tamara\Response\Payment\CancelResponse;
 class PaymentHelper
 {
     public const ALLOWED_PAYMENTS = [
-        PayLaterConfig::PAYMENT_TYPE_CODE
+        PayLaterConfig::PAYMENT_TYPE_CODE,
+        InstalmentConfig::PAYMENT_TYPE_CODE,
     ];
 
     public static function createCaptureRequestFromArray(array $data): CaptureRequest

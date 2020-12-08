@@ -1,0 +1,150 @@
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+    <div class="payment-method-title field choice">
+        <input type="radio"
+               name="payment[method]"
+               class="radio"
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+        <label class="label" data-bind="attr: {'for': getCode()}">
+            <span data-bind="text: getTitle()"></span>
+            <a id="tamara-logo-payment-pay-by-instalments" data-bind="attr: {href: tamaraLink, target: '_blank'}">
+                <img data-bind="attr: {src: tamaraImageSrc, alt: $t('Tamara'), height: '36', width: '208' }" class="payment-icon" />
+            </a>
+        </label>
+    </div>
+
+    <div class="payment-method-content">
+        <div class="message error message-error hidden-error-iframe" id="error-iframe-pay-by-instalments">
+        </div>
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <div data-bind="visible: shouldShowError()">
+            <h4 data-bind="i18n: 'Pay in 3 Instalments information'"></h4>
+            <ul>
+                <li>
+                    <span data-bind="text: $t('Min Limit:') + ' ' + getMinLimit()"></span>
+                </li>
+                <li>
+                    <span data-bind="text: $t('Max Limit:') + ' ' + getMaxLimit()"></span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="message error message-error" data-bind="visible: shouldShowError()">
+            <span data-bind="i18n: 'The grand total of order is over/under limit of Tamara.'"></span>
+        </div>
+
+        <div class="params">
+            <input type="hidden" id="order-id-pay-by-instalments" value="0" />
+        </div>
+
+        <!-- ko if: (!shouldShowError()) -->
+        <div class="instalment-period">
+
+            <!-- ko if: (isArabicLanguage()) -->
+            <h3 data-bind="text: getPeriodTitle()" style="text-align: right"></h3>
+            <!-- /ko -->
+
+            <!-- ko ifnot: (isArabicLanguage()) -->
+            <h3 data-bind="text: getPeriodTitle()"></h3>
+            <!-- /ko -->
+
+            <!-- ko if: (isArabicLanguage()) -->
+            <table>
+                <thead>
+                <tr>
+                    <!-- ko foreach: { data: getInstalmentPeriodsForArabic(), as: 'period' } -->
+                    <th class="text-center"><span data-bind="text: period.label"></span></th>
+                    <!-- /ko -->
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="text-center">
+                        <img data-bind="attr: { src: require.toUrl('Tamara_Checkout/images/instalments/icon3.png')}"   width="16" height="16" />
+                    </td>
+                    <td class="text-center">
+                        <img data-bind="attr: { src: require.toUrl('Tamara_Checkout/images/instalments/icon2.png')}"   width="16" height="16"/>
+                    </td>
+                    <td class="text-center">
+                        <img data-bind="attr: { src: require.toUrl('Tamara_Checkout/images/instalments/icon1.png')}"  width="16" height="16"/>
+                    </td>
+                </tr>
+                <tr>
+                    <!-- ko foreach: { data: getInstalmentPeriodsForArabic(), as: 'period' } -->
+                    <td class="text-center">
+                        <span data-bind="text: period.formatted_amount"></span>
+                    </td>
+                    <!-- /ko -->
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- /ko -->
+            <!-- ko ifnot: (isArabicLanguage()) -->
+            <table>
+                <thead>
+                    <tr>
+                        <!-- ko foreach: { data: getInstalmentPeriods(), as: 'period' } -->
+                        <th class="text-center"><span data-bind="text: period.label"></span></th>
+                        <!-- /ko -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-center">
+                            <img data-bind="attr: { src: require.toUrl('Tamara_Checkout/images/instalments/icon1.png')}"  width="16" height="16"/>
+                        </td>
+                        <td class="text-center">
+                            <img data-bind="attr: { src: require.toUrl('Tamara_Checkout/images/instalments/icon2.png')}"   width="16" height="16"/>
+                        </td>
+                        <td class="text-center">
+                            <img data-bind="attr: { src: require.toUrl('Tamara_Checkout/images/instalments/icon3.png')}"   width="16" height="16" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <!-- ko foreach: { data: getInstalmentPeriods(), as: 'period' } -->
+                        <td class="text-center">
+                            <span data-bind="text: period.formatted_amount"></span>
+                        </td>
+                        <!-- /ko -->
+                    </tr>
+                </tbody>
+            </table>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button class="action primary checkout"
+                        type="submit"
+                        data-bind="
+                            click: placeOrder,
+                            attr: {title: $t('Place Order')},
+                            enable: isPlaceOrderActive()
+                        ">
+                    <span data-bind="i18n: 'Place Order'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

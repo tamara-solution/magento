@@ -88,35 +88,106 @@
 
                 <group id="payment_types" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Types</label>
-                    <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Enabled Pay by later</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <config_path>payment/tamara_pay_later/active</config_path>
-                    </field>
-                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Title</label>
-                        <config_path>payment/tamara_pay_later/title</config_path>
-                    </field>
-                    <field id="update_limit_btn" translate="label" type="button" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Update config min/max limit amount of order</label>
-                        <frontend_model>Tamara\Checkout\Block\System\Config\UpdateMinMax</frontend_model>
-                    </field>
-                    <field id="min_limit" translate="label" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Min Limit Amount of Order</label>
-                        <config_path>payment/tamara_pay_later/min_limit</config_path>
-                        <frontend_class>pay_later_min_limit</frontend_class>
-                    </field>
-                    <field id="max_limit" translate="label" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Max Limit Amount of Order</label>
-                        <config_path>payment/tamara_pay_later/max_limit</config_path>
-                        <frontend_class>pay_later_max_limit</frontend_class>
-                    </field>
-                    <field id="sort_order" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
-                           showInStore="0">
-                        <label>Sort Order</label>
-                        <frontend_class>validate-number</frontend_class>
-                        <config_path>payment/tamara_pay_later/sort_order</config_path>
-                    </field>
+
+                    <group id="type_pay_later" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+
+                        <label>Pay later in 30 days</label>
+
+                        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Enabled Pay by later</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/tamara_pay_later/active</config_path>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/tamara_pay_later/title</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="update_limit_btn" translate="label" type="button" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Update config min/max limit amount of order</label>
+                            <frontend_model>Tamara\Checkout\Block\System\Config\UpdateMinMax</frontend_model>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="min_limit" translate="label" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Min Limit Amount of Order</label>
+                            <config_path>payment/tamara_pay_later/min_limit</config_path>
+                            <frontend_class>pay_later_min_limit</frontend_class>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="max_limit" translate="label" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Max Limit Amount of Order</label>
+                            <config_path>payment/tamara_pay_later/max_limit</config_path>
+                            <frontend_class>pay_later_max_limit</frontend_class>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
+                               showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/tamara_pay_later/sort_order</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                    </group>
+
+                    <group id="type_pay_by_instalments" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Pay in 3 instalments</label>
+
+                        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Enabled Pay in 3 instalments</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/tamara_pay_by_instalments/active</config_path>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/tamara_pay_by_instalments/title</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="update_limit_btn" translate="label" type="button" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Update config min/max limit amount of order</label>
+                            <frontend_model>Tamara\Checkout\Block\System\Config\UpdateMinMax</frontend_model>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="min_limit" translate="label" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Min Limit Amount of Order</label>
+                            <config_path>payment/tamara_pay_by_instalments/min_limit</config_path>
+                            <frontend_class>pay_by_instalments_min_limit</frontend_class>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="max_limit" translate="label" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Max Limit Amount of Order</label>
+                            <config_path>payment/tamara_pay_by_instalments/max_limit</config_path>
+                            <frontend_class>pay_by_instalments_max_limit</frontend_class>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
+                               showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/tamara_pay_by_instalments/sort_order</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                    </group>
+
                 </group>
 
 

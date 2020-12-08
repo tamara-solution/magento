@@ -99,6 +99,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->updateCmsBlock();
         }
 
+        if (version_compare($context->getVersion(), '1.0.7', '<')) {
+            $this->updateDataType($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -279,5 +283,102 @@ class UpgradeSchema implements UpgradeSchemaInterface
         $this->blockRepository->save($cmsBlock);
     }
 
+    private function updateDataType(SchemaSetupInterface $setup) {
+        $tables = [
+            'tamara_capture_items' => [
+                'unit_price' => [
+                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length'    => '20,4',
+                    'nullable'  => true,
+                    'default'   => 0.00,
+                    'comment'   => 'Unit price'
+                ],
+                'total_amount' => [
+                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length'    => '20,4',
+                    'nullable'  => true,
+                    'default'   => 0.00,
+                    'comment'   => 'Total item amount'
+                ],
+                'tax_amount' => [
+                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length'    => '20,4',
+                    'nullable'  => true,
+                    'default'   => 0.00,
+                    'comment'   => 'Tax amount'
+                ],
+                'discount_amount' => [
+                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length'    => '20,4',
+                    'nullable'  => true,
+                    'default'   => 0.00,
+                    'comment'   => 'Discount amount'
+                ],
+            ],
+            'tamara_captures' => [
+                'total_amount' => [
+                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length'    => '20,4',
+                    'nullable'  => true,
+                    'default'   => 0.00,
+                    'comment'   => 'Total amount'
+                ],
+                'tax_amount' => [
+                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length'    => '20,4',
+                    'nullable'  => true,
+                    'default'   => 0.00,
+                    'comment'   => 'Tax amount'
+                ],
+                'shipping_amount' => [
+                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length'    => '20,4',
+                    'nullable'  => true,
+                    'default'   => 0.00,
+                    'comment'   => 'Shipping amount'
+                ],
+                'discount_amount' => [
+                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length'    => '20,4',
+                    'nullable'  => true,
+                    'default'   => 0.00,
+                    'comment'   => 'Discount amount'
+                ],
+                'refunded_amount' => [
+                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length'    => '20,4',
+                    'nullable'  => true,
+                    'default'   => 0.00,
+                    'comment'   => 'Refunded amount'
+                ],
+            ],
+            'tamara_refunds' => [
+                'total_amount' => [
+                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length'    => '20,4',
+                    'nullable'  => true,
+                    'default'   => 0.00,
+                    'comment'   => 'Total amount'
+                ],
+                'refunded_amount' => [
+                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length'    => '20,4',
+                    'nullable'  => true,
+                    'default'   => 0.00,
+                    'comment'   => 'Refunded amount'
+                ],
+            ],
+        ];
 
+        foreach ($tables as $tableName => $columns) {
+            foreach ($columns as $columnName => $definition) {
+                $setup->getConnection()->changeColumn(
+                    $setup->getTable($tableName),
+                    $columnName,
+                    $columnName,
+                    $definition
+                );
+            }
+        }
+    }
 }

@@ -40,7 +40,7 @@ class UpdateMinMax extends Field
             MagentoButton::class
         )->setData(
             [
-                'id' => 'update_config',
+                'class' => 'update_config',
                 'label' => __('Update Config'),
             ]
         );
