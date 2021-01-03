@@ -3,6 +3,7 @@
 namespace Tamara\Checkout\Helper;
 
 use Magento\Framework\App\Helper\Context;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Sales\Model\Order;
 
 class Capture extends \Tamara\Checkout\Helper\AbstractData
@@ -11,10 +12,12 @@ class Capture extends \Tamara\Checkout\Helper\AbstractData
 
     public function __construct(
         Context $context,
+        \Magento\Framework\Locale\Resolver $locale,
+        StoreManagerInterface $storeManager,
         \Tamara\Checkout\Model\CaptureRepository $captureRepository
-    ) {
+    )  {
         $this->captureRepository = $captureRepository;
-        parent::__construct($context);
+        parent::__construct($context, $locale, $storeManager);
     }
 
     /**

@@ -15,6 +15,7 @@ define(
         'mage/url',
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Checkout/js/model/quote',
+        'Magento_Checkout/js/model/totals',
         'tamaraCheckoutFrame'
     ],
     function (
@@ -26,7 +27,8 @@ define(
         redirectOnSuccessAction,
         url,
         fullScreenLoader,
-        quote
+        quote,
+        totals
     ) {
         'use strict';
 
@@ -36,6 +38,7 @@ define(
             },
             tamaraImageSrc: window.populateTamara.tamaraLogoImageUrl,
             tamaraLink: window.populateTamara.tamaraAboutLink,
+            currencyCode: window.checkoutConfig.totalsData.quote_currency_code,
             redirectAfterPlaceOrder: true,
             preventPlaceOrderWhenError: false,
             totals: quote.getTotals(),
@@ -97,7 +100,7 @@ define(
             getGrandTotal: function () {
                 let grandTotal = 0;
                 if (this.totals()) {
-                    grandTotal = this.totals()['grand_total'];
+                    grandTotal = totals.getSegment('grand_total').value;
                 } else {
                     grandTotal = window.checkoutConfig.totalsData.grand_total;
                 }
@@ -116,6 +119,17 @@ define(
 
             isPlaceOrderActive: function () {
                 return !!this.isTotalAmountInLimit();
+            },
+
+            isArabicLanguage: function () {
+                return (window.checkoutConfig.payment.tamara_pay_by_instalments.locale_code).includes("ar_");
+            },
+
+            getPaymentLanguage: function () {
+                if (this.isArabicLanguage()) {
+                    return 'ar';
+                }
+                return 'en';
             },
 
             /**

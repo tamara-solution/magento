@@ -9,29 +9,36 @@ use Tamara\Checkout\Model\EmailWhiteListFactory;
 
 class Popup extends Template
 {
-    const SA_LANGUAGE = 'ar_SA';
-    protected $config;
+    private $registry;
 
     protected $customerSession;
 
+    protected $config;
+
     protected $whitelistFactory;
 
-    protected $_store;
+    protected $helper;
+
+    protected $instalmentConfig;
 
     public function __construct(
         Template\Context $context,
+        \Magento\Framework\Registry $registry,
         BaseConfig $config,
         Session $customerSession,
         EmailWhiteListFactory $whiteListFactory,
-        \Magento\Framework\Locale\Resolver $store,
+        \Tamara\Checkout\Helper\AbstractData $helper,
+        \Tamara\Checkout\Gateway\Config\InstalmentConfig $instalmentConfig,
         array $data = []
     )
     {
         parent::__construct($context, $data);
-        $this->config = $config;
+        $this->registry = $registry;
         $this->customerSession = $customerSession;
+        $this->config = $config;
         $this->whitelistFactory = $whiteListFactory;
-        $this->_store = $store;
+        $this->helper = $helper;
+        $this->instalmentConfig = $instalmentConfig;
     }
 
     protected function _toHtml()
@@ -68,12 +75,48 @@ class Popup extends Template
         return $collections->getId() > 0;
     }
 
-    public function isSaLanguage(): bool
+    /**
+     * @return bool
+     */
+    public function isArabicLanguage(): bool
     {
-        $currentStore = $this->_store->getLocale();
-        if ($currentStore === self::SA_LANGUAGE) {
-            return true;
+        return $this->helper->isArabicLanguage();
+    }
+
+    /**
+     * @return \Magento\Framework\Pricing\Price\PriceInterface
+     * @throws \Exception
+     */
+    public function getCurrentProductPrice() {
+
+        /**
+         * @var $currentProduct \Magento\Catalog\Model\Product
+         */
+        if ($currentProduct = $this->getCurrentProduct()) {
+            return $currentProduct->getPriceInfo()->getPrice('final_price')->getValue();
         }
-        return false;
+        throw new \Exception(__('Cannot get current product price'));
+    }
+
+    /**
+     * @return mixed
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getStoreCurrencyCode() {
+        return $this->helper->getStoreCurrencyCode();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCurrentProduct() {
+        return $this->registry->registry('current_product');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTamaraPayByInstalmentsMinLimit() {
+        return $this->instalmentConfig->getMinLimit();
     }
 }
