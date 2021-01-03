@@ -1,31 +1,26 @@
 <?php
-    $isSaLanguage = $this->isSaLanguage();
-    $cartLogo = $isSaLanguage ? 'cart_ar' : 'cart';
-    $cartLogoUrl = $this->getViewFileUrl(sprintf('Tamara_Checkout::images/%s.svg', $cartLogo));
-    $titleCartLogo = __('Buy now pay later in 30 days');
-    $saLangClass = $isSaLanguage ? ' sa-language' : '';
+/**
+ * @var $block \Tamara\Checkout\Block\Product\Popup
+ */
+
+$lang = 'en';
+if ($block->isArabicLanguage()) {
+    $lang = 'sa';
+}
+$productFinalPrice = $block->getCurrentProductPrice();
 ?>
-<div class="tamara-info-popup">
-    <div class="button-popup">
-        <div class="wrapper">
-            <button class="modal-toggle">
-                <img width="295" height="50" src="<?php echo $cartLogoUrl ?>" alt="Tamara - <?php echo $titleCartLogo; ?>"/>
-            </button>
-        </div>
-        <div class="popup-tamara-config<?php echo $saLangClass; ?>">
-            <?php
-            echo $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('tamara_cms_block_info')->toHtml();
-            ?>
-        </div>
-    </div>
-</div>
-<script type="text/javascript">
-    require(['jquery', 'jquery/ui'], function($){
-        $(document).ready(function () {
-            $('.modal-toggle').on('click', function(e) {
-                e.preventDefault();
-                $('.modal').toggleClass('is-visible');
-            });
-        });
-    });
+<script charset="utf-8" src="https://cdn.tamara.co/widget/product-widget.min.js"></script>
+<script>
+    setTimeout(() => {
+        if (window.TamaraProductWidget) {
+            window.TamaraProductWidget.init({ lang: '<?= $lang; ?>' });
+            window.TamaraProductWidget.render();
+        }
+    }, 300);
 </script>
+<a class="tamara-widget" data-lang="<?= $lang; ?>"></a>
+<?php if ($productFinalPrice < $block->getTamaraPayByInstalmentsMinLimit() ): ?>
+    <div class="tamara-product-widget" data-lang="<?= $lang; ?>"></div>
+<?php else: ?>
+    <div class="tamara-product-widget" data-price="<?= $productFinalPrice; ?>" data-currency="<?= $block->getStoreCurrencyCode(); ?>" data-payment-type="installment" data-lang="<?= $lang; ?>"></div>
+<?php endif; ?>

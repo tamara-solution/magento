@@ -14,14 +14,18 @@ class PopulateTamara extends Template
 
     protected $config;
 
+    protected $helper;
+
     public function __construct(
         Template\Context $context,
         AssetRepository $assetRepository,
-        BaseConfig $config
+        BaseConfig $config,
+        \Tamara\Checkout\Helper\AbstractData $helper
     ){
         parent::__construct($context);
         $this->assetRepository = $assetRepository;
         $this->config = $config;
+        $this->helper = $helper;
     }
 
     public function getTamaraConfig() {
@@ -36,5 +40,15 @@ class PopulateTamara extends Template
     {
         $params = array_merge(['_secure' => $this->_request->isSecure()], $params);
         return $this->assetRepository->getUrlWithParams($fileId, $params);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isArabicLanguage() {
+        if ($this->helper->startsWith($this->helper->getLocale(), 'ar')) {
+            return true;
+        }
+        return false;
     }
 }

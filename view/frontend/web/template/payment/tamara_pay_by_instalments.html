@@ -12,10 +12,14 @@
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
         <label class="label" data-bind="attr: {'for': getCode()}">
             <span data-bind="text: getTitle()"></span>
-            <a id="tamara-logo-payment-pay-by-instalments" data-bind="attr: {href: tamaraLink, target: '_blank'}">
+        </label>
+        <!-- ko if: isTotalAmountInLimit() -->
+        <div style="width: 255px; display: inline-block; margin-left: 16px;">
+            <a class="tamara-product-widget" data-bind="attr: {'data-lang': getPaymentLanguage(), 'data-price': getGrandTotal(), 'data-currency': currencyCode, 'data-payment-type': 'installment', 'data-inject-template': 'false', 'href': 'javascript:void(0)'}">
                 <img data-bind="attr: {src: tamaraImageSrc, alt: $t('Tamara'), height: '36', width: '208' }" class="payment-icon" />
             </a>
-        </label>
+        </div>
+        <!-- /ko -->
     </div>
 
     <div class="payment-method-content">
