@@ -93,6 +93,10 @@ define(
                 return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_by_instalments.min_limit);
             },
 
+            getMinLimitAmount: function () {
+                return window.checkoutConfig.payment.tamara_pay_by_instalments.min_limit;
+            },
+
             getMaxLimit: function () {
                 return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_by_instalments.max_limit);
             },
