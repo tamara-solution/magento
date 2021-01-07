@@ -116,7 +116,7 @@ class Popup extends Template
     /**
      * @return mixed
      */
-    public function getTamaraPayByInstalmentsMinLimit() {
+    public function getTamaraPayByInstallmentsMinLimit() {
         return $this->instalmentConfig->getMinLimit();
     }
 }
