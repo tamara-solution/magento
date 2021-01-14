@@ -203,7 +203,7 @@ class TamaraAdapter
                 /** @var \Magento\Sales\Model\Order $mageOrder */
                 $mageOrder = $this->mageRepository->get($order->getOrderId());
                 $mageOrder->setState(Order::STATE_PROCESSING)->setStatus($this->checkoutAuthoriseStatus);
-                $mageOrder->addCommentToStatusHistory(__('Tamara - order was authorised. Order ID: ' . $tamaraOrderId));
+                $mageOrder->addStatusHistoryComment(__('Tamara - order was authorised. Order ID: ' . $tamaraOrderId));
                 $this->mageRepository->save($mageOrder);
 
                 $this->orderSender->send($mageOrder);
@@ -234,7 +234,7 @@ class TamaraAdapter
             }
 
             $captureId = $response->getCaptureId();
-            $order->addCommentToStatusHistory(sprintf("Tamara - order was captured. Capture ID:  %s", $captureId), true);
+            $order->addStatusHistoryComment(sprintf("Tamara - order was captured. Capture ID:  %s", $captureId), true);
             $order->getResource()->save($order);
             $data['capture_id'] = $captureId;
             $capture = PaymentHelper::createCaptureFromArray($data);
@@ -412,7 +412,7 @@ class TamaraAdapter
             $mageOrder = $this->mageRepository->get($order->getOrderId());
             $mageOrder->setState(Order::STATE_CANCELED)->setStatus(Order::STATE_CANCELED);
             $comment = sprintf('Tamara - order was %s by webhook', $eventType);
-            $mageOrder->addCommentToStatusHistory(__($comment));
+            $mageOrder->addStatusHistoryComment(__($comment));
             $this->mageRepository->save($mageOrder);
 
         } catch (\Exception $exception) {
