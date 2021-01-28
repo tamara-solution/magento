@@ -13,7 +13,7 @@
                 <model>TamaraFacade</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Pay later in 14 days</title>
+                <title>Pay later in 30 days</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
