@@ -39,7 +39,7 @@ define(
             tamaraImageSrc: window.populateTamara.tamaraLogoImageUrl,
             tamaraLink: window.populateTamara.tamaraAboutLink,
             currencyCode: window.checkoutConfig.totalsData.quote_currency_code,
-            redirectAfterPlaceOrder: true,
+            redirectAfterPlaceOrder: false,
             preventPlaceOrderWhenError: false,
             totals: quote.getTotals(),
 
@@ -47,7 +47,7 @@ define(
              * After place order callback
              */
             afterPlaceOrder: function () {
-                // Override this function and put after place order logic here
+                this.createTamaraOrder();
             },
 
             initObservable: function () {
@@ -136,33 +136,21 @@ define(
                     event.preventDefault();
                 }
 
-                jQuery('#error-iframe-pay-by-instalments').addClass('hidden-error-iframe');
-
                 if (this.validate() && additionalValidators.validate()) {
-                    this.preventPlaceOrderWhenError = false;
-
-                    if (this.handleIframeCheckout()) {
-                        return true;
-                    }
-
-                    if (this.preventPlaceOrderWhenError) {
-                        return false;
-                    }
-
                     this.isPlaceOrderActionAllowed(false);
 
                     this.getPlaceOrderDeferredObject()
-                        .fail(
+                        .done(
                             function () {
-                                self.isPlaceOrderActionAllowed(true);
-                            }
-                        ).done(
-                        function () {
-                            self.afterPlaceOrder();
+                                self.afterPlaceOrder();
 
-                            if (self.redirectAfterPlaceOrder) {
-                                redirectOnSuccessAction.execute();
+                                if (self.redirectAfterPlaceOrder) {
+                                    redirectOnSuccessAction.execute();
+                                }
                             }
+                        ).always(
+                        function () {
+                            self.isPlaceOrderActionAllowed(true);
                         }
                     );
 
@@ -181,30 +169,25 @@ define(
                 );
             },
 
-            handleIframeCheckout: function () {
-                if (!window.checkoutConfig.payment.tamara_iframe_checkout) {
-                    return false;
-                }
-
+            createTamaraOrder: function () {
+                jQuery('#error-iframe-pay-by-instalments').addClass('hidden-error-iframe');
                 fullScreenLoader.startLoader();
-
-                let selectedPaymentMethod = $('input[name="payment[method]"]:checked').val();
-                let that = this;
-
                 $.ajax({
-                    url: url.build('tamara/payment/iframeCheckout'),
+                    url: url.build('tamara/payment/placeOrder'),
                     type: 'POST',
-                    data: {payment_method: selectedPaymentMethod},
+                    data: {},
                     success: function (response) {
                         fullScreenLoader.stopLoader(true);
                         if (response.success) {
-                            jQuery('#order-id-pay-by-instalments').val(response.orderId);
+                            jQuery('#order-id').val(response.orderId);
                             window.magentoOrderId = response.orderId;
-                            TamaraCheckoutFrame.checkout(response.redirectUrl);
+                            if (window.checkoutConfig.payment.tamara_iframe_checkout) {
+                                TamaraCheckoutFrame.checkout(response.redirectUrl);
+                            } else {
+                                window.location.replace(response.redirectUrl);
+                            }
                         } else {
                             jQuery('#error-iframe-pay-by-instalments').removeClass('hidden-error-iframe').text(response.error);
-                            that.preventPlaceOrderWhenError = true;
-
                             setTimeout(() => jQuery('#error-iframe-pay-by-instalments').addClass('hidden-error-iframe').text(''), 10000);
 
                             return false;
@@ -214,8 +197,6 @@ define(
                         fullScreenLoader.stopLoader(true);
                     }
                 });
-
-                return true;
             },
 
             getNumberOfInstalments: function() {

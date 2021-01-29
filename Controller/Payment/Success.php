@@ -6,25 +6,20 @@ use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Tamara\Checkout\Api\OrderRepositoryInterface as TamaraOrderRepository;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
 use Tamara\Checkout\Model\Helper\CartHelper;
-use Tamara\Checkout\Api\OrderRepositoryInterface as TamaraOrderRepository;
 
 class Success extends Action
 {
     protected $_pageFactory;
-
+    protected $orderRepository;
+    protected $config;
+    protected $tamaraOrderRepository;
     /**
      * @var CartHelper;
      */
     private $cartHelper;
-
-    protected $orderRepository;
-
-    protected $config;
-
-    protected $tamaraOrderRepository;
-
     /**
      * @var Session
      */
@@ -51,8 +46,21 @@ class Success extends Action
     public function execute()
     {
         $logger = $this->_objectManager->get('TamaraCheckoutLogger');
+        if (!$this->_objectManager->get(\Magento\Checkout\Model\Session\SuccessValidator::class)->isValid()) {
+            return $this->resultRedirectFactory->create()->setPath('checkout/cart');
+        }
+        $orderId = $this->checkoutSession->getLastOrderId();
+
+        //dispatch event onepage
+        $this->_eventManager->dispatch(
+            'checkout_onepage_controller_success_action',
+            [
+                'order_ids' => [$orderId],
+                'order' => $this->checkoutSession->getLastRealOrder()
+            ]
+        );
+
         try {
-            $orderId = $this->_request->getParam('order_id', 0);
             $successStatus = $this->config->getCheckoutSuccessStatus();
 
             $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);

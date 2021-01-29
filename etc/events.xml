@@ -7,9 +7,6 @@
 -->
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="controller_action_predispatch_checkout_onepage_success">
-        <observer name="pre_onepage_success" instance="Tamara\Checkout\Observer\PreOnepageSuccess" />
-    </event>
     <event name="sales_order_creditmemo_save_after">
         <observer name="creditmemo_save_after" instance="Tamara\Checkout\Observer\CreditmemoSaveAfter" />
     </event>
