@@ -6,6 +6,8 @@ use Magento\Config\Model\ResourceModel\Config;
 use Magento\Framework\Exception\IntegrationException;
 use Magento\Payment\Model\Method\Logger;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface as TransactionBuilder;
+use Magento\Sales\Api\TransactionRepositoryInterface;
 use Tamara\Checkout\Api\CancelRepositoryInterface;
 use Tamara\Checkout\Api\CaptureRepositoryInterface;
 use Tamara\Checkout\Api\OrderRepositoryInterface;
@@ -219,6 +221,56 @@ class TamaraAdapter
         return true;
     }
 
+    /**
+     * @param $order \Magento\Sales\Model\Order
+     * @param $type
+     * @param $message
+     * @param $transactionId
+     * @return string|null
+     * @throws \Exception
+     */
+    public function createTransaction($order, $type, $message, $transactionId = null)
+    {
+        try {
+            $payment = $order->getPayment();
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+            /**
+             * @var TransactionBuilder $transactionBuilder
+             */
+            $transactionBuilder = $objectManager->create(TransactionBuilder::class);
+
+            /**
+             * @var $transactionManager \Magento\Sales\Model\Order\Payment\Transaction\ManagerInterface
+             */
+            $transactionManager = $objectManager->create(\Magento\Sales\Model\Order\Payment\Transaction\ManagerInterface::class);
+            if (!$transactionId) {
+                $transactionId = $transactionManager->generateTransactionId($payment,$type);
+            }
+            $transaction = $transactionBuilder->setPayment($payment)
+                ->setOrder($order)
+                ->setTransactionId($transactionId)
+                ->build($type);
+
+            $transactionRepository = $objectManager->create(TransactionRepositoryInterface::class);
+            $transactionRepository->save($transaction);
+            $payment->addTransactionCommentsToOrder(
+                $transaction,
+                $message
+            );
+            $payment->setTransactionId($transactionId);
+            $payment->setParentTransactionId(null);
+            $payment->setLastTransId($transactionId);
+            $payment->save();
+            $order->save();
+
+            return  $transaction->save()->getTransactionId();
+        } catch (Exception $e) {
+           $this->logger->debug([$e->getMessage()]);
+        }
+        return null;
+    }
+
     public function capture(array $data, Order $order): void
     {
         $this->logger->debug(['Start to capture']);
@@ -234,7 +286,6 @@ class TamaraAdapter
             }
 
             $captureId = $response->getCaptureId();
-            $order->addStatusHistoryComment(sprintf("Tamara - order was captured. Capture ID:  %s", $captureId), true);
             $order->getResource()->save($order);
             $data['capture_id'] = $captureId;
             $capture = PaymentHelper::createCaptureFromArray($data);
@@ -256,12 +307,30 @@ class TamaraAdapter
                 throw new IntegrationException(__('Cannot save capture items, please check log'));
             }
 
+            $this->saveCaptureTransaction($data,$order, $captureId);
+
         } catch (\Exception $e) {
             $this->logger->debug([$e->getMessage()]);
             throw new IntegrationException(__($e->getMessage()));
         }
 
         $this->logger->debug(['End capture']);
+    }
+
+    /**
+     * @param $data array
+     * @param $order \Magento\Sales\Model\Order
+     * @param $captureId
+     * @return string|null
+     * @throws \Exception
+     */
+    private function saveCaptureTransaction($data, $order, $captureId) {
+        $formattedPrice = $order->getOrderCurrency()->formatTxt(
+            $data['total_amount']
+        );
+
+        $message = __('Tamara - order was captured. The captured amount is %1.', $formattedPrice);
+        return $this->createTransaction($order, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE, $message, $captureId);
     }
 
     public function refund(array $data): void
