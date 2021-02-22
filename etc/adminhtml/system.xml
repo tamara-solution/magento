@@ -214,7 +214,15 @@
                 <group id="capture_payment" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Capture payment</label>
                     <field id="order_status_should_be_captured" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>What order status do you want to capture?</label>
+                        <label>Which order status do you want to trigger Tamara capture API? (You should set it to the status after the order is shipped)</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                    </field>
+                </group>
+
+                <group id="console" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Console configuration</label>
+                    <field id="order_status_should_be_refunded" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Which order status do you want to trigger Tamara refund API? (You can ignore this if don't use the cronjob to trigger Tamara API)</label>
                         <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
                     </field>
                 </group>

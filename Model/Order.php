@@ -1,6 +1,7 @@
 <?php
 
 namespace Tamara\Checkout\Model;
+
 use Magento\Framework\DataObject\IdentityInterface;
 use Magento\Framework\Model\AbstractModel;
 use Tamara\Checkout\Api\OrderInterface;
@@ -12,11 +13,6 @@ class Order extends AbstractModel implements OrderInterface, IdentityInterface
     public function getIdentities()
     {
         return [self::CACHE_TAG . '_' . $this->getId()];
-    }
-
-    protected function _construct()
-    {
-        $this->_init(\Tamara\Checkout\Model\ResourceModel\Order::class);
     }
 
     /**
@@ -54,8 +50,8 @@ class Order extends AbstractModel implements OrderInterface, IdentityInterface
     }
 
     /**
- * {@inheritdoc}
- */
+     * {@inheritdoc}
+     */
     public function getRedirectUrl()
     {
         return $this->_getData('redirect_url');
@@ -109,5 +105,64 @@ class Order extends AbstractModel implements OrderInterface, IdentityInterface
     public function getUpdatedAt()
     {
         return $this->_getData('updated_at');
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCapturedFromConsole()
+    {
+        return $this->_getData('captured_from_console');
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCanceledFromConsole()
+    {
+        return $this->_getData('canceled_from_console');
+    }
+
+    /**
+     * @return bool
+     */
+    public function getRefundedFromConsole()
+    {
+        return $this->_getData('refunded_from_console');
+    }
+
+    /**
+     * @param $value bool
+     * @return $this
+     */
+    public function setCapturedFromConsole($value)
+    {
+        $this->setData('captured_from_console', $value);
+        return $this;
+    }
+
+    /**
+     * @param $value bool
+     * @return $this
+     */
+    public function setCanceledFromConsole($value)
+    {
+        $this->setData('canceled_from_console', $value);
+        return $this;
+    }
+
+    /**
+     * @param $value bool
+     * @return $this
+     */
+    public function setRefundedFromConsole($value)
+    {
+        $this->setData('refunded_from_console', $value);
+        return $this;
+    }
+
+    protected function _construct()
+    {
+        $this->_init(\Tamara\Checkout\Model\ResourceModel\Order::class);
     }
 }

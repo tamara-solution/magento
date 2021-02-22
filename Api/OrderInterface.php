@@ -67,4 +67,38 @@ interface OrderInterface
      * @return string
      */
     public function getUpdatedAt();
+
+    /**
+     * @return bool
+     */
+    public function getCapturedFromConsole();
+
+    /**
+     * @return bool
+     */
+    public function getCanceledFromConsole();
+
+    /**
+     * @return bool
+     */
+    public function getRefundedFromConsole();
+
+    /**
+     * @param $value bool
+     * @return $this
+     */
+    public function setCapturedFromConsole($value);
+
+    /**
+     * @param $value bool
+     * @return $this
+     */
+    public function setCanceledFromConsole($value);
+
+    /**
+     * @param $value bool
+     * @return $this
+     */
+    public function setRefundedFromConsole($value);
+
 }
