@@ -137,4 +137,13 @@ class BaseConfig extends MagentoPaymentConfig
     public function enabledDebug($storeId = null): bool {
         return (bool) $this->getValue('debug', $storeId);
     }
+
+    /**
+     * @param null $storeId
+     * @return string
+     */
+    public function getOrderStatusShouldBeRefunded($storeId = null): string
+    {
+        return $this->getValue('console/order_status_should_be_refunded', $storeId);
+    }
 }

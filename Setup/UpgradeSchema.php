@@ -14,8 +14,8 @@ use Magento\Cms\Model\BlockFactory;
 class UpgradeSchema implements UpgradeSchemaInterface
 {
     const TAMARA_WHITELIST = 'tamara_email_whitelist',
-          TAMARA_CUSTOMER_WHITELIST = 'tamara_customer_whitelist',
-          TAMARA_CAPTURE_ITEMS = 'tamara_capture_items';
+        TAMARA_CUSTOMER_WHITELIST = 'tamara_customer_whitelist',
+        TAMARA_CAPTURE_ITEMS = 'tamara_capture_items';
 
     private $blockFactory;
     private $blockRepository;
@@ -36,7 +36,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         if (version_compare($context->getVersion(), '1.0.2', '<')) {
             $setup->getConnection()->addColumn(
-                $setup->getTable(self::TAMARA_CAPTURE_ITEMS ),
+                $setup->getTable(self::TAMARA_CAPTURE_ITEMS),
                 'image_url',
                 [
                     'type' => Table::TYPE_TEXT,
@@ -103,6 +103,14 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->updateDataType($setup);
         }
 
+        if (version_compare($context->getVersion(), '1.0.8', '<')) {
+            $this->addProcessFromConsoleColumns($setup);
+        }
+
+        if (version_compare($context->getVersion(), '1.0.9', '<')) {
+            $this->addConsoleQueryIndex($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -150,7 +158,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             [
                 'identity' => true,
                 'unsigned' => true,
-                'primary'  => true,
+                'primary' => true,
                 'nullable' => false
             ]
         )
@@ -192,7 +200,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
         $setup->getConnection()->query($sql);
     }
 
-    private function createCmsBlock(){
+    private function createCmsBlock()
+    {
         $content = '<div class="modal">
                     <div class="modal-overlay modal-toggle">&nbsp;</div>
                     <div class="modal-wrapper modal-transition">
@@ -239,7 +248,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
         $this->blockFactory->create()->setData($cmsBlockData)->save();
     }
 
-    private function updateCmsBlock() {
+    private function updateCmsBlock()
+    {
         $cmsBlock = $this->blockRepository->getById('tamara_cms_block_info');
         $content = '<div class="modal">
                     <div class="modal-overlay modal-toggle">&nbsp;</div>
@@ -283,89 +293,90 @@ class UpgradeSchema implements UpgradeSchemaInterface
         $this->blockRepository->save($cmsBlock);
     }
 
-    private function updateDataType(SchemaSetupInterface $setup) {
+    private function updateDataType(SchemaSetupInterface $setup)
+    {
         $tables = [
             'tamara_capture_items' => [
                 'unit_price' => [
-                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
-                    'length'    => '20,4',
-                    'nullable'  => true,
-                    'default'   => 0.00,
-                    'comment'   => 'Unit price'
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length' => '20,4',
+                    'nullable' => true,
+                    'default' => 0.00,
+                    'comment' => 'Unit price'
                 ],
                 'total_amount' => [
-                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
-                    'length'    => '20,4',
-                    'nullable'  => true,
-                    'default'   => 0.00,
-                    'comment'   => 'Total item amount'
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length' => '20,4',
+                    'nullable' => true,
+                    'default' => 0.00,
+                    'comment' => 'Total item amount'
                 ],
                 'tax_amount' => [
-                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
-                    'length'    => '20,4',
-                    'nullable'  => true,
-                    'default'   => 0.00,
-                    'comment'   => 'Tax amount'
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length' => '20,4',
+                    'nullable' => true,
+                    'default' => 0.00,
+                    'comment' => 'Tax amount'
                 ],
                 'discount_amount' => [
-                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
-                    'length'    => '20,4',
-                    'nullable'  => true,
-                    'default'   => 0.00,
-                    'comment'   => 'Discount amount'
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length' => '20,4',
+                    'nullable' => true,
+                    'default' => 0.00,
+                    'comment' => 'Discount amount'
                 ],
             ],
             'tamara_captures' => [
                 'total_amount' => [
-                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
-                    'length'    => '20,4',
-                    'nullable'  => true,
-                    'default'   => 0.00,
-                    'comment'   => 'Total amount'
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length' => '20,4',
+                    'nullable' => true,
+                    'default' => 0.00,
+                    'comment' => 'Total amount'
                 ],
                 'tax_amount' => [
-                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
-                    'length'    => '20,4',
-                    'nullable'  => true,
-                    'default'   => 0.00,
-                    'comment'   => 'Tax amount'
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length' => '20,4',
+                    'nullable' => true,
+                    'default' => 0.00,
+                    'comment' => 'Tax amount'
                 ],
                 'shipping_amount' => [
-                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
-                    'length'    => '20,4',
-                    'nullable'  => true,
-                    'default'   => 0.00,
-                    'comment'   => 'Shipping amount'
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length' => '20,4',
+                    'nullable' => true,
+                    'default' => 0.00,
+                    'comment' => 'Shipping amount'
                 ],
                 'discount_amount' => [
-                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
-                    'length'    => '20,4',
-                    'nullable'  => true,
-                    'default'   => 0.00,
-                    'comment'   => 'Discount amount'
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length' => '20,4',
+                    'nullable' => true,
+                    'default' => 0.00,
+                    'comment' => 'Discount amount'
                 ],
                 'refunded_amount' => [
-                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
-                    'length'    => '20,4',
-                    'nullable'  => true,
-                    'default'   => 0.00,
-                    'comment'   => 'Refunded amount'
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length' => '20,4',
+                    'nullable' => true,
+                    'default' => 0.00,
+                    'comment' => 'Refunded amount'
                 ],
             ],
             'tamara_refunds' => [
                 'total_amount' => [
-                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
-                    'length'    => '20,4',
-                    'nullable'  => true,
-                    'default'   => 0.00,
-                    'comment'   => 'Total amount'
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length' => '20,4',
+                    'nullable' => true,
+                    'default' => 0.00,
+                    'comment' => 'Total amount'
                 ],
                 'refunded_amount' => [
-                    'type'      => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
-                    'length'    => '20,4',
-                    'nullable'  => true,
-                    'default'   => 0.00,
-                    'comment'   => 'Refunded amount'
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'length' => '20,4',
+                    'nullable' => true,
+                    'default' => 0.00,
+                    'comment' => 'Refunded amount'
                 ],
             ],
         ];
@@ -380,5 +391,38 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 );
             }
         }
+    }
+
+    private function addProcessFromConsoleColumns(SchemaSetupInterface $setup)
+    {
+        $connection = $setup->getConnection();
+        $columns = [
+            'captured_from_console' => [
+                'type' => Table::TYPE_BOOLEAN,
+                'nullable' => false,
+                'default' => false,
+                'comment' => __('Captured from console')
+            ],
+            'canceled_from_console' => [
+                'type' => Table::TYPE_BOOLEAN,
+                'nullable' => false,
+                'default' => false,
+                'comment' => __('Canceled from console')
+            ],
+            'refunded_from_console' => [
+                'type' => Table::TYPE_BOOLEAN,
+                'nullable' => false,
+                'default' => false,
+                'comment' => __('Refunded from console')
+            ]
+        ];
+
+        foreach ($columns as $columnName => $definition) {
+            $connection->addColumn($setup->getTable('tamara_orders'), $columnName, $definition);
+        }
+    }
+
+    private function addConsoleQueryIndex(SchemaSetupInterface $setup) {
+        $setup->getConnection()->query("ALTER TABLE tamara_orders ADD INDEX idx_console_query (is_authorised, created_at)");
     }
 }

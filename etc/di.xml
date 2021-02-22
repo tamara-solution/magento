@@ -333,4 +333,12 @@
         </arguments>
     </virtualType>
 
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="tamara_checkout_console_command_scan_order" xsi:type="object">Tamara\Checkout\Console\Command\ScanOrder</item>
+            </argument>
+        </arguments>
+    </type>
+
 </config>

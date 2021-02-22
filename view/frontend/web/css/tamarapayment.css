@@ -1,0 +1,256 @@
+/* Begin Tamara payment css */
+
+#tamara-logo-payment {
+    margin-left: 50px;
+}
+.tamara-success-title {
+    text-align: center;
+    font-weight: bolder;
+}
+.tamara-success-title h2 {
+    font-size: 4.6rem;
+    text-align: center;
+}
+#content-success {
+    margin: 10px auto;
+    width: 100%;
+    text-align: center;
+}
+#tamara-logo-success {
+    margin: 50px auto;
+    width: 100%;
+    text-align: center;
+}
+#tamara-logo-success img {
+    margin-top: 10px;
+}
+.message.error.hidden-error-iframe {
+    display: none;
+}
+/*popup product*/
+*:before,
+*:after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.tamara-info-popup .wrapper {
+    width: 100%;
+    margin: 0 auto;
+    text-align: left;
+    display: flex;
+    justify-content: flex-start;
+}
+.tamara-info-popup .wrapper .sub-title {
+    padding-right: 15px;
+    display: flex;
+    align-items: center;
+}
+.tamara-info-popup .wrapper .modal-toggle {
+    border: none;
+    background: none;
+    padding: 7px 15px;
+    margin: 0;
+    box-sizing: border-box;
+    vertical-align: middle;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 20px;
+    font-weight: 400;
+    color: #3F3F3F;
+}
+.tamara-info-popup .wrapper .modal-toggle:hover {
+    border: none;
+}
+.tamara-info-popup .icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    fill: currentcolor;
+}
+.tamara-info-popup h1,
+.tamara-info-popup h2,
+.tamara-info-popup h3,
+.tamara-info-popup h4,
+.tamara-info-popup h5,
+.tamara-info-popup h6 {
+    color: #222;
+    font-weight: 700;
+    font-family: inherit;
+    line-height: 1.333;
+    text-rendering: optimizeLegibility;
+}
+.tamara-info-popup .modal {
+    position: fixed;
+    z-index: 10000;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    visibility: hidden;
+    width: 100%;
+    height: 100%;
+}
+.tamara-info-popup .modal .modal-overlay {
+    position: fixed;
+    z-index: 10;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s linear 0.3s, opacity 0.3s;
+}
+.tamara-info-popup .modal .modal-wrapper {
+    position: absolute;
+    z-index: 9999;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%) !important;
+    width: 100%;
+    max-width: 380px;
+    background-color: #fff;
+    height: auto !important;
+    overflow-y: auto;
+    padding: 0 20px 30px;
+    box-shadow: 0 0 1.5em rgba(0, 0, 0, 0.35);
+    border-radius: 20px;
+}
+.tamara-info-popup .modal .modal-transition {
+    transition: all 0.3s 0.12s;
+    transform: translateY(-10%);
+    opacity: 0;
+}
+.tamara-info-popup .modal.is-visible {
+    visibility: visible;
+}
+.tamara-info-popup .modal.is-visible .modal-overlay {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+}
+.tamara-info-popup .modal.is-visible .modal-transition {
+    transform: translateY(0);
+    opacity: 1;
+}
+.tamara-info-popup .modal-header,
+.tamara-info-popup .modal-content {
+    padding: 16px;
+}
+.tamara-info-popup .modal-header {
+    position: relative;
+    background-color: #fff;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 15px 0 0;
+}
+.tamara-info-popup .modal-header .modal-close {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px;
+    color: #aaa;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    height: auto;
+    z-index: 999;
+}
+.tamara-info-popup .modal-header .modal-close:before {
+    content: 'X';
+    display: block;
+    position: relative;
+    font-weight: 900;
+}
+.tamara-info-popup .modal-header .modal-close:hover {
+    color: #777;
+}
+.tamara-info-popup .modal-header .modal-heading {
+    font-size: 1.125em;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    position: relative;
+    width: 100%;
+    padding-bottom: 0px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.tamara-info-popup .modal-header .modal-heading img {
+    text-align: center;
+    margin: 0 auto;
+}
+.tamara-info-popup .modal-header .modal-heading .sub-title-head {
+    font-weight: 600;
+    margin: 10px 0 0 0;
+    font-size: 15px;
+    letter-spacing: 0;
+    line-height: 20px;
+}
+.tamara-info-popup .modal-header .title {
+    padding: 20px 15px 0;
+    text-align: center;
+    text-transform: uppercase;
+}
+.tamara-info-popup .sa-language .modal-body .one-block {
+    flex-direction: row-reverse;
+}
+.tamara-info-popup .sa-language .modal-body .one-block .right-content {
+    text-align: right;
+    padding-left: 0;
+    width: calc(80% - 15px);
+    padding-right: 15px;
+    direction: rtl;
+}
+.tamara-info-popup .modal-body {
+    padding-top: 30px;
+}
+.tamara-info-popup .modal-body .one-block {
+    padding: 0;
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.tamara-info-popup .modal-body .one-block .left-content {
+    width: 20%;
+    display: flex;
+    align-items: center;
+}
+.tamara-info-popup .modal-body .one-block .left-content img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    text-align: center;
+    margin: 0 auto;
+}
+.tamara-info-popup .modal-body .one-block .right-content {
+    width: calc(80% - 15px);
+    text-align: left;
+    padding-left: 15px;
+}
+.tamara-info-popup .modal-body .one-block .right-content .sub-title {
+    font-weight: 600;
+    margin-bottom: 0;
+    font-size: 15px;
+    letter-spacing: 0;
+    line-height: 20px;
+}
+.tamara-info-popup .modal-body .one-block .right-content .sub-description {
+    display: block;
+    font-size: 13px;
+    letter-spacing: 0;
+    line-height: 18px;
+}
+.tamara-info-popup .modal-content > *:first-child {
+    margin-top: 0;
+}
+.tamara-info-popup .modal-content > *:last-child {
+    margin-bottom: 0;
+}
+
+/* End Tamarapayment css */

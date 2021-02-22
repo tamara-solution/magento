@@ -20,24 +20,9 @@ class OrderSaveAfter extends AbstractObserver
     protected $logger;
 
     /**
-     * @var MagentoOrderRepository
-     */
-    protected $magentoOrderRepository;
-
-    /**
-     * @var TamaraAdapterFactory
-     */
-    protected $adapter;
-
-    /**
      * @var OrderRepositoryInterface
      */
     protected $orderRepository;
-
-    /**
-     * @var ProductHelper
-     */
-    protected $productHelper;
 
     /**
      * @var BaseConfig
@@ -51,18 +36,12 @@ class OrderSaveAfter extends AbstractObserver
 
     public function __construct(
         Logger $logger,
-        MagentoOrderRepository $magentoOrderRepository,
-        TamaraAdapterFactory $adapter,
         OrderRepositoryInterface $orderRepository,
-        ProductHelper $productHelper,
         BaseConfig $config,
         \Tamara\Checkout\Helper\Capture $captureHelper
     ) {
         $this->logger = $logger;
-        $this->magentoOrderRepository = $magentoOrderRepository;
-        $this->adapter = $adapter;
         $this->orderRepository = $orderRepository;
-        $this->productHelper = $productHelper;
         $this->config = $config;
         $this->captureHelper = $captureHelper;
     }
@@ -102,89 +81,6 @@ class OrderSaveAfter extends AbstractObserver
             return;
         }
 
-        //Get order from magento repository, avoid order from event
-        $order = $this->magentoOrderRepository->get($order->getEntityId());
-
-        if (!$this->captureHelper->canCapture($order)) {
-            $this->logger->debug(['Order cannot capture'], null, $this->config->enabledDebug());
-            return;
-        }
-
-        $payment = $order->getPayment();
-        if ($payment === null) {
-            return;
-        }
-        if (!$this->isTamaraPayment($payment->getMethod())) {
-            return;
-        }
-
-        $tamaraOrder = $this->orderRepository->getTamaraOrderByOrderId($order->getId());
-        $data['order_id'] = $order->getId();
-        $data['tamara_order_id'] = $tamaraOrder->getTamaraOrderId();
-        $data['total_amount'] = $order->getGrandTotal();
-        $data['tax_amount'] = $order->getTaxAmount();
-        $data['shipping_amount'] = $order->getShippingAmount();
-        $data['discount_amount'] = $order->getDiscountAmount();
-        $data['shipping_info'] = $order->getTracksCollection()->toArray() ?? [];
-        $data['currency'] = $order->getOrderCurrencyCode();
-
-        $data['items'] = [];
-        foreach ($order->getItems() as $orderItem) {
-            $totalAmount = $this->getRowTotalItem($orderItem);
-            if (empty($totalAmount)) {
-                continue;
-            }
-            $itemTemp = [];
-            $itemTemp['order_item_id'] = $orderItem->getItemId();
-            $itemTemp['type'] = $orderItem->getProductType();
-            $itemTemp['total_amount'] = $totalAmount;
-            $itemTemp['tax_amount'] = $orderItem->getTaxAmount();
-            $itemTemp['discount_amount'] = $orderItem->getDiscountAmount();
-            $itemTemp['unit_price'] = $orderItem->getPrice();
-            $itemTemp['name'] = $orderItem->getName();
-            $itemTemp['sku'] = $orderItem->getSku();
-            $itemTemp['quantity'] = $this->getQty($orderItem);
-            $itemTemp['image_url'] = $this->productHelper->getImageFromProductId($orderItem->getProductId());
-            $data['items'][] = $itemTemp;
-        }
-
-        $tamaraAdapter = $this->adapter->create();
-        $this->logger->debug([sprintf('Capture when order status is %s', $order->getStatus())], null,
-            $this->config->enabledDebug());
-        $tamaraAdapter->capture($data, $order);
-    }
-
-
-    /**
-     * @param OrderItemInterface $item
-     * @return float
-     */
-    private function getRowTotalItem(OrderItemInterface $item): float
-    {
-        if ($item->getRowTotal() === null || !$item->getRowTotal()) {
-            return 0.0;
-        }
-
-        return floatval($item->getRowTotal()
-            - $item->getDiscountAmount()
-            + $item->getTaxAmount()
-            + $item->getDiscountTaxCompensationAmount());
-    }
-
-    /**
-     * @param OrderItemInterface $item
-     * @return int
-     */
-    private function getQty(OrderItemInterface $item): int
-    {
-        if ($qtyShipped = intval($item->getQtyShipped())) {
-            return $qtyShipped;
-        }
-        if ($qtyInvoiced = intval($item->getQtyInvoiced())) {
-            return $qtyInvoiced;
-        }
-        if ($qtyOrdered = intval($item->getQtyOrdered())) {
-            return $qtyOrdered;
-        }
+        $this->captureHelper->captureOrder($order->getEntityId());
     }
 }
