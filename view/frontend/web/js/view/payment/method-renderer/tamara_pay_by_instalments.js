@@ -206,10 +206,11 @@ define(
             getInstalmentPeriods: function () {
                 let periods = [];
                 let numberOfInstalments = this.getNumberOfInstalments();
-                let grandTotal = this.getGrandTotal();
+                let grandTotal = this.getGrandTotal() * 100;
                 let mod = grandTotal % numberOfInstalments;
-                let payForEachMonth = (grandTotal - mod) / numberOfInstalments;
-                let dueToDay = grandTotal - (payForEachMonth * (numberOfInstalments - 1));
+                let payForEachMonth = (grandTotal - mod) / numberOfInstalments / 100;
+                let dueToDay = parseFloat(((grandTotal - mod)/numberOfInstalments/100) + (mod/100)).toFixed(2);
+
                 periods.push({'label': $.mage.__('Due today'), 'amount': dueToDay, 'formatted_amount': priceUtils.formatPrice(dueToDay)});
                 for(let i = 1; i < numberOfInstalments; i++) {
                     let label = i;
