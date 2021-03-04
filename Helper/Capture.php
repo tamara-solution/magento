@@ -107,6 +107,44 @@ class Capture extends \Tamara\Checkout\Helper\AbstractData
         $tamaraAdapter = $this->tamaraAdapterFactory->create();
         $this->log([sprintf('Capture when order status is %s', $order->getStatus())]);
         $tamaraAdapter->capture($data, $order);
+
+        //invoice after capture payment
+        $order = $this->magentoOrderRepository->get($orderId);
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+        /**
+         * @var $invoiceService \Magento\Sales\Model\Service\InvoiceService
+         */
+        $invoiceService = $objectManager->create(\Magento\Sales\Model\Service\InvoiceService::class);
+
+        /**
+         * @var $transaction \Magento\Framework\DB\Transaction
+         */
+        $transaction = $objectManager->create(\Magento\Framework\DB\Transaction::class);
+
+        /**
+         * @var $invoiceSender \Magento\Sales\Model\Order\Email\Sender\InvoiceSender
+         */
+        $invoiceSender = $objectManager->create(\Magento\Sales\Model\Order\Email\Sender\InvoiceSender::class);
+        if($order->canInvoice()) {
+            $invoice = $invoiceService->prepareInvoice($order);
+            $invoice->register();
+            $invoice->save();
+            $transactionSave = $transaction->addObject(
+                $invoice
+            )->addObject(
+                $invoice->getOrder()
+            );
+            $transactionSave->save();
+            $invoiceSender->send($invoice);
+
+            //send notification code
+            $order->addCommentToStatusHistory(
+                __('Notified customer about invoice #%1.', $invoice->getId())
+            )
+                ->setIsCustomerNotified(true)
+                ->save();
+        }
     }
 
     /**

@@ -214,45 +214,6 @@ class TamaraAdapter
                 $mageOrder->getPayment()->setBaseAmountPaidOnline($baseAmountPaid);
                 $this->mageRepository->save($mageOrder);
                 $this->orderSender->send($mageOrder);
-
-
-                //invoice after authorise payment
-                $mageOrder = $this->mageRepository->get($order->getOrderId());
-                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-
-                /**
-                 * @var $invoiceService \Magento\Sales\Model\Service\InvoiceService
-                 */
-                $invoiceService = $objectManager->create(\Magento\Sales\Model\Service\InvoiceService::class);
-
-                /**
-                 * @var $transaction \Magento\Framework\DB\Transaction
-                 */
-                $transaction = $objectManager->create(\Magento\Framework\DB\Transaction::class);
-
-                /**
-                 * @var $invoiceSender \Magento\Sales\Model\Order\Email\Sender\InvoiceSender
-                 */
-                $invoiceSender = $objectManager->create(\Magento\Sales\Model\Order\Email\Sender\InvoiceSender::class);
-                if($mageOrder->canInvoice()) {
-                    $invoice = $invoiceService->prepareInvoice($mageOrder);
-                    $invoice->register();
-                    $invoice->save();
-                    $transactionSave = $transaction->addObject(
-                        $invoice
-                    )->addObject(
-                        $invoice->getOrder()
-                    );
-                    $transactionSave->save();
-                    $invoiceSender->send($invoice);
-
-                    //send notification code
-                    $mageOrder->addCommentToStatusHistory(
-                        __('Notified customer about invoice #%1.', $invoice->getId())
-                    )
-                        ->setIsCustomerNotified(true)
-                        ->save();
-                }
             }
 
         } catch (\Exception $exception) {
