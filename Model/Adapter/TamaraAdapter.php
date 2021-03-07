@@ -148,9 +148,9 @@ class TamaraAdapter
     public function createCheckout(array $data): array
     {
         $this->logger->debug(['Start create checkout']);
-        $orderRequest = OrderHelper::createTamaraOrderFromArray($data);
 
         try  {
+            $orderRequest = OrderHelper::createTamaraOrderFromArray($data);
             $result = $this->client->createCheckout(new CreateCheckoutRequest($orderRequest));
         } catch (RequestDispatcherException $e) {
             $this->logger->debug([$e->getMessage()]);
@@ -414,28 +414,34 @@ class TamaraAdapter
     public function registerWebhook(): void
     {
         $this->logger->debug(['Start to register webhook']);
-        $baseUrl = StoreHelper::getBaseUrl();
-        $webhookUrl = $baseUrl . self::WEBHOOK_URL;
 
-        $request = new RegisterWebhookRequest(
-            $webhookUrl,
-            self::ALLOWED_WEBHOOKS
-        );
+        try {
+            $baseUrl = StoreHelper::getBaseUrl();
+            $webhookUrl = $baseUrl . self::WEBHOOK_URL;
 
-        $response = $this->client->registerWebhook($request);
+            $request = new RegisterWebhookRequest(
+                $webhookUrl,
+                self::ALLOWED_WEBHOOKS
+            );
 
-        if (!$response->isSuccess()) {
-            $errorLogs = [$response->getContent()];
-            $this->logger->debug($errorLogs);
-            throw new IntegrationException(__($response->getMessage()));
+            $response = $this->client->registerWebhook($request);
+
+            if (!$response->isSuccess()) {
+                $errorLogs = [$response->getContent()];
+                $this->logger->debug($errorLogs);
+                throw new IntegrationException(__($response->getMessage()));
+            }
+
+            $webhookId = $response->getWebhookId();
+
+            $this->resourceConfig->saveConfig(
+                'payment/tamara_checkout/webhook_id',
+                $webhookId
+            );
+        } catch (\Exception $exception) {
+            $this->logger->debug([$exception->getMessage()]);
+            throw $exception;
         }
-
-        $webhookId = $response->getWebhookId();
-
-        $this->resourceConfig->saveConfig(
-            'payment/tamara_checkout/webhook_id',
-            $webhookId
-        );
 
         $this->logger->debug(['End of register webhook']);
     }
