@@ -2,26 +2,30 @@
 /**
  * @var $block \Tamara\Checkout\Block\Product\Popup
  */
-
-$lang = 'en';
-if ($block->isArabicLanguage()) {
-    $lang = 'sa';
-}
 $productFinalPrice = $block->getCurrentProductPrice();
-$installmentsMinLimit = $block->getTamaraPayByInstallmentsMinLimit();
+$availableMethod = $block->getPaymentMethodForPdpWidget($productFinalPrice);
 ?>
-<script charset="utf-8" src="https://cdn.tamara.co/widget/product-widget.min.js"></script>
-<script>
-    setTimeout(() => {
-        if (window.TamaraProductWidget) {
-            window.TamaraProductWidget.init({ lang: '<?= $lang; ?>' });
-            window.TamaraProductWidget.render();
-        }
-    }, 300);
-</script>
-<a class="tamara-widget" data-lang="<?= $lang; ?>"></a>
-<?php if ($productFinalPrice <  $installmentsMinLimit): ?>
-    <div class="tamara-product-widget" data-lang="<?= $lang; ?>"></div>
-<?php else: ?>
-    <div class="tamara-product-widget" data-price="<?= $productFinalPrice; ?>" data-currency="<?= $block->getStoreCurrencyCode(); ?>" data-payment-type="installment" data-lang="<?= $lang; ?>" data-installment-minimum-amount="<?= $installmentsMinLimit; ?>"></div>
+
+<?php if (!empty($availableMethod)): ?>
+    <?php
+    $lang = 'en';
+    if ($block->isArabicLanguage()) {
+        $lang = 'sa';
+    }
+    ?>
+    <script charset="utf-8" src="https://cdn.tamara.co/widget/product-widget.min.js"></script>
+    <script>
+        setTimeout(() => {
+            if (window.TamaraProductWidget) {
+                window.TamaraProductWidget.init({ lang: '<?= $lang; ?>' });
+                window.TamaraProductWidget.render();
+            }
+        }, 300);
+    </script>
+
+    <?php if ($availableMethod['name'] == \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS): ?>
+        <div class="tamara-product-widget" data-disable-paylater="true" data-price="<?= $productFinalPrice; ?>" data-currency="<?= $block->getStoreCurrencyCode(); ?>" data-payment-type="installment" data-lang="<?= $lang; ?>" data-installment-minimum-amount="<?= $availableMethod['min_limit']; ?>"></div>
+    <?php elseif ($availableMethod['name'] == \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER): ?>
+        <div class="tamara-product-widget" data-payment-type="paylater" data-disable-installment="true"  data-lang="<?= $lang; ?>"></div>
+    <?php endif; ?>
 <?php endif; ?>

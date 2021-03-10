@@ -10,7 +10,8 @@ class PayLaterConfig extends MagentoPaymentConfig
     const PAYMENT_TYPE_CODE = 'tamara_pay_later',
           MIN_LIMIT = 'min_limit',
           MAX_LIMIT = 'max_limit',
-          TITLE = 'title';
+          TITLE = 'title',
+          ACTIVE = 'active';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -41,5 +42,9 @@ class PayLaterConfig extends MagentoPaymentConfig
     public function getPayLaterTitle($storeId = null)
     {
         return $this->getValue(self::TITLE, $storeId);
+    }
+
+    public function isEnabled($storeId = null) {
+        return (bool) $this->getValue(self::ACTIVE, $storeId);
     }
 }

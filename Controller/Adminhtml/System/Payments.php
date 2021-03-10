@@ -12,9 +12,13 @@ use Magento\Framework\Controller\ResultInterface;
 use Tamara\Checkout\Model\Adapter\TamaraAdapterFactory;
 use Magento\Backend\App\Action\Context;
 use Tamara\Exception\RequestDispatcherException;
+use Magento\Config\Model\ResourceModel\Config as ResourceConfig;
 
 class Payments extends Action
 {
+    const PAY_BY_INSTALMENTS = 'PAY_BY_INSTALMENTS';
+    const PAY_BY_LATER = 'PAY_BY_LATER';
+
     /**
      * @var JsonFactory
      */
@@ -26,6 +30,11 @@ class Payments extends Action
     protected $tamaraAdapterFactory;
 
     /**
+     * @var ResourceConfig
+     */
+    protected $resourceConfig;
+
+    /**
      * GetPaymentTypes constructor.
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
@@ -34,10 +43,12 @@ class Payments extends Action
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
-        TamaraAdapterFactory $tamaraAdapterFactory
+        TamaraAdapterFactory $tamaraAdapterFactory,
+        ResourceConfig $resourceConfig
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->tamaraAdapterFactory = $tamaraAdapterFactory;
+        $this->resourceConfig = $resourceConfig;
         parent::__construct($context);
     }
 
@@ -56,6 +67,15 @@ class Payments extends Action
 
         if (empty($result)) {
             $resultJson->setData(['message' => __('Can not get the payment types')]);
+        } else {
+            if (isset($result[self::PAY_BY_INSTALMENTS])) {
+                $this->resourceConfig->saveConfig('payment/tamara_pay_by_instalments/min_limit', $result[self::PAY_BY_INSTALMENTS]['min_limit']);
+                $this->resourceConfig->saveConfig('payment/tamara_pay_by_instalments/max_limit', $result[self::PAY_BY_INSTALMENTS]['max_limit']);
+            }
+            if (isset($result[self::PAY_BY_LATER])) {
+                $this->resourceConfig->saveConfig('payment/tamara_pay_later/min_limit', $result[self::PAY_BY_LATER]['min_limit']);
+                $this->resourceConfig->saveConfig('payment/tamara_pay_later/max_limit', $result[self::PAY_BY_LATER]['max_limit']);
+            }
         }
 
         $resultJson->setData($result);

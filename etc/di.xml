@@ -82,11 +82,18 @@
         <arguments>
             <argument name="validators" xsi:type="array">
                 <item name="currency" xsi:type="string">TamaraCurrencyValidator</item>
+                <item name="country" xsi:type="string">TamaraCountryValidator</item>
             </argument>
         </arguments>
     </virtualType>
 
     <virtualType name="TamaraCurrencyValidator" type="Tamara\Checkout\Gateway\Validator\CurrencyValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TamaraCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
             <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
         </arguments>

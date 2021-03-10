@@ -10,7 +10,8 @@ class InstalmentConfig extends MagentoPaymentConfig
     const PAYMENT_TYPE_CODE = 'tamara_pay_by_instalments',
           MIN_LIMIT = 'min_limit',
           MAX_LIMIT = 'max_limit',
-          TITLE = 'title';
+          TITLE = 'title',
+          ACTIVE = 'active';
     const NUMBER_OF_INSTALMENTS = 3;
 
     /**
@@ -42,5 +43,9 @@ class InstalmentConfig extends MagentoPaymentConfig
     public function getPayByInstalmentsTitle($storeId = null)
     {
         return $this->getValue(self::TITLE, $storeId);
+    }
+
+    public function isEnabled($storeId = null) {
+        return (bool) $this->getValue(self::ACTIVE, $storeId);
     }
 }
