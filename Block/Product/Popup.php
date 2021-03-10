@@ -21,6 +21,8 @@ class Popup extends Template
 
     protected $instalmentConfig;
 
+    protected $payLaterConfig;
+
     public function __construct(
         Template\Context $context,
         \Magento\Framework\Registry $registry,
@@ -29,6 +31,7 @@ class Popup extends Template
         EmailWhiteListFactory $whiteListFactory,
         \Tamara\Checkout\Helper\AbstractData $helper,
         \Tamara\Checkout\Gateway\Config\InstalmentConfig $instalmentConfig,
+        \Tamara\Checkout\Gateway\Config\PayLaterConfig $payLaterConfig,
         array $data = []
     )
     {
@@ -39,6 +42,7 @@ class Popup extends Template
         $this->whitelistFactory = $whiteListFactory;
         $this->helper = $helper;
         $this->instalmentConfig = $instalmentConfig;
+        $this->payLaterConfig = $payLaterConfig;
     }
 
     protected function _toHtml()
@@ -93,7 +97,7 @@ class Popup extends Template
          * @var $currentProduct \Magento\Catalog\Model\Product
          */
         if ($currentProduct = $this->getCurrentProduct()) {
-            return $currentProduct->getPriceInfo()->getPrice('final_price')->getValue();
+            return $currentProduct->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
         }
         throw new \Exception(__('Cannot get current product price'));
     }
@@ -118,5 +122,102 @@ class Popup extends Template
      */
     public function getTamaraPayByInstallmentsMinLimit() {
         return $this->instalmentConfig->getMinLimit();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabledPayLaterMethod() {
+        return $this->payLaterConfig->isEnabled();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabledInstallmentsMethod() {
+        return $this->instalmentConfig->isEnabled();
+    }
+
+    /**
+     * @param float $price
+     * @return array
+     */
+    public function getAvailablePaymentMethods(float $price) {
+        $enabledMethods = $this->getEnabledMethods();
+        $inLimitMethods = $this->filterUnderOver($enabledMethods, $price);
+        return $this->markHighPriorityMethod($inLimitMethods);
+    }
+
+    protected function markHighPriorityMethod(array $methods) {
+        if (!empty($methods)) {
+            $isExistedHighPriorityMethod = false;
+            foreach ($methods as &$method) {
+                if ($method['name'] == \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS) {
+                    $method['checked'] = true;
+                    $isExistedHighPriorityMethod = true;
+                } else {
+                    $method['checked'] = false;
+                }
+            }
+            if (!$isExistedHighPriorityMethod) {
+                $methods[0]['checked'] = true;
+            }
+        }
+        return $methods;
+    }
+
+    /**
+     * @param array $methods
+     * @param float $price
+     * @return array
+     */
+    public function filterUnderOver(array $methods, float $price) {
+        $result = [];
+        foreach ($methods as $method) {
+            if ($price < $method['min_limit'] || $price > $method['max_limit']) {
+                continue;
+            }
+            $result[] = $method;
+        }
+        return $result;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEnabledMethods() {
+        $enabledMethods = [];
+        if ($this->isEnabledPayLaterMethod()) {
+            $enabledMethods[] = [
+                'name' => \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER,
+                'min_limit' => $this->payLaterConfig->getMinLimit(),
+                'max_limit' => $this->payLaterConfig->getMaxLimit()
+            ];
+        }
+        if ($this->isEnabledInstallmentsMethod()) {
+            $enabledMethods[] = [
+                'name' => \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS,
+                'min_limit' => $this->instalmentConfig->getMinLimit(),
+                'max_limit' => $this->instalmentConfig->getMaxLimit()
+            ];
+        }
+        return $enabledMethods;
+    }
+
+    /**
+     * @param $price
+     * @return array|mixed
+     */
+    public function getPaymentMethodForPdpWidget($price) {
+        $result = [];
+        $availableMethods = $this->getAvailablePaymentMethods($price);
+        if (!empty($availableMethods)) {
+            foreach ($availableMethods as $method) {
+                if ($method['checked']) {
+                    return $method;
+                }
+            }
+        }
+        return $result;
     }
 }

@@ -146,4 +146,12 @@ class BaseConfig extends MagentoPaymentConfig
     {
         return $this->getValue('console/order_status_should_be_refunded', $storeId);
     }
+
+    /**
+     * @param null $storeId
+     * @return bool
+     */
+    public function getEnableTamaraPdpWidget($storeId = null) {
+        return (bool) $this->getValue('enable_pdp_widget', $storeId);
+    }
 }

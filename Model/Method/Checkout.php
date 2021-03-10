@@ -34,7 +34,7 @@ class Checkout extends AbstractMethod {
 	 */
 	protected $_code = 'tamara_checkout';
 
-	const ALLOWED_COUNTRIES = 'SA';
+	const ALLOWED_COUNTRIES = 'SA,AE';
 
 	/**
 	 * @var string

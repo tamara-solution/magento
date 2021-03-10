@@ -2,13 +2,22 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <payment>
-            <tamara_pay_later>
+            <tamara_checkout>
+                <active>0</active>
+                <model>Tamara\Checkout\Model\Method\TamaraCheckout</model>
                 <debug>1</debug>
                 <trigger_actions>1</trigger_actions>
                 <send_email_invoice>1</send_email_invoice>
                 <is_email_whitelist_enabled>0</is_email_whitelist_enabled>
                 <link_about_tamara>https://www.tamara.co/about-us.html</link_about_tamara>
-                <enable_iframe_checkout>1</enable_iframe_checkout>
+                <enable_iframe_checkout>0</enable_iframe_checkout>
+                <block_web_view>0</block_web_view>
+                <enable_webhook>1</enable_webhook>
+                <enable_pdp_widget>1</enable_pdp_widget>
+                <can_use_checkout>1</can_use_checkout>
+                <group>tamara</group>
+            </tamara_checkout>
+            <tamara_pay_later>
                 <active>0</active>
                 <model>TamaraFacade</model>
                 <order_status>pending</order_status>
@@ -18,16 +27,11 @@
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
                 <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>1</can_use_internal>
                 <sort_order>1</sort_order>
                 <group>tamara</group>
             </tamara_pay_later>
             <tamara_pay_by_instalments>
-                <debug>1</debug>
-                <trigger_actions>1</trigger_actions>
-                <send_email_invoice>1</send_email_invoice>
-                <is_email_whitelist_enabled>0</is_email_whitelist_enabled>
-                <link_about_tamara>https://www.tamara.co/about-us.html</link_about_tamara>
-                <enable_iframe_checkout>1</enable_iframe_checkout>
                 <active>0</active>
                 <model>Tamara\Checkout\Model\PayByInstalments</model>
                 <order_status>pending</order_status>
@@ -37,6 +41,7 @@
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
                 <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>1</can_use_internal>
                 <sort_order>1</sort_order>
                 <group>tamara</group>
             </tamara_pay_by_instalments>

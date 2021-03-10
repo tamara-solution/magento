@@ -302,7 +302,7 @@ class TamaraAdapter
             $captureRequest = PaymentHelper::createCaptureRequestFromArray($data);
             $response = $this->client->capture($captureRequest);
 
-            if (!$response->isSuccess()) {
+            if (!$response->isSuccess() && $response->getStatusCode() !== 409) {
                 $errorLogs = $response->getErrors() ?? [$response->getMessage()];
                 $this->logger->debug($errorLogs);
                 throw new IntegrationException(__('Could not capture in tamara, please check log'));
@@ -364,7 +364,7 @@ class TamaraAdapter
             $refundRequest = PaymentHelper::createRefundRequestFromArray($data);
             $response = $this->client->refund($refundRequest);
 
-            if (!$response->isSuccess()) {
+            if (!$response->isSuccess() && $response->getStatusCode() !== 409) {
                 $errorLogs = [$response->getContent()];
                 $this->logger->debug($errorLogs);
                 throw new IntegrationException(__($response->getMessage()));
@@ -410,7 +410,7 @@ class TamaraAdapter
             $cancelRequest = PaymentHelper::createCancelRequestFromArray($data);
             $response = $this->client->cancelOrder($cancelRequest);
 
-            if (!$response->isSuccess()) {
+            if (!$response->isSuccess() && $response->getStatusCode() !== 409) {
                 $errorLogs = [$response->getContent()];
                 $this->logger->debug($errorLogs);
                 throw new IntegrationException(__($response->getMessage()));
