@@ -84,6 +84,11 @@ class TamaraAdapter
      */
     private $resourceConfig;
 
+    /**
+     * @var \Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory
+     */
+    private $orderStatusCollectionFactory;
+
     public function __construct(
         $apiUrl,
         $merchantToken,
@@ -96,7 +101,8 @@ class TamaraAdapter
         $cancelRepository,
         $logger,
         OrderSender $orderSender,
-        Config $resourceConfig
+        Config $resourceConfig,
+        \Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory $orderStatusCollectionFactory
     )
     {
         $this->logger = $logger;
@@ -111,6 +117,7 @@ class TamaraAdapter
         $this->checkoutAuthoriseStatus = $checkoutAuthoriseStatus;
         $this->orderSender = $orderSender;
         $this->resourceConfig = $resourceConfig;
+        $this->orderStatusCollectionFactory = $orderStatusCollectionFactory;
     }
 
     /**
@@ -204,7 +211,18 @@ class TamaraAdapter
             if (!empty($this->checkoutAuthoriseStatus)) {
                 /** @var \Magento\Sales\Model\Order $mageOrder */
                 $mageOrder = $this->mageRepository->get($order->getOrderId());
-                $mageOrder->setState(Order::STATE_PROCESSING)->setStatus($this->checkoutAuthoriseStatus);
+                $orderStatusCollection = $this->orderStatusCollectionFactory->create();
+                $orderStatusCollection->joinStates();
+                $orderStatusCollection->addFieldToFilter('main_table.status', $this->checkoutAuthoriseStatus);
+                $stateWillBeUsed = Order::STATE_PROCESSING;
+                foreach ($orderStatusCollection as $item) {
+                    if ($item->getState() == Order::STATE_PROCESSING) {
+                        $stateWillBeUsed = Order::STATE_PROCESSING;
+                        break;
+                    }
+                    $stateWillBeUsed = $item->getState();
+                }
+                $mageOrder->setState($stateWillBeUsed)->setStatus($this->checkoutAuthoriseStatus);
                 $mageOrder->addCommentToStatusHistory(__('Tamara - order was authorised. Order ID: ' . $tamaraOrderId));
 
                 //set base amount paid

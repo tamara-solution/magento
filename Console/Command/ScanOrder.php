@@ -49,10 +49,16 @@ class ScanOrder extends Command
     {
         $this->helper->log(["Run scan orders from console"]);
         $this->scanOrder->setScanFromConsole(true);
-        if ($this->input->getOption(self::END_TIME)) {
-            $this->scanOrder->scan($this->input->getOption(self::START_TIME), $this->input->getOption(self::END_TIME));
-        } else {
-            $this->scanOrder->scan($this->input->getOption(self::START_TIME));
+        try {
+            if ($this->input->getOption(self::END_TIME)) {
+                $this->scanOrder->scan($this->input->getOption(self::START_TIME),
+                    $this->input->getOption(self::END_TIME));
+            } else {
+                $this->scanOrder->scan($this->input->getOption(self::START_TIME));
+            }
+        } catch (\Exception $exception) {
+            // just log the error and don't break the job
+            $this->helper->log([$exception->getMessage()]);
         }
     }
 
