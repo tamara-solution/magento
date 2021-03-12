@@ -11,6 +11,18 @@ class OrderPaymentPlaceEnd extends AbstractObserver
 {
     private const STATUS_PENDING = 'pending';
 
+    /**
+     * @var \Tamara\Checkout\Gateway\Config\BaseConfig
+     */
+    protected $config;
+
+    public function __construct(
+        \Tamara\Checkout\Gateway\Config\BaseConfig $config
+    )
+    {
+        $this->config = $config;
+    }
+
     public function execute(Observer $observer): void
     {
         /** @var Order\Payment $payment */
@@ -20,6 +32,6 @@ class OrderPaymentPlaceEnd extends AbstractObserver
             return;
         }
 
-        $payment->getOrder()->setState(Order::STATE_NEW)->setStatus(self::STATUS_PENDING);
+        $payment->getOrder()->setState(Order::STATE_NEW)->setStatus($this->config->getCheckoutOrderCreateStatus());
     }
 }

@@ -81,6 +81,10 @@ class BaseConfig extends MagentoPaymentConfig
         return $this->getValue('checkout_order_statuses/checkout_authorise_status', $storeId);
     }
 
+    public function getCheckoutOrderCreateStatus($storeId = null) {
+        return $this->getValue('checkout_order_statuses/checkout_order_created_status', $storeId);
+    }
+
     public function getTriggerActions($storeId = null)
     {
         return $this->getValue('trigger_actions', $storeId);

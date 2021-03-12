@@ -17,7 +17,12 @@ use Magento\Sales\Model\OrderRepository;
 
 class AuthorizeCommand implements CommandInterface
 {
-    private const STATUS_PENDING = 'pending';
+    const STATUS_PENDING = 'pending';
+
+    /**
+     * @var \Tamara\Checkout\Gateway\Config\BaseConfig 
+     */
+    protected $config;
 
     /**
      * @var \Tamara\Checkout\Model\OrderFactory
@@ -78,7 +83,8 @@ class AuthorizeCommand implements CommandInterface
         TransferFactoryInterface $transferFactory,
         ClientInterface $client,
         HandlerInterface $handler,
-        Logger $logger
+        Logger $logger,
+        \Tamara\Checkout\Gateway\Config\BaseConfig $config
     )
     {
         $this->tamaraOrderFactory = $tamaraOrderFactory;
@@ -89,6 +95,7 @@ class AuthorizeCommand implements CommandInterface
         $this->client = $client;
         $this->handler = $handler;
         $this->logger = $logger;
+        $this->config = $config;
     }
 
     /**
@@ -105,8 +112,7 @@ class AuthorizeCommand implements CommandInterface
         $payment = $commandSubject['payment']->getPayment();
         /** @var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
-        $order->setState(Order::STATE_NEW)->setStatus(self::STATUS_PENDING);
-        $order->addCommentToStatusHistory(__('Tamara - order was created'));
+
         // disable sending confirmation email
         $order->setCanSendNewEmailFlag(false);
 
@@ -124,6 +130,11 @@ class AuthorizeCommand implements CommandInterface
 
         try {
             $response = $this->client->placeRequest($transferO);
+
+            //set state for new order
+            $order->setState(Order::STATE_NEW)->setStatus($this->config->getCheckoutOrderCreateStatus());
+            $order->addCommentToStatusHistory(__('Tamara - order was created, order id: ' . $response['order_id']));
+
             $tamaraOrder = $this->tamaraOrderFactory->create();
             $tamaraOrder->setData([
                 'order_id' => $entityId,
