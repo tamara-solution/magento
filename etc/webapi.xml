@@ -13,4 +13,16 @@
             <resource ref="Tamara_Checkout::config" />
         </resources>
     </route>
+    <route url="/V1/tamara/order/:magentoOrderId" method="GET">
+        <service class="Tamara\Checkout\Api\OrderRepositoryInterface" method="getTamaraOrderByOrderId"/>
+        <resources>
+            <resource ref="Tamara_Checkout::config" />
+        </resources>
+    </route>
+    <route url="/V1/tamara/checkout/:magentoOrderId" method="GET">
+        <service class="Tamara\Checkout\Api\CheckoutInformationRepositoryInterface" method="getTamaraCheckoutInformation"/>
+        <resources>
+            <resource ref="Tamara_Checkout::config" />
+        </resources>
+    </route>
 </routes>

@@ -35,9 +35,7 @@ class OrderRepository implements OrderRepositoryInterface
     }
 
     /**
-     * @param OrderInterface $order
-     * @return OrderInterface
-     * @throws CouldNotSaveException
+     * @inheritDoc
      */
     public function save(OrderInterface $order)
     {
@@ -50,21 +48,22 @@ class OrderRepository implements OrderRepositoryInterface
     }
 
     /**
-     * @param $id
-     * @return \Magento\Sales\Model\Order|Order
-     * @throws NoSuchEntityException
+     * @inheritDoc
      */
-    public function getTamaraOrderByOrderId($id)
+    public function getTamaraOrderByOrderId($magentoOrderId)
     {
         $order = $this->orderFactory->create();
-        $orderId = $this->resourceModel->getByOrderId($id);
+        $orderId = $this->resourceModel->getByOrderId($magentoOrderId);
         if (!$orderId) {
-            throw new NoSuchEntityException(__('Requested order doesn\'t exist: ' . $id));
+            throw new NoSuchEntityException(__('Requested order doesn\'t exist: ' . $magentoOrderId));
         }
         $this->resourceModel->load($order, $orderId);
         return $order;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getTamaraOrderByTamaraOrderId($tamaraOrderId)
     {
         $order = $this->orderFactory->create();

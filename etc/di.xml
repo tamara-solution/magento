@@ -315,6 +315,8 @@
     <preference for="Tamara\Checkout\Api\CancelRepositoryInterface" type="Tamara\Checkout\Model\CancelRepository" />
     <preference for="Tamara\Checkout\Api\ConfigRepositoryInterface" type="Tamara\Checkout\Model\ConfigRepository" />
     <preference for="Tamara\Checkout\Api\EmailWhiteListRepositoryInterface" type="Tamara\Checkout\Model\EmailWhiteListRepository" />
+    <preference for="Tamara\Checkout\Api\Data\CheckoutInformationInterface" type="Tamara\Checkout\Model\CheckoutInformation" />
+    <preference for="Tamara\Checkout\Api\CheckoutInformationRepositoryInterface" type="Tamara\Checkout\Model\CheckoutInformationRepository" />
 
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
