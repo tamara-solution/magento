@@ -10,6 +10,9 @@ class Order extends AbstractModel implements OrderInterface, IdentityInterface
 {
     const CACHE_TAG = 'tamara_order';
 
+    /**
+     * @inheritDoc
+     */
     public function getIdentities()
     {
         return [self::CACHE_TAG . '_' . $this->getId()];

@@ -3,7 +3,6 @@
 namespace Tamara\Checkout\Api;
 
 use Magento\Framework\Exception\CouldNotSaveException;
-use Tamara\Checkout\Model\Order;
 
 interface OrderRepositoryInterface
 {
@@ -17,14 +16,14 @@ interface OrderRepositoryInterface
     public function save(OrderInterface $order);
 
     /**
-     * @param $id
-     * @return Order
+     * @param int $magentoOrderId
+     * @return OrderInterface
      */
-    public function getTamaraOrderByOrderId($id);
+    public function getTamaraOrderByOrderId($magentoOrderId);
 
     /**
      * @param $tamaraOrderId
-     * @return Order
+     * @return OrderInterface
      */
     public function getTamaraOrderByTamaraOrderId($tamaraOrderId);
 }
