@@ -140,7 +140,7 @@ class Capture extends \Tamara\Checkout\Helper\AbstractData
 
             //send notification code
             $order->addStatusHistoryComment(
-                __('Notified customer about invoice #%1.', $invoice->getId())
+                __('Notified customer about invoice #%1.', $invoice->getIncrementId())
             )
                 ->setIsCustomerNotified(true)
                 ->save();
