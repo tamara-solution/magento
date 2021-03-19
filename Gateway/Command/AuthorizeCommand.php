@@ -123,6 +123,7 @@ class AuthorizeCommand implements CommandInterface
         $commandSubject['order_result_id'] = $entityId;
         $commandSubject['order_currency_code'] = $currencyCode;
         $commandSubject['order'] = $orderResult;
+        $commandSubject['phone_verified'] = $this->config->isPhoneVerified();
 
         $transferO = $this->transferFactory->create(
             $this->requestBuilder->build($commandSubject)

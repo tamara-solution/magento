@@ -68,8 +68,8 @@ class Success extends Action
             if (!$tamaraOrder->getIsAuthorised()) {
                 /** @var \Magento\Sales\Model\Order $order */
                 $order = $this->orderRepository->get($orderId);
-                $order->setState(Order::STATE_PROCESSING)->setStatus($successStatus);
-                $order->addStatusHistoryComment(__('Tamara - order was processing'));
+                $order->setState(Order::STATE_PENDING_PAYMENT)->setStatus($successStatus);
+                $order->addStatusHistoryComment(__('Tamara - order checkout success, we will confirm soon'));
                 $this->orderRepository->save($order);
             }
         } catch (\Exception $e) {

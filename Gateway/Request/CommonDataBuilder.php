@@ -23,7 +23,8 @@ class CommonDataBuilder implements BuilderInterface
         DESCRIPTION = 'description',
         TAX_AMOUNT = 'tax_amount',
         DISCOUNT_AMOUNT = 'discount_amount',
-        SHIPPING_AMOUNT = 'shipping_amount';
+        SHIPPING_AMOUNT = 'shipping_amount',
+        RISK_ASSESSMENT = 'risk_assessment';
 
     /**
      * @var ProductMetadata
@@ -50,6 +51,7 @@ class CommonDataBuilder implements BuilderInterface
         /** @var OrderInterface $order */
         $order = $buildSubject['order'];
         $currencyCode = $buildSubject['order_currency_code'];
+        $phoneVerified = $buildSubject['phone_verified'];
 
         $discountName = $order->getCouponCode() ?? 'N/A';
         $discountAmount = new Discount($discountName, new Money($order->getDiscountAmount(), $currencyCode));
@@ -78,7 +80,8 @@ class CommonDataBuilder implements BuilderInterface
             self::COUNTRY_CODE => $order->getBillingAddress()->getCountryId(),
             self::PAYMENT_TYPE => $paymentType,
             self::PLATFORM => 'Magento Version: ' . $this->productMetaData->getVersion(),
-            self::DESCRIPTION => 'Description'
+            self::DESCRIPTION => 'Description',
+            self::RISK_ASSESSMENT => ['phone_verified' => $phoneVerified]
         ];
     }
 }

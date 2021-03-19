@@ -27,6 +27,12 @@
                         <config_path>payment/tamara_checkout/notification_token</config_path>
                         <backend_model>Tamara\Checkout\Model\Config\Backend\Value</backend_model>
                     </field>
+                    <field id="phone_verified" translate="label" type="select" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Phone verified</label>
+                        <config_path>payment/tamara_checkout/phone_verified</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>Please check this if you verify the phone number on your side</comment>
+                    </field>
                     <field id="enable_webhook" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Enable Webhook</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -89,6 +95,12 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/tamara_checkout/enable_pdp_widget</config_path>
                         <comment>Enable it if you want to show Tamara widget in product detail page</comment>
+                    </field>
+                    <field id="auto_generate_invoice" translate="label" type="select" sortOrder="97" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Auto generate invoice</label>
+                        <source_model>Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice</source_model>
+                        <config_path>payment/tamara_checkout/auto_generate_invoice</config_path>
+                        <comment>Please select the state of the order when the invoice should be generated automatically</comment>
                     </field>
                     <field id="link_about_tamara" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Link About Tamara Payment</label>
@@ -229,23 +241,23 @@
                     <label>Checkout Order Statuses</label>
                     <field id="checkout_order_created_status" translate="label" type="select" sortOrder="210" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Order status after order created in Magento</label>
-                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                        <source_model>Tamara\Checkout\Model\Config\Source\Order\State\StateNew\Status</source_model>
                     </field>
                     <field id="checkout_success_status" translate="label" type="select" sortOrder="220" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Order status when checkout is success (after redirect)</label>
-                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                        <source_model>Tamara\Checkout\Model\Config\Source\Order\State\PendingPayment\Status</source_model>
                     </field>
                     <field id="checkout_cancel_status" translate="label" type="select" sortOrder="230" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Order status when checkout is cancelled</label>
-                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                        <source_model>Tamara\Checkout\Model\Config\Source\Order\State\Cancelled\Status</source_model>
                     </field>
                     <field id="checkout_failure_status" translate="label" type="select" sortOrder="240" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Order status when checkout is failure</label>
-                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                        <source_model>Tamara\Checkout\Model\Config\Source\Order\State\Failure\Status</source_model>
                     </field>
                     <field id="checkout_authorise_status" translate="label" type="select" sortOrder="250" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Order status when order is authorised</label>
-                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                        <source_model>Tamara\Checkout\Model\Config\Source\Order\State\Processing\Status</source_model>
                     </field>
                 </group>
 
@@ -254,7 +266,7 @@
                     <field id="order_status_should_be_captured" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Which order status do you want to Tamara capture API?</label>
                         <comment>You should set it to the status after the order is shipped</comment>
-                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                        <source_model>Tamara\Checkout\Model\Config\Source\Order\State\Capture\Status</source_model>
                     </field>
                 </group>
 
@@ -263,7 +275,7 @@
                     <field id="order_status_should_be_refunded" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Which order status do you want to Tamara refund API?</label>
                         <comment>You can ignore this if don't use the cronjob to trigger Tamara API</comment>
-                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                        <source_model>Tamara\Checkout\Model\Config\Source\Order\State\Refund\Status</source_model>
                     </field>
                 </group>
 

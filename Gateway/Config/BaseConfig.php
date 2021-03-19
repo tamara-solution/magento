@@ -125,6 +125,14 @@ class BaseConfig extends MagentoPaymentConfig
         return (bool) $this->getValue('enable_iframe_checkout', $storeId);
     }
 
+    public function getAutoGenerateInvoice($storeId = null) {
+        return (int) $this->getValue('auto_generate_invoice', $storeId);
+    }
+
+    public function isPhoneVerified($storeId = null) {
+        return (bool) $this->getValue('phone_verified', $storeId);
+    }
+
     /**
      * @param null $storeId
      * @return string
