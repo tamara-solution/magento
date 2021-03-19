@@ -89,6 +89,16 @@ class TamaraAdapter
      */
     private $orderStatusCollectionFactory;
 
+    /**
+     * @var \Tamara\Checkout\Gateway\Config\BaseConfig
+     */
+    protected $baseConfig;
+
+    /**
+     * @var \Tamara\Checkout\Helper\Invoice
+     */
+    protected $tamaraInvoiceHelper;
+
     public function __construct(
         $apiUrl,
         $merchantToken,
@@ -102,7 +112,9 @@ class TamaraAdapter
         $logger,
         OrderSender $orderSender,
         Config $resourceConfig,
-        \Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory $orderStatusCollectionFactory
+        \Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory $orderStatusCollectionFactory,
+        \Tamara\Checkout\Gateway\Config\BaseConfig $baseConfig,
+        \Tamara\Checkout\Helper\Invoice $tamaraInvoiceHelper
     )
     {
         $this->logger = $logger;
@@ -118,6 +130,8 @@ class TamaraAdapter
         $this->orderSender = $orderSender;
         $this->resourceConfig = $resourceConfig;
         $this->orderStatusCollectionFactory = $orderStatusCollectionFactory;
+        $this->baseConfig = $baseConfig;
+        $this->tamaraInvoiceHelper = $tamaraInvoiceHelper;
     }
 
     /**
@@ -232,6 +246,11 @@ class TamaraAdapter
                 $mageOrder->getPayment()->setBaseAmountPaidOnline($baseAmountPaid);
                 $this->mageRepository->save($mageOrder);
                 $this->orderSender->send($mageOrder);
+
+                if ($this->baseConfig->getAutoGenerateInvoice() == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_AUTHORISE) {
+                    $this->tamaraInvoiceHelper->log(["Automatically generate invoice after capture payment"]);
+                    $this->tamaraInvoiceHelper->generateInvoice($mageOrder->getId());
+                }
             }
 
         } catch (\Exception $exception) {

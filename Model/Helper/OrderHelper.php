@@ -31,6 +31,7 @@ class OrderHelper
         $order->setMerchantUrl($data[MerchantUrlDataBuilder::MERCHANT_URL]);
         $order->setConsumer($data[ConsumerDataBuilder::CONSUMER]);
         $order->setItems($data[ItemsDataBuilder::ITEMS]);
+        $order->setRiskAssessment(new \Tamara\Model\Order\RiskAssessment($data[CommonDataBuilder::RISK_ASSESSMENT]));
 
         return $order;
     }

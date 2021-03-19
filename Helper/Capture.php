@@ -34,6 +34,11 @@ class Capture extends \Tamara\Checkout\Helper\AbstractData
      */
     protected $productHelper;
 
+    /**
+     * @var Invoice
+     */
+    protected $tamaraInvoiceHelper;
+
     public function __construct(
         Context $context,
         \Magento\Framework\Locale\Resolver $locale,
@@ -43,13 +48,15 @@ class Capture extends \Tamara\Checkout\Helper\AbstractData
         \Tamara\Checkout\Api\OrderRepositoryInterface $tamaraOrderRepository,
         \Tamara\Checkout\Model\CaptureRepository $captureRepository,
         \Tamara\Checkout\Model\Adapter\TamaraAdapterFactory $tamaraAdapterFactory,
-        ProductHelper $productHelper
+        ProductHelper $productHelper,
+        \Tamara\Checkout\Helper\Invoice $tamaraInvoiceHelper
     ) {
         $this->magentoOrderRepository = $magentoOrderRepository;
         $this->captureRepository = $captureRepository;
         $this->tamaraOrderRepository = $tamaraOrderRepository;
         $this->tamaraAdapterFactory = $tamaraAdapterFactory;
         $this->productHelper = $productHelper;
+        $this->tamaraInvoiceHelper = $tamaraInvoiceHelper;
         parent::__construct($context, $locale, $storeManager, $tamaraConfig);
     }
 
@@ -108,42 +115,9 @@ class Capture extends \Tamara\Checkout\Helper\AbstractData
         $this->log([sprintf('Capture when order status is %s', $order->getStatus())]);
         $tamaraAdapter->capture($data, $order);
 
-        //invoice after capture payment
-        $order = $this->magentoOrderRepository->get($orderId);
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-
-        /**
-         * @var $invoiceService \Magento\Sales\Model\Service\InvoiceService
-         */
-        $invoiceService = $objectManager->create(\Magento\Sales\Model\Service\InvoiceService::class);
-
-        /**
-         * @var $transaction \Magento\Framework\DB\Transaction
-         */
-        $transaction = $objectManager->create(\Magento\Framework\DB\Transaction::class);
-
-        /**
-         * @var $invoiceSender \Magento\Sales\Model\Order\Email\Sender\InvoiceSender
-         */
-        $invoiceSender = $objectManager->create(\Magento\Sales\Model\Order\Email\Sender\InvoiceSender::class);
-        if($order->canInvoice()) {
-            $invoice = $invoiceService->prepareInvoice($order);
-            $invoice->register();
-            $invoice->save();
-            $transactionSave = $transaction->addObject(
-                $invoice
-            )->addObject(
-                $invoice->getOrder()
-            );
-            $transactionSave->save();
-            $invoiceSender->send($invoice);
-
-            //send notification code
-            $order->addCommentToStatusHistory(
-                __('Notified customer about invoice #%1.', $invoice->getIncrementId())
-            )
-                ->setIsCustomerNotified(true)
-                ->save();
+        if ($this->tamaraConfig->getAutoGenerateInvoice() == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_CAPTURE) {
+            $this->log(["Automatically generate invoice after capture payment"]);
+            $this->tamaraInvoiceHelper->generateInvoice($order->getId());
         }
     }
 
