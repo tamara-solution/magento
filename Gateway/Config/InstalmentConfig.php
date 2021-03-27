@@ -30,16 +30,6 @@ class InstalmentConfig extends MagentoPaymentConfig
         $this->serializer = $serializer;
     }
 
-    public function getMinLimit($storeId = null)
-    {
-        return $this->getValue(self::MIN_LIMIT, $storeId);
-    }
-
-    public function getMaxLimit($storeId = null)
-    {
-        return $this->getValue(self::MAX_LIMIT, $storeId);
-    }
-
     public function getPayByInstalmentsTitle($storeId = null)
     {
         return $this->getValue(self::TITLE, $storeId);

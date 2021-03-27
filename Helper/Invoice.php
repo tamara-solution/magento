@@ -29,17 +29,19 @@ class Invoice extends \Tamara\Checkout\Helper\AbstractData
         Context $context,
         \Magento\Framework\Locale\Resolver $locale,
         StoreManagerInterface $storeManager,
+        \Magento\Framework\App\CacheInterface $magentoCache,
         \Tamara\Checkout\Gateway\Config\BaseConfig $tamaraConfig,
         \Magento\Sales\Api\OrderRepositoryInterface $magentoOrderRepository,
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
         \Magento\Framework\DB\Transaction $dbTransaction,
-        \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender
+        \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender,
+        \Tamara\Checkout\Model\Adapter\TamaraAdapterFactory $tamaraAdapterFactory
     ) {
         $this->magentoOrderRepository = $magentoOrderRepository;
         $this->invoiceService = $invoiceService;
         $this->dbTransaction = $dbTransaction;
         $this->invoiceSender = $invoiceSender;
-        parent::__construct($context, $locale, $storeManager, $tamaraConfig);
+        parent::__construct($context, $locale, $storeManager, $magentoCache, $tamaraConfig, $tamaraAdapterFactory);
     }
 
     /**

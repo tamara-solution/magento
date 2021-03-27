@@ -19,6 +19,11 @@ use Tamara\Checkout\Gateway\Request\MerchantUrlDataBuilder;
 class ConfigRepository extends GatewayConfig implements ConfigRepositoryInterface
 {
     /**
+     * @var \Tamara\Checkout\Helper\AbstractData
+     */
+    protected $tamaraHelper;
+
+    /**
      * @var StoreManagerInterface
      */
     private $storeManager;
@@ -39,6 +44,7 @@ class ConfigRepository extends GatewayConfig implements ConfigRepositoryInterfac
         StoreManagerInterface $storeManager,
         PayLaterConfig $payLaterConfig,
         InstalmentConfig $instalmentConfig,
+        \Tamara\Checkout\Helper\AbstractData $tamaraHelper,
         $methodCode = self::CODE,
         $pathPattern = MagentoPaymentConfig::DEFAULT_PATH_PATTERN
     ) {
@@ -46,6 +52,7 @@ class ConfigRepository extends GatewayConfig implements ConfigRepositoryInterfac
         $this->storeManager = $storeManager;
         $this->payLaterConfig = $payLaterConfig;
         $this->instalmentConfig = $instalmentConfig;
+        $this->tamaraHelper = $tamaraHelper;
     }
 
     /**
@@ -73,13 +80,13 @@ class ConfigRepository extends GatewayConfig implements ConfigRepositoryInterfac
         $data = [
             [
                 'name' => $this->payLaterConfig->getPayLaterTitle(),
-                'min_limit' => (float)$this->payLaterConfig->getMinLimit(),
-                'max_limit' => (float)$this->payLaterConfig->getMaxLimit()
+                'min_limit' => (float) $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['min_limit'],
+                'max_limit' => (float) $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['max_limit']
             ],
             [
                 'name' => $this->instalmentConfig->getPayByInstalmentsTitle(),
-                'min_limit' => (float)$this->instalmentConfig->getMinLimit(),
-                'max_limit' => (float)$this->instalmentConfig->getMaxLimit()
+                'min_limit' => (float) $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['min_limit'],
+                'max_limit' => (float) $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['max_limit']
             ],
         ];
 

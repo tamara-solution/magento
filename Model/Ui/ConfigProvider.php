@@ -12,6 +12,11 @@ class ConfigProvider implements ConfigProviderInterface
     private const TAMARA_IFRAME_CHECKOUT = 'tamara_iframe_checkout';
 
     /**
+     * @var \Tamara\Checkout\Helper\AbstractData
+     */
+    protected $tamaraHelper;
+
+    /**
      * @var $locale \Magento\Framework\Locale\Resolver
      */
     private $locale;
@@ -31,16 +36,23 @@ class ConfigProvider implements ConfigProviderInterface
      */
     private $baseConfig;
 
+    /**
+     * @var array
+     */
+    private $paymentTypes;
+
     public function __construct(
         \Magento\Framework\Locale\Resolver $locale,
         PayLaterConfig $payLaterConfig,
         InstalmentConfig $instalmentConfig,
-        BaseConfig $baseConfig
+        BaseConfig $baseConfig,
+        \Tamara\Checkout\Helper\AbstractData $tamaraHelper
     ) {
         $this->locale = $locale;
         $this->payLaterConfig = $payLaterConfig;
         $this->instalmentConfig = $instalmentConfig;
         $this->baseConfig = $baseConfig;
+        $this->tamaraHelper = $tamaraHelper;
     }
 
     /**
@@ -63,15 +75,15 @@ class ConfigProvider implements ConfigProviderInterface
     private function getMinMaxOrderPayLater()
     {
         return [
-            'min_limit' => $this->payLaterConfig->getMinLimit(),
-            'max_limit' => $this->payLaterConfig->getMaxLimit(),
+            'min_limit' => $this->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['min_limit'],
+            'max_limit' => $this->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['max_limit'],
         ];
     }
 
     private function getMinMaxOrderPayByInstalments() {
         return [
-            'min_limit' => $this->instalmentConfig->getMinLimit(),
-            'max_limit' => $this->instalmentConfig->getMaxLimit(),
+            'min_limit' => $this->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['min_limit'],
+            'max_limit' => $this->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['max_limit'],
             'number_of_instalments' => InstalmentConfig::NUMBER_OF_INSTALMENTS,
             'locale_code' => $this->getLocale()
         ];
@@ -82,5 +94,16 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getLocale() {
         return $this->locale->getLocale();
+    }
+
+    /**
+     * @return array|mixed
+     * @throws \Tamara\Exception\RequestDispatcherException
+     */
+    public function getPaymentTypes() {
+        if ($this->paymentTypes === null) {
+            $this->paymentTypes = $this->tamaraHelper->getPaymentTypes();
+        }
+        return $this->paymentTypes;
     }
 }

@@ -148,31 +148,6 @@
                                 <field id="active">1</field>
                             </depends>
                         </field>
-                        <field id="min_limit" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
-                            <label>Min Limit Amount of Order</label>
-                            <config_path>payment/tamara_pay_later/min_limit</config_path>
-                            <frontend_class>pay_later_min_limit</frontend_class>
-                            <frontend_model>Tamara\Checkout\Block\Adminhtml\System\Config\Form\Disable</frontend_model>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
-                        </field>
-                        <field id="max_limit" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
-                            <label>Max Limit Amount of Order</label>
-                            <config_path>payment/tamara_pay_later/max_limit</config_path>
-                            <frontend_class>pay_later_max_limit</frontend_class>
-                            <frontend_model>Tamara\Checkout\Block\Adminhtml\System\Config\Form\Disable</frontend_model>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
-                        </field>
-                        <field id="update_limit_btn" translate="label" type="button" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
-                            <label>Update config min/max limit amount of order</label>
-                            <frontend_model>Tamara\Checkout\Block\System\Config\UpdateMinMax</frontend_model>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
-                        </field>
                     </group>
 
                     <group id="type_pay_by_instalments" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -203,31 +178,6 @@
                             <label>Sort Order</label>
                             <frontend_class>validate-number</frontend_class>
                             <config_path>payment/tamara_pay_by_instalments/sort_order</config_path>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
-                        </field>
-                        <field id="min_limit" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
-                            <label>Min Limit Amount of Order</label>
-                            <config_path>payment/tamara_pay_by_instalments/min_limit</config_path>
-                            <frontend_class>pay_by_instalments_min_limit</frontend_class>
-                            <frontend_model>Tamara\Checkout\Block\Adminhtml\System\Config\Form\Disable</frontend_model>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
-                        </field>
-                        <field id="max_limit" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
-                            <label>Max Limit Amount of Order</label>
-                            <config_path>payment/tamara_pay_by_instalments/max_limit</config_path>
-                            <frontend_class>pay_by_instalments_max_limit</frontend_class>
-                            <frontend_model>Tamara\Checkout\Block\Adminhtml\System\Config\Form\Disable</frontend_model>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
-                        </field>
-                        <field id="update_limit_btn" translate="label" type="button" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
-                            <label>Update config min/max limit amount of order</label>
-                            <frontend_model>Tamara\Checkout\Block\System\Config\UpdateMinMax</frontend_model>
                             <depends>
                                 <field id="active">1</field>
                             </depends>

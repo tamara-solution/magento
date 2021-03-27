@@ -23,6 +23,11 @@ class Popup extends Template
 
     protected $payLaterConfig;
 
+    /**
+     * @var \Tamara\Checkout\Helper\AbstractData
+     */
+    protected $tamaraHelper;
+
     public function __construct(
         Template\Context $context,
         \Magento\Framework\Registry $registry,
@@ -32,6 +37,7 @@ class Popup extends Template
         \Tamara\Checkout\Helper\AbstractData $helper,
         \Tamara\Checkout\Gateway\Config\InstalmentConfig $instalmentConfig,
         \Tamara\Checkout\Gateway\Config\PayLaterConfig $payLaterConfig,
+        \Tamara\Checkout\Helper\AbstractData $tamaraHelper,
         array $data = []
     )
     {
@@ -43,6 +49,7 @@ class Popup extends Template
         $this->helper = $helper;
         $this->instalmentConfig = $instalmentConfig;
         $this->payLaterConfig = $payLaterConfig;
+        $this->tamaraHelper = $tamaraHelper;
     }
 
     protected function _toHtml()
@@ -118,13 +125,6 @@ class Popup extends Template
     }
 
     /**
-     * @return mixed
-     */
-    public function getTamaraPayByInstallmentsMinLimit() {
-        return $this->instalmentConfig->getMinLimit();
-    }
-
-    /**
      * @return bool
      */
     public function isEnabledPayLaterMethod() {
@@ -190,15 +190,15 @@ class Popup extends Template
         if ($this->isEnabledPayLaterMethod()) {
             $enabledMethods[] = [
                 'name' => \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER,
-                'min_limit' => $this->payLaterConfig->getMinLimit(),
-                'max_limit' => $this->payLaterConfig->getMaxLimit()
+                'min_limit' => $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['min_limit'],
+                'max_limit' => $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['max_limit']
             ];
         }
         if ($this->isEnabledInstallmentsMethod()) {
             $enabledMethods[] = [
                 'name' => \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS,
-                'min_limit' => $this->instalmentConfig->getMinLimit(),
-                'max_limit' => $this->instalmentConfig->getMaxLimit()
+                'min_limit' => $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['min_limit'],
+                'max_limit' => $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['max_limit']
             ];
         }
         return $enabledMethods;

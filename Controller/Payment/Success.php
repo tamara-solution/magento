@@ -50,13 +50,14 @@ class Success extends Action
             return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         }
         $orderId = $this->checkoutSession->getLastOrderId();
+        $magentoOrder = $this->checkoutSession->getLastRealOrder();
 
         //dispatch event onepage
         $this->_eventManager->dispatch(
             'checkout_onepage_controller_success_action',
             [
                 'order_ids' => [$orderId],
-                'order' => $this->checkoutSession->getLastRealOrder()
+                'order' => $magentoOrder
             ]
         );
 
@@ -80,6 +81,7 @@ class Success extends Action
 
         $block = $page->getLayout()->getBlock('tamara_success');
         $block->setData('order_id', $orderId);
+        $block->setData('order_increment_id', $magentoOrder->getIncrementId());
 
         $quoteId = $this->checkoutSession->getQuoteId();
 

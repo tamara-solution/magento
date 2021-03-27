@@ -413,6 +413,14 @@ class TamaraAdapter
                 $this->refundRepository->save($refundModel);
             }
 
+            $magentoOrder = $this->mageRepository->get($data['order_id']);
+            $formattedTotalRefundedAmount = $magentoOrder->getOrderCurrency()->formatTxt(
+                $data['refund_grand_total']
+            );
+            $refundComment = __('Tamara - order was refunded. The refunded amount is %1.', $formattedTotalRefundedAmount);
+            $magentoOrder->addCommentToStatusHistory($refundComment);
+            $magentoOrder->save($magentoOrder);
+
         } catch (\Exception $e) {
             $this->logger->debug([$e->getMessage()]);
             throw new IntegrationException(__($e->getMessage()));

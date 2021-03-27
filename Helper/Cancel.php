@@ -26,6 +26,7 @@ class Cancel extends \Tamara\Checkout\Helper\AbstractData
         Context $context,
         \Magento\Framework\Locale\Resolver $locale,
         StoreManagerInterface $storeManager,
+        \Magento\Framework\App\CacheInterface $magentoCache,
         \Tamara\Checkout\Gateway\Config\BaseConfig $tamaraConfig,
         \Magento\Sales\Model\OrderRepository $magentoOrderRepository,
         \Tamara\Checkout\Model\OrderRepository $tamaraOrderRepository,
@@ -34,7 +35,7 @@ class Cancel extends \Tamara\Checkout\Helper\AbstractData
         $this->magentoOrderRepository = $magentoOrderRepository;
         $this->tamaraOrderRepository = $tamaraOrderRepository;
         $this->tamaraAdapterFactory = $tamaraAdapterFactory;
-        parent::__construct($context, $locale, $storeManager, $tamaraConfig);
+        parent::__construct($context, $locale, $storeManager, $magentoCache, $tamaraConfig, $tamaraAdapterFactory);
     }
 
     public function cancelOrder($orderId): void

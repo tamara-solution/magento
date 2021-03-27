@@ -1,6 +1,9 @@
 <div id="content-success">
     <div class="text-center">
-        <span data-bind="i18n: 'Thank you for your purchase. Your good will be shipped to you by merchant and you have 30 days to pay them on tamara website.'"></span>
+        <span data-bind="i18n: 'Thank you for your purchase.'"></span>
+        <span data-bind="i18n: 'Order id #'"></span><span data-bind="text: orderIncrementId"></span>
+        <br />
+        <span data-bind="i18n: 'Your good will be shipped to you by merchant and you have 30 days to pay them on tamara website.'"></span>
     </div>
     <div id="tamara-logo-success">
         <a class="tamara-logo-succes-image" data-bind="attr: {href: tamaraLoginLink, target: '_blank'}">
