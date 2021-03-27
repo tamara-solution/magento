@@ -43,6 +43,7 @@ class Capture extends \Tamara\Checkout\Helper\AbstractData
         Context $context,
         \Magento\Framework\Locale\Resolver $locale,
         StoreManagerInterface $storeManager,
+        \Magento\Framework\App\CacheInterface $magentoCache,
         \Tamara\Checkout\Gateway\Config\BaseConfig $tamaraConfig,
         \Magento\Sales\Model\OrderRepository $magentoOrderRepository,
         \Tamara\Checkout\Api\OrderRepositoryInterface $tamaraOrderRepository,
@@ -57,7 +58,7 @@ class Capture extends \Tamara\Checkout\Helper\AbstractData
         $this->tamaraAdapterFactory = $tamaraAdapterFactory;
         $this->productHelper = $productHelper;
         $this->tamaraInvoiceHelper = $tamaraInvoiceHelper;
-        parent::__construct($context, $locale, $storeManager, $tamaraConfig);
+        parent::__construct($context, $locale, $storeManager, $magentoCache, $tamaraConfig, $tamaraAdapterFactory);
     }
 
     public function captureOrder($orderId): void

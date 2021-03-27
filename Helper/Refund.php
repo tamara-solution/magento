@@ -36,6 +36,7 @@ class Refund extends \Tamara\Checkout\Helper\AbstractData
         Context $context,
         \Magento\Framework\Locale\Resolver $locale,
         StoreManagerInterface $storeManager,
+        \Magento\Framework\App\CacheInterface $magentoCache,
         \Tamara\Checkout\Gateway\Config\BaseConfig $tamaraConfig,
         \Magento\Sales\Model\OrderRepository $magentoOrderRepository,
         \Tamara\Checkout\Model\Adapter\TamaraAdapterFactory $tamaraAdapterFactory,
@@ -46,7 +47,7 @@ class Refund extends \Tamara\Checkout\Helper\AbstractData
         $this->tamaraAdapterFactory = $tamaraAdapterFactory;
         $this->captureRepository = $captureRepository;
         $this->tamaraOrderRepository = $tamaraOrderRepository;
-        parent::__construct($context, $locale, $storeManager, $tamaraConfig);
+        parent::__construct($context, $locale, $storeManager, $magentoCache, $tamaraConfig, $tamaraAdapterFactory);
     }
 
     public function refundOrder($orderId)
@@ -219,6 +220,7 @@ class Refund extends \Tamara\Checkout\Helper\AbstractData
         $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($order->getId());
 
         $grandTotal = $creditMemo->getGrandTotal();
+        $data['refund_grand_total'] = $grandTotal;
 
         $captureItems = $this->captureRepository->getCaptureItemsByConditions(['order_id' => $data['order_id']]);
 

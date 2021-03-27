@@ -4,6 +4,7 @@ namespace Tamara\Checkout\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\Controller\Result\Json;
 use Magento\Store\Model\StoreManagerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
@@ -11,6 +12,9 @@ use Tamara\Checkout\Model\Helper\PaymentHelper;
 
 class AbstractData extends AbstractHelper
 {
+    const PAYMENT_TYPES_CACHE_IDENTIFIER = 'payment_types_cache';
+    const PAYMENT_TYPES_CACHE_LIFE_TIME = 1800; //30 minutes
+
     /**
      * @var \Magento\Framework\Locale\Resolver
      */
@@ -22,9 +26,19 @@ class AbstractData extends AbstractHelper
     protected $storeManager;
 
     /**
+     * @var \Magento\Framework\App\CacheInterface
+     */
+    protected $magentoCache;
+
+    /**
      * @var BaseConfig
      */
     protected $tamaraConfig;
+
+    /**
+     * @var \Tamara\Checkout\Model\Adapter\TamaraAdapterFactory
+     */
+    protected $tamaraAdapterFactory;
 
     /**
      * @var \Magento\Payment\Model\Method\Logger
@@ -40,11 +54,15 @@ class AbstractData extends AbstractHelper
         Context $context,
         \Magento\Framework\Locale\Resolver $locale,
         StoreManagerInterface $storeManager,
-        BaseConfig $tamaraConfig
+        \Magento\Framework\App\CacheInterface $magentoCache,
+        BaseConfig $tamaraConfig,
+        \Tamara\Checkout\Model\Adapter\TamaraAdapterFactory $tamaraAdapterFactory
     ) {
         $this->locale = $locale;
         $this->storeManager = $storeManager;
+        $this->magentoCache = $magentoCache;
         $this->tamaraConfig = $tamaraConfig;
+        $this->tamaraAdapterFactory = $tamaraAdapterFactory;
         parent::__construct($context);
     }
 
@@ -160,5 +178,50 @@ class AbstractData extends AbstractHelper
     public function isTamaraPayment($method)
     {
         return PaymentHelper::isTamaraPayment($method);
+    }
+
+    /**
+     * @param string $countryCode
+     * @return array|mixed
+     * @throws \Tamara\Exception\RequestDispatcherException
+     */
+    public function getPaymentTypes($countryCode = 'SA') {
+        $cachedPaymentTypes = $this->getPaymentTypesCached($countryCode);
+        if (empty($cachedPaymentTypes)) {
+            $adapter = $this->tamaraAdapterFactory->create();
+            $cachedPaymentTypes = $adapter->getPaymentTypes($countryCode);
+            $this->cachePaymentTypes($cachedPaymentTypes, $countryCode);
+        }
+        return $cachedPaymentTypes;
+    }
+
+    /**
+     * @param array $paymentTypes
+     * @param $countryCode
+     */
+    private function cachePaymentTypes(array $paymentTypes, $countryCode) {
+        $paymentTypesAsStr = json_encode($paymentTypes);
+        $this->magentoCache->save($paymentTypesAsStr, $this->getPaymentTypesCacheIdentifier($countryCode), [],
+            self::PAYMENT_TYPES_CACHE_LIFE_TIME);
+    }
+
+    /**
+     * @param $countryCode
+     * @return array|mixed
+     */
+    private function getPaymentTypesCached($countryCode) {
+        $cachedStr = $this->magentoCache->load($this->getPaymentTypesCacheIdentifier($countryCode));
+        if (empty($cachedStr)) {
+            return [];
+        }
+        return json_decode($cachedStr, true);
+    }
+
+    /**
+     * @param $countryCode
+     * @return string
+     */
+    protected function getPaymentTypesCacheIdentifier($countryCode) {
+        return self::PAYMENT_TYPES_CACHE_IDENTIFIER . $countryCode;
     }
 }
