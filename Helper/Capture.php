@@ -115,11 +115,6 @@ class Capture extends \Tamara\Checkout\Helper\AbstractData
         $tamaraAdapter = $this->tamaraAdapterFactory->create();
         $this->log([sprintf('Capture when order status is %s', $order->getStatus())]);
         $tamaraAdapter->capture($data, $order);
-
-        if ($this->tamaraConfig->getAutoGenerateInvoice() == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_CAPTURE) {
-            $this->log(["Automatically generate invoice after capture payment"]);
-            $this->tamaraInvoiceHelper->generateInvoice($order->getId());
-        }
     }
 
     /**
