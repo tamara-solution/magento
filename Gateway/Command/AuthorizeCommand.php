@@ -65,6 +65,11 @@ class AuthorizeCommand implements CommandInterface
     private $logger;
 
     /**
+     * @var \Tamara\Checkout\Helper\Transaction
+     */
+    protected $tamaraTransactionHelper;
+
+    /**
      * AuthorizeCommand constructor.
      * @param \Tamara\Checkout\Model\OrderFactory $tamaraOrderFactory
      * @param OrderRepository $orderRepository
@@ -74,6 +79,8 @@ class AuthorizeCommand implements CommandInterface
      * @param ClientInterface $client
      * @param HandlerInterface $handler
      * @param Logger $logger
+     * @param \Tamara\Checkout\Gateway\Config\BaseConfig $config
+     * @param \Tamara\Checkout\Helper\Transaction $tamaraTransactionHelper
      */
     public function __construct(
         \Tamara\Checkout\Model\OrderFactory $tamaraOrderFactory,
@@ -84,7 +91,8 @@ class AuthorizeCommand implements CommandInterface
         ClientInterface $client,
         HandlerInterface $handler,
         Logger $logger,
-        \Tamara\Checkout\Gateway\Config\BaseConfig $config
+        \Tamara\Checkout\Gateway\Config\BaseConfig $config,
+        \Tamara\Checkout\Helper\Transaction $tamaraTransactionHelper
     )
     {
         $this->tamaraOrderFactory = $tamaraOrderFactory;
@@ -96,6 +104,7 @@ class AuthorizeCommand implements CommandInterface
         $this->handler = $handler;
         $this->logger = $logger;
         $this->config = $config;
+        $this->tamaraTransactionHelper = $tamaraTransactionHelper;
     }
 
     /**
@@ -134,7 +143,6 @@ class AuthorizeCommand implements CommandInterface
 
             //set state for new order
             $order->setState(Order::STATE_NEW)->setStatus($this->config->getCheckoutOrderCreateStatus());
-            $order->addStatusHistoryComment(__('Tamara - order was created, order id: ' . $response['order_id']));
 
             $tamaraOrder = $this->tamaraOrderFactory->create();
             $tamaraOrder->setData([
@@ -143,6 +151,16 @@ class AuthorizeCommand implements CommandInterface
                 'redirect_url' => $response['checkout_url'],
             ]);
 
+            $order->addStatusHistoryComment(__('Tamara - order was created, order id: ' . $response['order_id']));
+            if ($this->config->getGenerateTransaction() == \Tamara\Checkout\Model\Config\Source\GenerateTransaction::GENERATE_WHEN_CREATE_ORDER) {
+                $transactionId = $response['order_id'] . "-" . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_ORDER;
+                $payment = $order->getPayment();
+                $payment->setTransactionId($transactionId);
+                $payment->setParentTransactionId($transactionId);
+                $payment->setLastTransId($transactionId);
+                $payment->setIsTransactionClosed(true);
+                $payment->save();
+            }
             $this->tamaraOrderRepository->save($tamaraOrder);
         } catch (Exception $e) {
             $orderResult->setState(Order::STATE_CANCELED)->setStatus(Order::STATE_CANCELED);

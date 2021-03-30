@@ -64,7 +64,7 @@ class Invoice extends \Tamara\Checkout\Helper\AbstractData
                 $invoiceSender->send($invoice);
 
                 //send notification code
-                $order->addCommentToStatusHistory(
+                $order->addStatusHistoryComment(
                     __('Notified customer about invoice #%1.', $invoice->getIncrementId())
                 )
                     ->setIsCustomerNotified(true)
