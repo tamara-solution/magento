@@ -32,6 +32,11 @@ class Refund extends \Tamara\Checkout\Helper\AbstractData
      */
     protected $magentoOrderRepository;
 
+    /**
+     * @var Cancel
+     */
+    protected $tamaraCancelHelper;
+
     public function __construct(
         Context $context,
         \Magento\Framework\Locale\Resolver $locale,
@@ -41,12 +46,14 @@ class Refund extends \Tamara\Checkout\Helper\AbstractData
         \Magento\Sales\Model\OrderRepository $magentoOrderRepository,
         \Tamara\Checkout\Model\Adapter\TamaraAdapterFactory $tamaraAdapterFactory,
         CaptureRepositoryInterface $captureRepository,
-        TamaraOrderRepository $tamaraOrderRepository
+        TamaraOrderRepository $tamaraOrderRepository,
+        \Tamara\Checkout\Helper\Cancel $tamaraCancelHelper
     ) {
         $this->magentoOrderRepository = $magentoOrderRepository;
         $this->tamaraAdapterFactory = $tamaraAdapterFactory;
         $this->captureRepository = $captureRepository;
         $this->tamaraOrderRepository = $tamaraOrderRepository;
+        $this->tamaraCancelHelper = $tamaraCancelHelper;
         parent::__construct($context, $locale, $storeManager, $magentoCache, $tamaraConfig, $tamaraAdapterFactory);
     }
 
@@ -60,6 +67,13 @@ class Refund extends \Tamara\Checkout\Helper\AbstractData
         }
 
         if (!$this->isTamaraPayment($payment->getMethod())) {
+            return;
+        }
+
+        //cancel if the order was not captured
+        $captures = $this->captureRepository->getCaptureByConditions(['order_id' => $order->getId()]);
+        if (!count($captures)) {
+            $this->tamaraCancelHelper->cancelOrder($orderId);
             return;
         }
 
@@ -208,6 +222,13 @@ class Refund extends \Tamara\Checkout\Helper\AbstractData
         }
 
         if (!$this->isTamaraPayment($payment->getMethod())) {
+            return;
+        }
+
+        //cancel if the order was not captured
+        $captures = $this->captureRepository->getCaptureByConditions(['order_id' => $order->getId()]);
+        if (!count($captures)) {
+            $this->tamaraCancelHelper->cancelOrder($order->getId());
             return;
         }
 
