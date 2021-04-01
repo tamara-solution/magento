@@ -40,8 +40,7 @@ class Cancel extends \Tamara\Checkout\Helper\AbstractData
 
     public function cancelOrder($orderId): void
     {
-
-        $this->log(['Start to cancel order from command line, order id: ' . $orderId]);
+        $this->log(['Start to cancel order, order id: ' . $orderId]);
         $order = $this->magentoOrderRepository->get($orderId);
         $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);
 

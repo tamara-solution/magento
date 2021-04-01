@@ -82,23 +82,4 @@ class Transaction extends \Tamara\Checkout\Helper\AbstractData
             $tamaraOrderId
         );
     }
-
-    /**
-     * @param $message
-     * @param $order
-     * @param $captureId
-     *
-     * @return string|null
-     *
-     * @throws \Exception
-     */
-    public function saveCaptureTransaction($message, $order, $captureId)
-    {
-        return $this->createTransaction(
-            $order,
-            \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE,
-            $message,
-            $captureId
-        );
-    }
 }

@@ -265,6 +265,11 @@ class TamaraAdapter
                     $this->tamaraInvoiceHelper->log(["Automatically generate invoice after authorise payment"]);
                     $this->tamaraInvoiceHelper->generateInvoice($mageOrder->getId());
                 }
+
+                //create capture transaction
+                $captureComment = __('Tamara - order was captured. The captured amount is %1.', $authorisedAmount);
+                $captureTransactionId = $tamaraOrderId . "-" . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE;
+                $this->tamaraTransactionHelper->createTransaction($mageOrder, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE, $captureComment, $captureTransactionId);
                 return true;
             }
 
@@ -313,19 +318,12 @@ class TamaraAdapter
                 throw new IntegrationException(__('Cannot save capture items, please check log'));
             }
 
-            $capturedAmount = $order->getOrderCurrency()->formatTxt(
-                $data['total_amount']
-            );
-
             $this->mageRepository->save($order);
 
             if ($this->baseConfig->getAutoGenerateInvoice() == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_CAPTURE) {
                 $this->logger->debug(["Automatically generate invoice after capture payment"]);
                 $this->tamaraInvoiceHelper->generateInvoice($order->getId());
             }
-
-            $captureComment = __('Tamara - order was captured. The captured amount is %1.', $capturedAmount);
-            $this->tamaraTransactionHelper->saveCaptureTransaction($captureComment, $order, $captureId);
         } catch (\Exception $e) {
             $this->logger->debug([$e->getMessage()]);
             throw new IntegrationException(__($e->getMessage()));
@@ -405,7 +403,10 @@ class TamaraAdapter
             $cancel->setOrderId($data['order_id']);
             $cancel->setRequest($cancelRequest->toArray());
             $this->cancelRepository->save($cancel);
-
+            $mageOrder = $this->mageRepository->get($data['order_id']);
+            $comment = __('Tamara - order was canceled');
+            $mageOrder->addCommentToStatusHistory(__($comment));
+            $this->mageRepository->save($mageOrder);
         } catch (\Exception $e) {
             $this->logger->debug([$e->getMessage()]);
             throw new IntegrationException(__($e->getMessage()));
