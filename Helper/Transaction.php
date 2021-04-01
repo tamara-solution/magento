@@ -8,19 +8,6 @@ use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface as Transactio
 class Transaction extends \Tamara\Checkout\Helper\AbstractData
 {
     /**
-     * @param $message
-     * @param $order \Magento\Sales\Model\Order
-     * @param $captureId
-     * @return string|null
-     * @throws \Exception
-     */
-    public function saveCaptureTransaction($message, $order, $captureId)
-    {
-        return $this->createTransaction($order, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE, $message,
-            $captureId);
-    }
-
-    /**
      * @param $order \Magento\Sales\Model\Order
      * @param $type
      * @param $message
@@ -60,7 +47,15 @@ class Transaction extends \Tamara\Checkout\Helper\AbstractData
             $payment->setTransactionId($transactionId);
             $payment->setParentTransactionId($transactionId);
             $payment->setLastTransId($transactionId);
-            $payment->setIsTransactionClosed(true);
+            switch ($type) {
+                case \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND:
+                case \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE:
+                    $payment->setIsTransactionClosed(true);
+                    break;
+                default:
+                    $payment->setIsTransactionClosed(false);
+                    break;
+            }
             $payment->save();
             $order->save();
 
@@ -80,8 +75,30 @@ class Transaction extends \Tamara\Checkout\Helper\AbstractData
      */
     public function saveAuthoriseTransaction($message, $order, $tamaraOrderId)
     {
-        $transactionId = $tamaraOrderId . "-" . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH;
-        return $this->createTransaction($order, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH, $message,
-            $transactionId);
+        return $this->createTransaction(
+            $order,
+            \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH,
+            $message,
+            $tamaraOrderId
+        );
+    }
+
+    /**
+     * @param $message
+     * @param $order
+     * @param $captureId
+     *
+     * @return string|null
+     *
+     * @throws \Exception
+     */
+    public function saveCaptureTransaction($message, $order, $captureId)
+    {
+        return $this->createTransaction(
+            $order,
+            \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE,
+            $message,
+            $captureId
+        );
     }
 }

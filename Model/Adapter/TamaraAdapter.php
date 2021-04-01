@@ -257,16 +257,12 @@ class TamaraAdapter
                 );
 
                 $authoriseComment = __('Tamara - order was authorised. The authorised amount is %1.', $authorisedAmount);
-                if ($this->baseConfig->getGenerateTransaction() == \Tamara\Checkout\Model\Config\Source\GenerateTransaction::GENERATE_AFTER_AUTHORISE) {
-                    $this->tamaraInvoiceHelper->log(["Create transaction after authorise payment"]);
-                    $this->tamaraTransactionHelper->saveAuthoriseTransaction($authoriseComment, $mageOrder, $tamaraOrderId);
-                } else {
-                    $mageOrder->addCommentToStatusHistory($authoriseComment);
-                }
+                $this->tamaraInvoiceHelper->log(["Create transaction after authorise payment"]);
+                $this->tamaraTransactionHelper->saveAuthoriseTransaction($authoriseComment, $mageOrder, $tamaraOrderId);
                 $this->mageRepository->save($mageOrder);
 
                 if ($this->baseConfig->getAutoGenerateInvoice() == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_AUTHORISE) {
-                    $this->tamaraInvoiceHelper->log(["Automatically generate invoice after capture payment"]);
+                    $this->tamaraInvoiceHelper->log(["Automatically generate invoice after authorise payment"]);
                     $this->tamaraInvoiceHelper->generateInvoice($mageOrder->getId());
                 }
                 return true;
@@ -320,18 +316,16 @@ class TamaraAdapter
             $capturedAmount = $order->getOrderCurrency()->formatTxt(
                 $data['total_amount']
             );
-            if ($this->baseConfig->getGenerateTransaction() == \Tamara\Checkout\Model\Config\Source\GenerateTransaction::GENERATE_AFTER_CAPTURE) {
-                $captureComment = __('Tamara - order was captured. The captured amount is %1.', $capturedAmount);
-                $this->tamaraTransactionHelper->saveCaptureTransaction($captureComment, $order, $captureId);
-            } else {
-                $captureComment = __('Tamara - order was captured. The captured amount is %1. Capture id: %2', $capturedAmount, $captureId);
-                $order->addCommentToStatusHistory($captureComment);
-            }
+
             $this->mageRepository->save($order);
+
             if ($this->baseConfig->getAutoGenerateInvoice() == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_CAPTURE) {
                 $this->logger->debug(["Automatically generate invoice after capture payment"]);
                 $this->tamaraInvoiceHelper->generateInvoice($order->getId());
             }
+
+            $captureComment = __('Tamara - order was captured. The captured amount is %1.', $capturedAmount);
+            $this->tamaraTransactionHelper->saveCaptureTransaction($captureComment, $order, $captureId);
         } catch (\Exception $e) {
             $this->logger->debug([$e->getMessage()]);
             throw new IntegrationException(__($e->getMessage()));
@@ -382,10 +376,9 @@ class TamaraAdapter
             $refundedAmount = $magentoOrder->getOrderCurrency()->formatTxt(
                 $data['refund_grand_total']
             );
-            $refundComment = __('Tamara - order was refunded. The refunded amount is %1. Refund id: %2', $refundedAmount, implode("-", $refundIds));
-            $magentoOrder->addCommentToStatusHistory($refundComment);
-            $this->mageRepository->save($magentoOrder);
-
+            $refundTransactionId = implode("-", $refundIds);
+            $refundComment = __('Tamara - order was refunded. The refunded amount is %1.', $refundedAmount);
+            $this->tamaraTransactionHelper->createTransaction($magentoOrder, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND, $refundComment, $refundTransactionId);
         } catch (\Exception $e) {
             $this->logger->debug([$e->getMessage()]);
             throw new IntegrationException(__($e->getMessage()));

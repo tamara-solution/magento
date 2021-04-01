@@ -129,10 +129,6 @@ class BaseConfig extends MagentoPaymentConfig
         return (int) $this->getValue('auto_generate_invoice', $storeId);
     }
 
-    public function getGenerateTransaction($storeId = null) {
-        return (int) $this->getValue('generate_transaction', $storeId);
-    }
-
     public function isPhoneVerified($storeId = null) {
         return (bool) $this->getValue('phone_verified', $storeId);
     }

@@ -152,15 +152,6 @@ class AuthorizeCommand implements CommandInterface
             ]);
 
             $order->addCommentToStatusHistory(__('Tamara - order was created, order id: ' . $response['order_id']));
-            if ($this->config->getGenerateTransaction() == \Tamara\Checkout\Model\Config\Source\GenerateTransaction::GENERATE_WHEN_CREATE_ORDER) {
-                $transactionId = $response['order_id'] . "-" . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_ORDER;
-                $payment = $order->getPayment();
-                $payment->setTransactionId($transactionId);
-                $payment->setParentTransactionId($transactionId);
-                $payment->setLastTransId($transactionId);
-                $payment->setIsTransactionClosed(true);
-                $payment->save();
-            }
             $this->tamaraOrderRepository->save($tamaraOrder);
         } catch (Exception $e) {
             $orderResult->setState(Order::STATE_CANCELED)->setStatus(Order::STATE_CANCELED);
