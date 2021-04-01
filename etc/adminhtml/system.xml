@@ -102,12 +102,6 @@
                         <config_path>payment/tamara_checkout/auto_generate_invoice</config_path>
                         <comment>Please select the state of the order when the invoice should be generated automatically</comment>
                     </field>
-                    <field id="generate_transaction" translate="label" type="select" sortOrder="98" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Generate transaction</label>
-                        <source_model>Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice</source_model>
-                        <config_path>payment/tamara_checkout/generate_transaction</config_path>
-                        <comment>Please select the state of the order when the transaction should be generated automatically</comment>
-                    </field>
                     <field id="link_about_tamara" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Link About Tamara Payment</label>
                         <config_path>payment/tamara_checkout/link_about_tamara</config_path>
