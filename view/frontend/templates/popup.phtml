@@ -10,7 +10,7 @@ $availableMethod = $block->getPaymentMethodForPdpWidget($productFinalPrice);
     <?php
     $lang = 'en';
     if ($block->isArabicLanguage()) {
-        $lang = 'sa';
+        $lang = 'ar';
     }
     ?>
     <script charset="utf-8" src="https://cdn.tamara.co/widget/product-widget.min.js"></script>
@@ -29,6 +29,6 @@ $availableMethod = $block->getPaymentMethodForPdpWidget($productFinalPrice);
     <?php if ($availableMethod['name'] == \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS): ?>
         <div class="tamara-product-widget" id="tamara-product-widget" data-disable-paylater="true" data-price="<?= $productFinalPrice; ?>" data-currency="<?= $block->getStoreCurrencyCode(); ?>" data-payment-type="installment" data-lang="<?= $lang; ?>" data-installment-minimum-amount="<?= $availableMethod['min_limit']; ?>"></div>
     <?php elseif ($availableMethod['name'] == \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER): ?>
-        <div class="tamara-product-widget" id="tamara-product-widget" data-payment-type="paylater" data-price="<?= $productFinalPrice; ?>" data-disable-installment="true"  data-lang="<?= $lang; ?>"></div>
+        <div class="tamara-product-widget" id="tamara-product-widget" data-payment-type="paylater" data-disable-paylater="false" data-pay-later-max-amount="<?= $availableMethod['max_limit'] ?>" data-price="<?= $productFinalPrice; ?>" data-disable-installment="true"  data-lang="<?= $lang; ?>"></div>
     <?php endif; ?>
 <?php endif; ?>
