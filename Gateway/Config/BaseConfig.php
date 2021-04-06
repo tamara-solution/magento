@@ -133,6 +133,10 @@ class BaseConfig extends MagentoPaymentConfig
         return (bool) $this->getValue('phone_verified', $storeId);
     }
 
+    public function useMagentoCheckoutSuccessPage($storeId = null) {
+        return (bool) $this->getValue('use_magento_success_page', $storeId);
+    }
+
     /**
      * @param null $storeId
      * @return string
