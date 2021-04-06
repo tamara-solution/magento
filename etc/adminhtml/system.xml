@@ -90,6 +90,12 @@
                         <config_path>payment/tamara_checkout/enable_iframe_checkout</config_path>
                         <comment>Enable it if you want to use iframe for Tamara checkout</comment>
                     </field>
+                    <field id="use_magento_success_page" translate="label" type="select" sortOrder="93" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Use magento checkout success page</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/tamara_checkout/use_magento_success_page</config_path>
+                        <comment>If not, we will use Tamara checkout success page</comment>
+                    </field>
                     <field id="enable_pdp_widget" translate="label" type="select" sortOrder="95" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Enable Tamara widget</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

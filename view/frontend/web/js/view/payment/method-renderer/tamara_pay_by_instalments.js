@@ -65,8 +65,12 @@ define(
             },
 
             successPayByInstalments: function () {
-                let orderId = window.magentoOrderId;
-                window.location.replace(url.build('tamara/payment/' + orderId + '/success'));
+                if (window.checkoutConfig.payment.tamara.use_magento_checkout_success) {
+                    window.location.replace(url.build(window.checkoutConfig.defaultSuccessPageUrl));
+                } else {
+                    let orderId = window.magentoOrderId;
+                    window.location.replace(url.build('tamara/payment/' + orderId + '/success'));
+                }
             },
 
             failedPayByInstalments: function () {

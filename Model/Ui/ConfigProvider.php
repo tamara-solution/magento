@@ -67,7 +67,10 @@ class ConfigProvider implements ConfigProviderInterface
             'payment' => [
                 PayLaterConfig::PAYMENT_TYPE_CODE => $this->getMinMaxOrderPayLater(),
                 InstalmentConfig::PAYMENT_TYPE_CODE => $this->getMinMaxOrderPayByInstalments(),
-                self::TAMARA_IFRAME_CHECKOUT => $this->baseConfig->getEnableIframeCheckout()
+                self::TAMARA_IFRAME_CHECKOUT => $this->baseConfig->getEnableIframeCheckout(),
+                'tamara' => [
+                    'use_magento_checkout_success' => $this->baseConfig->useMagentoCheckoutSuccessPage()
+                ]
             ]
         ];
     }

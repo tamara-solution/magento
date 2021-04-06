@@ -15,6 +15,7 @@
                 <enable_webhook>1</enable_webhook>
                 <enable_pdp_widget>1</enable_pdp_widget>
                 <can_use_checkout>1</can_use_checkout>
+                <use_magento_success_page>0</use_magento_success_page>
                 <group>tamara</group>
             </tamara_checkout>
             <tamara_pay_later>
