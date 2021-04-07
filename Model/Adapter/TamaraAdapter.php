@@ -258,7 +258,7 @@ class TamaraAdapter
 
                 $authoriseComment = __('Tamara - order was authorised. The authorised amount is %1.', $authorisedAmount);
                 $this->tamaraInvoiceHelper->log(["Create transaction after authorise payment"]);
-                $this->tamaraTransactionHelper->saveAuthoriseTransaction($authoriseComment, $mageOrder, $tamaraOrderId);
+                $this->tamaraTransactionHelper->saveAuthoriseTransaction($authoriseComment, $mageOrder, $mageOrder->getIncrementId());
                 $this->mageRepository->save($mageOrder);
 
                 if ($this->baseConfig->getAutoGenerateInvoice() == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_AUTHORISE) {
@@ -268,7 +268,7 @@ class TamaraAdapter
 
                 //create capture transaction
                 $captureComment = __('Tamara - order was captured. The captured amount is %1.', $authorisedAmount);
-                $captureTransactionId = $tamaraOrderId . "-" . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE;
+                $captureTransactionId = $mageOrder->getIncrementId() . "-" . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE;
                 $this->tamaraTransactionHelper->createTransaction($mageOrder, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE, $captureComment, $captureTransactionId);
                 return true;
             }
@@ -374,7 +374,7 @@ class TamaraAdapter
             $refundedAmount = $magentoOrder->getOrderCurrency()->formatTxt(
                 $data['refund_grand_total']
             );
-            $refundTransactionId = implode("-", $refundIds);
+            $refundTransactionId = $magentoOrder->getIncrementId() . '-refund';
             $refundComment = __('Tamara - order was refunded. The refunded amount is %1.', $refundedAmount);
             $this->tamaraTransactionHelper->createTransaction($magentoOrder, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND, $refundComment, $refundTransactionId);
         } catch (\Exception $e) {
