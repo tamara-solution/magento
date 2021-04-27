@@ -63,6 +63,11 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/tamara_checkout/is_email_whitelist_enabled</config_path>
                     </field>
+                    <field id="send_email_when" translate="label" type="multiselect" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Send email when</label>
+                        <source_model>Tamara\Checkout\Model\Config\Source\EmailTo\Options</source_model>
+                        <config_path>payment/tamara_checkout/send_email_when</config_path>
+                    </field>
                     <field id="allowspecific" translate="label" type="allowspecific" sortOrder="60" showInDefault="9"
                            showInWebsite="1" showInStore="0">
                         <label>Payment From Applicable Countries</label>

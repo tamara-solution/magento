@@ -51,6 +51,11 @@ class BaseConfig extends MagentoPaymentConfig
         return $this->getValue('merchant_failure_url', $storeId);
     }
 
+    public function getSendEmailWhen($storeId = null) {
+        $valueAsStr = $this->getValue('send_email_when', $storeId);
+        return explode(",",$valueAsStr);
+    }
+
     public function getMerchantCancelUrl($storeId = null)
     {
         return $this->getValue('merchant_cancel_url', $storeId);

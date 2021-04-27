@@ -90,6 +90,11 @@ class TamaraAdapter
     private $orderStatusCollectionFactory;
 
     /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\OrderCommentSender
+     */
+    private $orderCommentSender;
+
+    /**
      * @var \Tamara\Checkout\Gateway\Config\BaseConfig
      */
     protected $baseConfig;
@@ -118,6 +123,7 @@ class TamaraAdapter
         OrderSender $orderSender,
         Config $resourceConfig,
         \Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory $orderStatusCollectionFactory,
+        \Magento\Sales\Model\Order\Email\Sender\OrderCommentSender $orderCommentSender,
         \Tamara\Checkout\Gateway\Config\BaseConfig $baseConfig,
         \Tamara\Checkout\Helper\Invoice $tamaraInvoiceHelper,
         \Tamara\Checkout\Helper\Transaction $tamaraTransactionHelper
@@ -136,6 +142,7 @@ class TamaraAdapter
         $this->orderSender = $orderSender;
         $this->resourceConfig = $resourceConfig;
         $this->orderStatusCollectionFactory = $orderStatusCollectionFactory;
+        $this->orderCommentSender = $orderCommentSender;
         $this->baseConfig = $baseConfig;
         $this->tamaraInvoiceHelper = $tamaraInvoiceHelper;
         $this->tamaraTransactionHelper = $tamaraTransactionHelper;
@@ -258,7 +265,14 @@ class TamaraAdapter
 
                 $authoriseComment = __('Tamara - order was authorised. The authorised amount is %1.', $authorisedAmount);
                 $this->tamaraInvoiceHelper->log(["Create transaction after authorise payment"]);
-                $this->tamaraTransactionHelper->saveAuthoriseTransaction($authoriseComment, $mageOrder, $tamaraOrderId);
+                $this->tamaraTransactionHelper->saveAuthoriseTransaction($authoriseComment, $mageOrder, $mageOrder->getIncrementId());
+                if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_AUTHORISE, $this->baseConfig->getSendEmailWhen())) {
+                    $this->orderCommentSender->send($mageOrder, true, $authoriseComment);
+                    $mageOrder->addCommentToStatusHistory(
+                        __('Notified customer about order #%1 was authorised.', $mageOrder->getIncrementId()),
+                        $this->baseConfig->getCheckoutAuthoriseStatus()
+                    )->setIsCustomerNotified(true)->save();
+                }
                 $this->mageRepository->save($mageOrder);
 
                 if ($this->baseConfig->getAutoGenerateInvoice() == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_AUTHORISE) {
@@ -267,8 +281,8 @@ class TamaraAdapter
                 }
 
                 //create capture transaction
-                $captureComment = __('Tamara - order was captured. The captured amount is %1.', $authorisedAmount);
-                $captureTransactionId = $tamaraOrderId . "-" . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE;
+                $captureComment = __('Magento capture transaction created.');
+                $captureTransactionId = $mageOrder->getIncrementId() . "-" . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE;
                 $this->tamaraTransactionHelper->createTransaction($mageOrder, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE, $captureComment, $captureTransactionId);
                 return true;
             }
@@ -318,6 +332,11 @@ class TamaraAdapter
                 throw new IntegrationException(__('Cannot save capture items, please check log'));
             }
 
+            $capturedAmount = $order->getOrderCurrency()->formatTxt(
+                $data['total_amount']
+            );
+            $captureComment = __('Tamara - order was captured. The captured amount is %1. Capture id is %2', $capturedAmount, $response->getCaptureId());
+            $order->addCommentToStatusHistory($captureComment);
             $this->mageRepository->save($order);
 
             if ($this->baseConfig->getAutoGenerateInvoice() == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_CAPTURE) {
@@ -374,9 +393,17 @@ class TamaraAdapter
             $refundedAmount = $magentoOrder->getOrderCurrency()->formatTxt(
                 $data['refund_grand_total']
             );
-            $refundTransactionId = implode("-", $refundIds);
+            $refundTransactionId = $magentoOrder->getIncrementId() . '-refund';
             $refundComment = __('Tamara - order was refunded. The refunded amount is %1.', $refundedAmount);
             $this->tamaraTransactionHelper->createTransaction($magentoOrder, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND, $refundComment, $refundTransactionId);
+            if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_REFUND_ORDER, $this->baseConfig->getSendEmailWhen())) {
+                $magentoOrder->setStatus($this->baseConfig->getOrderStatusShouldBeRefunded());
+                $this->orderCommentSender->send($magentoOrder, true, $refundComment);
+                $magentoOrder->addCommentToStatusHistory(
+                    __('Notified customer about order #%1 was refunded.', $magentoOrder->getIncrementId()),
+                    $this->baseConfig->getOrderStatusShouldBeRefunded()
+                )->setIsCustomerNotified(true)->save();
+            }
         } catch (\Exception $e) {
             $this->logger->debug([$e->getMessage()]);
             throw new IntegrationException(__($e->getMessage()));
@@ -407,6 +434,13 @@ class TamaraAdapter
             $comment = __('Tamara - order was canceled');
             $mageOrder->addCommentToStatusHistory(__($comment));
             $this->mageRepository->save($mageOrder);
+            if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_CANCEL_ORDER, $this->baseConfig->getSendEmailWhen())) {
+                $this->orderCommentSender->send($mageOrder, true, $comment);
+                $mageOrder->addCommentToStatusHistory(
+                    __('Notified customer about order #%1 was canceled.', $mageOrder->getIncrementId()),
+                    $this->baseConfig->getCheckoutCancelStatus()
+                )->setIsCustomerNotified(true)->save();
+            }
         } catch (\Exception $e) {
             $this->logger->debug([$e->getMessage()]);
             throw new IntegrationException(__($e->getMessage()));
