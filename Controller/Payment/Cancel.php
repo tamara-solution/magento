@@ -5,6 +5,7 @@ namespace Tamara\Checkout\Controller\Payment;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\ResponseInterface;
+use Magento\Checkout\Model\Session;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
@@ -22,6 +23,11 @@ class Cancel extends Action
     protected $config;
 
     /**
+     * @var Session
+     */
+    private $checkoutSession;
+
+    /**
      * Cancel constructor.
      * @param Context $context
      * @param PageFactory $pageFactory
@@ -34,11 +40,13 @@ class Cancel extends Action
         PageFactory $pageFactory,
         CartHelper $cartHelper,
         OrderRepositoryInterface $orderRepository,
+        Session $checkoutSession,
         BaseConfig $config
     ) {
         $this->pageFactory = $pageFactory;
         $this->cartHelper = $cartHelper;
         $this->orderRepository = $orderRepository;
+        $this->checkoutSession = $checkoutSession;
         $this->config = $config;
         parent::__construct($context);
     }
@@ -46,7 +54,12 @@ class Cancel extends Action
     public function execute()
     {
         try {
-            $orderId = $this->_request->getParam('order_id', 0);
+            $orderId = $this->checkoutSession->getLastOrderId();
+            $magentoOrder = $this->checkoutSession->getLastRealOrder();
+            if (empty($orderId) || empty($magentoOrder->getGrandTotal())) {
+                $this->_redirect('checkout/cart');
+                return $this->getResponse()->sendResponse();
+            }
 
             /** @var \Magento\Sales\Model\Order $order */
             $order = $this->orderRepository->get($orderId);
