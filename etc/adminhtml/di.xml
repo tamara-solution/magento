@@ -20,4 +20,8 @@
             <argument name="tamaraAdapterFactory" xsi:type="object">Tamara\Checkout\Model\Adapter\TamaraAdapterFactory</argument>
         </arguments>
     </type>
+
+    <type name="Magento\Config\Model\Config">
+        <plugin name="add_config_value_to_registry" type="Tamara\Checkout\Plugin\Model\Config" sortOrder="1" />
+    </type>
 </config>

@@ -562,4 +562,11 @@ class TamaraAdapter
 
         return $message;
     }
+
+    /**
+     * @return Client
+     */
+    public function getClient() {
+        return $this->client;
+    }
 }

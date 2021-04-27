@@ -25,6 +25,7 @@
                     <field id="notification_token" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Notification Token</label>
                         <config_path>payment/tamara_checkout/notification_token</config_path>
+                        <validate>required-entry</validate>
                         <backend_model>Tamara\Checkout\Model\Config\Backend\Value</backend_model>
                     </field>
                     <field id="phone_verified" translate="label" type="select" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="0">
@@ -38,6 +39,7 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/tamara_checkout/enable_webhook</config_path>
                         <comment>Enable it if you want register webhook from tamara payment</comment>
+                        <backend_model>Tamara\Checkout\Model\Config\Backend\EnableWebHook</backend_model>
                     </field>
                     <field id="webhook_id" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Webhook Id</label>
@@ -134,6 +136,7 @@
                             <label>Enabled Pay by later</label>
                             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                             <config_path>payment/tamara_pay_later/active</config_path>
+                            <backend_model>Tamara\Checkout\Model\Config\Backend\EnablePaymentType</backend_model>
                         </field>
                         <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                             <label>Title</label>
@@ -168,6 +171,7 @@
                             <label>Enabled Pay in 3 instalments</label>
                             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                             <config_path>payment/tamara_pay_by_instalments/active</config_path>
+                            <backend_model>Tamara\Checkout\Model\Config\Backend\EnablePaymentType</backend_model>
                         </field>
                         <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                             <label>Title</label>

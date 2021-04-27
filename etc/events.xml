@@ -16,10 +16,7 @@
     <event name="sales_order_payment_place_end">
         <observer name="tamara_order_payment_place_end" instance="Tamara\Checkout\Observer\OrderPaymentPlaceEnd" />
     </event>
-    <event name="admin_system_config_changed_section_payment">
-        <observer name="custom_admin_system_config_changed_section_payment" instance="Tamara\Checkout\Observer\ConfigChange"/>
-    </event>
     <event name="sales_order_save_after">
-        <observer name="tamada_capture_payment_when_order_status_change" instance="Tamara\Checkout\Observer\OrderSaveAfter"/>
+        <observer name="tamara_capture_payment_when_order_status_change" instance="Tamara\Checkout\Observer\OrderSaveAfter"/>
     </event>
 </config>

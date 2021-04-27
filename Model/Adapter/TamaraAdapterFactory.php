@@ -20,6 +20,11 @@ class TamaraAdapterFactory
     private $objectManager;
 
     /**
+     * @var \Magento\Framework\Registry
+     */
+    protected $registry;
+
+    /**
      * @var BaseConfig
      */
     private $config;
@@ -71,6 +76,7 @@ class TamaraAdapterFactory
      */
     public function __construct(
         ObjectManagerInterface $objectManager,
+        \Magento\Framework\Registry $registry,
         BaseConfig $config,
         Logger $logger,
         OrderRepositoryInterface $orderRepository,
@@ -82,6 +88,7 @@ class TamaraAdapterFactory
     ) {
         $this->config = $config;
         $this->objectManager = $objectManager;
+        $this->registry = $registry;
         $this->logger = $logger;
         $this->orderRepository = $orderRepository;
         $this->captureRepository = $captureRepository;
@@ -102,12 +109,22 @@ class TamaraAdapterFactory
      */
     public function create($storeId = null): TamaraAdapter
     {
+        $groups = $this->registry->registry('tamara_config_groups');
+        if (is_array($groups) && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"])) {
+            $notificationToken = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["notification_token"]["value"];
+            $apiUrl = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["api_url"]["value"];
+            $merchantToken = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["merchant_token"]["value"];
+        } else {
+            $notificationToken = $this->config->getNotificationToken($storeId);
+            $apiUrl = $this->config->getApiUrl($storeId);
+            $merchantToken = $this->config->getMerchantToken($storeId);
+        }
         return $this->objectManager->create(
             TamaraAdapter::class,
             [
-                'apiUrl' => $this->config->getApiUrl($storeId),
-                'merchantToken' => $this->config->getMerchantToken($storeId),
-                'notificationToken' => $this->config->getNotificationToken($storeId),
+                'apiUrl' => $apiUrl,
+                'merchantToken' => $merchantToken,
+                'notificationToken' => $notificationToken,
                 'checkoutAuthoriseStatus' => $this->config->getCheckoutAuthoriseStatus(),
                 'orderRepository' => $this->orderRepository,
                 'captureRepository' => $this->captureRepository,
