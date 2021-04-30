@@ -20,6 +20,11 @@ class TamaraAdapterFactory
     private $objectManager;
 
     /**
+     * @var \Magento\Framework\Registry
+     */
+    protected $registry;
+
+    /**
      * @var BaseConfig
      */
     private $config;
@@ -60,28 +65,30 @@ class TamaraAdapterFactory
     private $resourceConfig;
 
     /**
-     * @param ObjectManagerInterface $objectManager
-     * @param BaseConfig $config
-     * @param Logger $logger
-     * @param OrderRepositoryInterface $orderRepository
-     * @param CaptureRepositoryInterface $captureRepository
+     * @param ObjectManagerInterface                      $objectManager
+     * @param BaseConfig                                  $config
+     * @param Logger                                      $logger
+     * @param OrderRepositoryInterface                    $orderRepository
+     * @param CaptureRepositoryInterface                  $captureRepository
      * @param \Magento\Sales\Api\OrderRepositoryInterface $mageRepository
-     * @param RefundRepositoryInterface $refundRepository
-     * @param CancelRepositoryInterface $cancelRepository
+     * @param RefundRepositoryInterface                   $refundRepository
+     * @param CancelRepositoryInterface                   $cancelRepository
      */
     public function __construct(
-        ObjectManagerInterface                      $objectManager,
-        BaseConfig                                  $config,
-        Logger                                      $logger,
-        OrderRepositoryInterface                    $orderRepository,
-        CaptureRepositoryInterface                  $captureRepository,
+        ObjectManagerInterface $objectManager,
+        \Magento\Framework\Registry $registry,
+        BaseConfig $config,
+        Logger $logger,
+        OrderRepositoryInterface $orderRepository,
+        CaptureRepositoryInterface $captureRepository,
         \Magento\Sales\Api\OrderRepositoryInterface $mageRepository,
-        RefundRepositoryInterface                   $refundRepository,
-        CancelRepositoryInterface                   $cancelRepository,
-        Config                                      $resourceConfig
+        RefundRepositoryInterface $refundRepository,
+        CancelRepositoryInterface $cancelRepository,
+        Config $resourceConfig
     ) {
         $this->config = $config;
         $this->objectManager = $objectManager;
+        $this->registry = $registry;
         $this->logger = $logger;
         $this->orderRepository = $orderRepository;
         $this->captureRepository = $captureRepository;
@@ -101,12 +108,22 @@ class TamaraAdapterFactory
      */
     public function create($storeId = null): TamaraAdapter
     {
+        $groups = $this->registry->registry('tamara_config_groups');
+        if (is_array($groups) && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"])) {
+            $notificationToken = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["notification_token"]["value"];
+            $apiUrl = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["api_url"]["value"];
+            $merchantToken = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["merchant_token"]["value"];
+        } else {
+            $notificationToken = $this->config->getNotificationToken($storeId);
+            $apiUrl = $this->config->getApiUrl($storeId);
+            $merchantToken = $this->config->getMerchantToken($storeId);
+        }
         return $this->objectManager->create(
             TamaraAdapter::class,
             [
-                'apiUrl' => $this->config->getApiUrl($storeId),
-                'merchantToken' => $this->config->getMerchantToken($storeId),
-                'notificationToken' => $this->config->getNotificationToken($storeId),
+                'apiUrl' => $apiUrl,
+                'merchantToken' => $merchantToken,
+                'notificationToken' => $notificationToken,
                 'checkoutAuthoriseStatus' => $this->config->getCheckoutAuthoriseStatus(),
                 'orderRepository' => $this->orderRepository,
                 'captureRepository' => $this->captureRepository,
