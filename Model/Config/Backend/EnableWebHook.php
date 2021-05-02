@@ -32,9 +32,6 @@ class EnableWebHook extends \Magento\Framework\App\Config\Value
      */
     public function beforeSave()
     {
-        if (!$this->isValueChanged()) {
-            return parent::beforeSave();
-        }
         $webhookEnabled = false;
         if (!empty($this->getValue())) {
             $webhookEnabled = true;
@@ -50,6 +47,9 @@ class EnableWebHook extends \Magento\Framework\App\Config\Value
             throw new \Exception("Tamara checkout config, error when register web hook, error message: " . __($exception->getMessage()));
         }
 
+        if (!$this->isValueChanged()) {
+            return parent::beforeSave();
+        }
         try {
             if (!$webhookEnabled && $webhookId) {
                 $adapter = $this->tamaraAdapterFactory->create();

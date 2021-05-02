@@ -11,6 +11,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
 use Tamara\Checkout\Model\Helper\CartHelper;
+use Tamara\Checkout\Api\OrderRepositoryInterface as TamaraOrderRepository;
 
 class Cancel extends Action
 {
@@ -27,27 +28,23 @@ class Cancel extends Action
      */
     private $checkoutSession;
 
-    /**
-     * Cancel constructor.
-     * @param Context $context
-     * @param PageFactory $pageFactory
-     * @param CartHelper $cartHelper
-     * @param OrderRepositoryInterface $orderRepository
-     * @param BaseConfig $config
-     */
+    private $tamaraOrderRepository;
+
     public function __construct(
         Context $context,
         PageFactory $pageFactory,
         CartHelper $cartHelper,
         OrderRepositoryInterface $orderRepository,
         Session $checkoutSession,
-        BaseConfig $config
+        BaseConfig $config,
+        TamaraOrderRepository $tamaraOrderRepository
     ) {
         $this->pageFactory = $pageFactory;
         $this->cartHelper = $cartHelper;
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
         $this->config = $config;
+        $this->tamaraOrderRepository = $tamaraOrderRepository;
         parent::__construct($context);
     }
 
@@ -57,6 +54,13 @@ class Cancel extends Action
             $orderId = $this->checkoutSession->getLastOrderId();
             $magentoOrder = $this->checkoutSession->getLastRealOrder();
             if (empty($orderId) || empty($magentoOrder->getGrandTotal())) {
+                $this->_redirect('checkout/cart');
+                return $this->getResponse()->sendResponse();
+            }
+
+            $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);
+
+            if ((bool) $tamaraOrder->getIsAuthorised()) {
                 $this->_redirect('checkout/cart');
                 return $this->getResponse()->sendResponse();
             }
