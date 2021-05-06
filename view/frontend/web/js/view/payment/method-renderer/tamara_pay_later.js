@@ -15,8 +15,7 @@ define(
         'mage/url',
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Checkout/js/model/quote',
-        'Magento_Checkout/js/model/totals',
-        'tamaraCheckoutFrame'
+        'Magento_Checkout/js/model/totals'
     ],
     function (
         $,
@@ -55,11 +54,6 @@ define(
                     .observe([
                         'tamaraPayLater'
                     ]);
-
-                TamaraCheckoutFrame.init();
-                TamaraCheckoutFrame.addEventHandlers(TamaraCheckoutFrame.Events.SUCCESS, this.successPayLater);
-                TamaraCheckoutFrame.addEventHandlers(TamaraCheckoutFrame.Events.FAILED, this.failedPayLater);
-                TamaraCheckoutFrame.addEventHandlers(TamaraCheckoutFrame.Events.CANCELED, this.cancelPayLater);
 
                 return this;
             },
@@ -191,11 +185,7 @@ define(
                         if (response.success) {
                             jQuery('#order-id').val(response.orderId);
                             window.magentoOrderId = response.orderId;
-                            if (window.checkoutConfig.payment.tamara_iframe_checkout) {
-                                TamaraCheckoutFrame.checkout(response.redirectUrl);
-                            } else {
-                                window.location.replace(response.redirectUrl);
-                            }
+                            window.location.replace(response.redirectUrl);
                         } else {
                             jQuery('#error-iframe').removeClass('hidden-error-iframe').text(response.error);
                             setTimeout(() => jQuery('#error-iframe').addClass('hidden-error-iframe').text(''), 10000);

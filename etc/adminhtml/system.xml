@@ -91,12 +91,6 @@
                         <config_path>payment/tamara_checkout/block_web_view</config_path>
                         <comment>Enable it if you want to block the Tamara checkout from native mobile app.</comment>
                     </field>
-                    <field id="enable_iframe_checkout" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Enable Iframe Checkout</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <config_path>payment/tamara_checkout/enable_iframe_checkout</config_path>
-                        <comment>Enable it if you want to use iframe for Tamara checkout</comment>
-                    </field>
                     <field id="use_magento_success_page" translate="label" type="select" sortOrder="93" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Use magento checkout success page</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
