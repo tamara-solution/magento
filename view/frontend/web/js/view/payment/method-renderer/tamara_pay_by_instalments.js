@@ -15,8 +15,7 @@ define(
         'mage/url',
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Checkout/js/model/quote',
-        'Magento_Checkout/js/model/totals',
-        'tamaraCheckoutFrame'
+        'Magento_Checkout/js/model/totals'
     ],
     function (
         $,
@@ -55,11 +54,6 @@ define(
                     .observe([
                         'tamaraPayByInstalments'
                     ]);
-
-                TamaraCheckoutFrame.init();
-                TamaraCheckoutFrame.addEventHandlers(TamaraCheckoutFrame.Events.SUCCESS, this.successPayByInstalments);
-                TamaraCheckoutFrame.addEventHandlers(TamaraCheckoutFrame.Events.FAILED, this.failedPayByInstalments);
-                TamaraCheckoutFrame.addEventHandlers(TamaraCheckoutFrame.Events.CANCELED, this.cancelPayByInstalments);
 
                 return this;
             },
@@ -185,11 +179,7 @@ define(
                         if (response.success) {
                             jQuery('#order-id').val(response.orderId);
                             window.magentoOrderId = response.orderId;
-                            if (window.checkoutConfig.payment.tamara_iframe_checkout) {
-                                TamaraCheckoutFrame.checkout(response.redirectUrl);
-                            } else {
-                                window.location.replace(response.redirectUrl);
-                            }
+                            window.location.replace(response.redirectUrl);
                         } else {
                             jQuery('#error-iframe-pay-by-instalments').removeClass('hidden-error-iframe').text(response.error);
                             setTimeout(() => jQuery('#error-iframe-pay-by-instalments').addClass('hidden-error-iframe').text(''), 10000);
