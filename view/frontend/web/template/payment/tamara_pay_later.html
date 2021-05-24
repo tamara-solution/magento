@@ -42,20 +42,21 @@
             <h4 data-bind="i18n: 'Pay later information'"></h4>
             <ul>
                 <li>
-                    <span data-bind="text: $t('Min Limit:') + ' ' + getMinLimit()"></span>
+                    <span data-bind="text: $t('Min Limit') + ' : ' + getMinLimit()"></span>
                 </li>
                 <li>
-                    <span data-bind="text: $t('Max Limit:') + ' ' + getMaxLimit()"></span>
+                    <span data-bind="text: $t('Max Limit') + ' : ' + getMaxLimit()"></span>
                 </li>
             </ul>
         </div>
 
-        <div class="message error message-error" data-bind="visible: shouldShowError()">
+        <div class="message warning message-error" data-bind="visible: shouldShowError()">
             <span data-bind="i18n: 'The grand total of order is over/under limit of Tamara.'"></span>
         </div>
 
         <div class="params">
             <input type="hidden" id="order-id" value="0" />
+            <input class="render-product-widget" data-bind="visible: renderProductWidget()" />
         </div>
 
         <div class="actions-toolbar">

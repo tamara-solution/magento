@@ -99,6 +99,10 @@ define(
                 return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_by_instalments.max_limit);
             },
 
+            getMaxLimitAmount: function () {
+                return window.checkoutConfig.payment.tamara_pay_by_instalments.max_limit;
+            },
+
             getGrandTotal: function () {
                 let grandTotal = 0;
                 if (this.totals()) {
@@ -240,6 +244,38 @@ define(
                     return 'ar';
                 }
                 return 'en';
+            },
+
+            renderProductWidget: function () {
+                var countExistTamaraProductWidget = 0;
+                var existTamaraPaymentProductWidget = setInterval(function() {
+                    if ($('.tamara-product-widget').length) {
+                        if (window.TamaraProductWidget) {
+                            window.TamaraProductWidget.render();
+                            clearInterval(existTamaraPaymentProductWidget);
+                        }
+                    }
+                    if (++countExistTamaraProductWidget > 33) {
+                        clearInterval(existTamaraPaymentProductWidget);
+                    }
+                }, 300);
+                return false;
+            },
+
+            renderInstallmentsPlanWidget: function () {
+                var countExistTamaraInstallmentsPlan = 0;
+                var existTamaraInstallmentsPlan = setInterval(function() {
+                    if ($('.tamara-installment-plan-widget').length) {
+                        if (window.TamaraInstallmentPlan) {
+                            window.TamaraInstallmentPlan.render();
+                            clearInterval(existTamaraInstallmentsPlan);
+                        }
+                    }
+                    if (++countExistTamaraInstallmentsPlan > 33) {
+                        clearInterval(existTamaraInstallmentsPlan);
+                    }
+                }, 300);
+                return false;
             }
         });
     }

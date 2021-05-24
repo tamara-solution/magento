@@ -197,6 +197,22 @@ define(
                         fullScreenLoader.stopLoader(true);
                     }
                 });
+            },
+
+            renderProductWidget: function () {
+                var countExistTamaraProductWidget = 0;
+                var existTamaraPaymentProductWidget = setInterval(function() {
+                    if ($('.tamara-product-widget').length) {
+                        if (window.TamaraProductWidget) {
+                            window.TamaraProductWidget.render();
+                            clearInterval(existTamaraPaymentProductWidget);
+                        }
+                    }
+                    if (++countExistTamaraProductWidget > 33) {
+                        clearInterval(existTamaraPaymentProductWidget);
+                    }
+                }, 300);
+                return false;
             }
         });
     }
