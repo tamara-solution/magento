@@ -44,100 +44,31 @@
             <h4 data-bind="i18n: 'Pay in 3 Instalments information'"></h4>
             <ul>
                 <li>
-                    <span data-bind="text: $t('Min Limit:') + ' ' + getMinLimit()"></span>
+                    <span data-bind="text: $t('Min Limit') + ' : ' + getMinLimit()"></span>
                 </li>
                 <li>
-                    <span data-bind="text: $t('Max Limit:') + ' ' + getMaxLimit()"></span>
+                    <span data-bind="text: $t('Max Limit') + ' : ' + getMaxLimit()"></span>
                 </li>
             </ul>
         </div>
 
-        <div class="message error message-error" data-bind="visible: shouldShowError()">
+        <div class="message warning message-error" data-bind="visible: shouldShowError()">
             <span data-bind="i18n: 'The grand total of order is over/under limit of Tamara.'"></span>
         </div>
 
         <div class="params">
             <input type="hidden" id="order-id-pay-by-instalments" value="0" />
+            <input class="render-product-widget" data-bind="visible: renderProductWidget()" />
+            <input class="render-installments-widget" data-bind="visible: renderInstallmentsPlanWidget()" />
         </div>
 
         <!-- ko if: (!shouldShowError()) -->
-        <div class="instalment-period">
-
-            <!-- ko if: (isArabicLanguage()) -->
-            <h3 data-bind="text: getPeriodTitle()" style="text-align: right"></h3>
-            <!-- /ko -->
-
-            <!-- ko ifnot: (isArabicLanguage()) -->
-            <h3 data-bind="text: getPeriodTitle()"></h3>
-            <!-- /ko -->
-
-            <!-- ko if: (isArabicLanguage()) -->
-            <table>
-                <thead>
-                <tr>
-                    <!-- ko foreach: { data: getInstalmentPeriodsForArabic(), as: 'period' } -->
-                    <th class="text-center"><span data-bind="text: period.label"></span></th>
-                    <!-- /ko -->
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="text-center">
-                        <img data-bind="attr: { src: require.toUrl('Tamara_Checkout/images/instalments/icon3.png')}"   width="16" height="16" />
-                    </td>
-                    <td class="text-center">
-                        <img data-bind="attr: { src: require.toUrl('Tamara_Checkout/images/instalments/icon2.png')}"   width="16" height="16"/>
-                    </td>
-                    <td class="text-center">
-                        <img data-bind="attr: { src: require.toUrl('Tamara_Checkout/images/instalments/icon1.png')}"  width="16" height="16"/>
-                    </td>
-                </tr>
-                <tr>
-                    <!-- ko foreach: { data: getInstalmentPeriodsForArabic(), as: 'period' } -->
-                    <td class="text-center">
-                        <span data-bind="text: period.formatted_amount"></span>
-                    </td>
-                    <!-- /ko -->
-                </tr>
-                </tbody>
-            </table>
-
-            <!-- /ko -->
-            <!-- ko ifnot: (isArabicLanguage()) -->
-            <table>
-                <thead>
-                    <tr>
-                        <!-- ko foreach: { data: getInstalmentPeriods(), as: 'period' } -->
-                        <th class="text-center"><span data-bind="text: period.label"></span></th>
-                        <!-- /ko -->
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="text-center">
-                            <img data-bind="attr: { src: require.toUrl('Tamara_Checkout/images/instalments/icon1.png')}"  width="16" height="16"/>
-                        </td>
-                        <td class="text-center">
-                            <img data-bind="attr: { src: require.toUrl('Tamara_Checkout/images/instalments/icon2.png')}"   width="16" height="16"/>
-                        </td>
-                        <td class="text-center">
-                            <img data-bind="attr: { src: require.toUrl('Tamara_Checkout/images/instalments/icon3.png')}"   width="16" height="16" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <!-- ko foreach: { data: getInstalmentPeriods(), as: 'period' } -->
-                        <td class="text-center">
-                            <span data-bind="text: period.formatted_amount"></span>
-                        </td>
-                        <!-- /ko -->
-                    </tr>
-                </tbody>
-            </table>
-            <!-- /ko -->
-        </div>
+        <div class="tamara-installment-plan-widget"
+             data-bind="attr: {'data-lang': getPaymentLanguage(), 'data-price': getGrandTotal(), 'data-currency': currencyCode, 'data-installment-minimum-amount': getMinLimitAmount(), 'installment-maximum-amount': getMaxLimitAmount(), 'number-of-installments': getNumberOfInstalments()}"
+        ></div>
         <!-- /ko -->
 
-        <div class="actions-toolbar">
+        <div class="actions-toolbar" style="margin-top: 10px;">
             <div class="primary">
                 <button class="action primary checkout"
                         type="submit"

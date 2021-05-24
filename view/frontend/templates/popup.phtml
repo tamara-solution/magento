@@ -16,11 +16,16 @@ $availableMethod = $block->getPaymentMethodForPdpWidget($productFinalPrice);
     <script charset="utf-8" src="https://cdn.tamara.co/widget/product-widget.min.js"></script>
     <script>
         require(['jquery', 'jquery/ui'], function($){
-            setTimeout(() => {
-                if (window.TamaraProductWidget) {
+            var countExistTamaraProductWidget = 0;
+            var existTamaraProductWidget = setInterval(function() {
+                if ($('#tamara-product-widget').length && window.TamaraProductWidget) {
                     $("#tamara-product-widget").empty();
                     window.TamaraProductWidget.init({ lang: '<?= $lang; ?>' });
                     window.TamaraProductWidget.render();
+                    clearInterval(existTamaraProductWidget);
+                }
+                if (++countExistTamaraProductWidget > 33) {
+                    clearInterval(existTamaraProductWidget);
                 }
             }, 300);
         });
