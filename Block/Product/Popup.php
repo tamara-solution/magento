@@ -190,15 +190,15 @@ class Popup extends Template
         if ($this->isEnabledPayLaterMethod()) {
             $enabledMethods[] = [
                 'name' => \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER,
-                'min_limit' => $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['min_limit'],
-                'max_limit' => $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['max_limit']
+                'min_limit' => $this->tamaraHelper->getPaymentTypesOfStore()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['min_limit'],
+                'max_limit' => $this->tamaraHelper->getPaymentTypesOfStore()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['max_limit']
             ];
         }
         if ($this->isEnabledInstallmentsMethod()) {
             $enabledMethods[] = [
                 'name' => \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS,
-                'min_limit' => $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['min_limit'],
-                'max_limit' => $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['max_limit']
+                'min_limit' => $this->tamaraHelper->getPaymentTypesOfStore()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['min_limit'],
+                'max_limit' => $this->tamaraHelper->getPaymentTypesOfStore()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['max_limit']
             ];
         }
         return $enabledMethods;

@@ -21,16 +21,20 @@ class Available
 
     private $httpHeader;
 
+    private $tamaraHelper;
+
     public function __construct(
         Logger $logger,
         BaseConfig $config,
         EmailWhiteListRepositoryInterface $emailWhiteListRepository,
-        Header $httpHeader
+        Header $httpHeader,
+        \Tamara\Checkout\Helper\AbstractData $tamaraHelper
     ) {
         $this->logger = $logger;
         $this->config = $config;
         $this->emailWhiteListRepository = $emailWhiteListRepository;
         $this->httpHeader = $httpHeader;
+        $this->tamaraHelper = $tamaraHelper;
     }
 
 
@@ -39,7 +43,15 @@ class Available
         $availableMethods,
         \Magento\Quote\Api\Data\CartInterface $quote = null
     ) {
-
+        $removeMethods = [];
+        $paymentTypes = $this->tamaraHelper->getPaymentTypesOfStore();
+        if (!isset($paymentTypes[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER])) {
+            $removeMethods[] = \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE;
+        }
+        if (!isset($paymentTypes[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS])) {
+            $removeMethods[] = \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE;
+        }
+        $availableMethods = $this->removeMethod($availableMethods, $removeMethods);
         $userAgent = $this->httpHeader->getHttpUserAgent();
         if ($this->config->isBlockWebViewEnabled()) {
             if (!$this->isWebView($userAgent) || $this->isRestful()) {
@@ -60,14 +72,12 @@ class Available
         return $this->removeTamaraMethod($availableMethods);
     }
 
-    private function removeTamaraMethod($availableMethods): array
-    {
+    private function removeMethod($availableMethods, $removeMethods) {
         foreach ($availableMethods as $key => $method) {
-            if (PaymentHelper::isTamaraPayment($method->getCode())) {
+            if (in_array($method->getCode(), $removeMethods)) {
                 unset($availableMethods[$key]);
             }
         }
-
         return $availableMethods;
     }
 
@@ -84,6 +94,17 @@ class Available
         }
 
         return false;
+    }
+
+    private function removeTamaraMethod($availableMethods): array
+    {
+        foreach ($availableMethods as $key => $method) {
+            if (PaymentHelper::isTamaraPayment($method->getCode())) {
+                unset($availableMethods[$key]);
+            }
+        }
+
+        return $availableMethods;
     }
 
     private function isRestful(): bool

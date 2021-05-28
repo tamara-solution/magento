@@ -136,6 +136,11 @@ class Checkout extends AbstractMethod {
      */
 	protected $tamaraOrder;
 
+    /**
+     * @var \Tamara\Checkout\Helper\AbstractData
+     */
+    protected $tamaraHelper;
+
 
     /**
      * @param \Magento\Framework\Model\Context $context
@@ -165,6 +170,7 @@ class Checkout extends AbstractMethod {
 		BaseConfig $config,
         OrderRepositoryInterface $tamaraOrderRepository,
         OrderInterface $tamaraOrder,
+        \Tamara\Checkout\Helper\AbstractData $tamaraHelper,
 		AbstractResource $resource = null,
 		AbstractDb $resourceCollection = null,
 		array $data = [],
@@ -186,6 +192,7 @@ class Checkout extends AbstractMethod {
 		$this->_configModule = $config;
 		$this->tamaraOrderRepository = $tamaraOrderRepository;
 		$this->tamaraOrder = $tamaraOrder;
+		$this->tamaraHelper = $tamaraHelper;
 	}
     /**
      * To check billing country is allowed for the payment method
@@ -196,6 +203,9 @@ class Checkout extends AbstractMethod {
      */
     public function canUseForCountry($country)
     {
+        if ($country != $this->tamaraHelper->getStoreCountryCode()) {
+            return false;
+        }
         return parent::canUseForCountry($country) && in_array($country, explode(',', self::ALLOWED_COUNTRIES));
     }
 

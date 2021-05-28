@@ -80,13 +80,13 @@ class ConfigRepository extends GatewayConfig implements ConfigRepositoryInterfac
         $data = [
             [
                 'name' => $this->payLaterConfig->getPayLaterTitle(),
-                'min_limit' => (float) $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['min_limit'],
-                'max_limit' => (float) $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['max_limit']
+                'min_limit' => (float) $this->tamaraHelper->getPaymentTypesOfStore()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['min_limit'],
+                'max_limit' => (float) $this->tamaraHelper->getPaymentTypesOfStore()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['max_limit']
             ],
             [
                 'name' => $this->instalmentConfig->getPayByInstalmentsTitle(),
-                'min_limit' => (float) $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['min_limit'],
-                'max_limit' => (float) $this->tamaraHelper->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['max_limit']
+                'min_limit' => (float) $this->tamaraHelper->getPaymentTypesOfStore()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['min_limit'],
+                'max_limit' => (float) $this->tamaraHelper->getPaymentTypesOfStore()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['max_limit']
             ],
         ];
 

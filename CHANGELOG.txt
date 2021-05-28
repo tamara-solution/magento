@@ -1,0 +1,6 @@
+1.12.2
+    Bugs fixed:
+    + Fixed an issue revert order when cancel order by webhook
+    + Fixed bug sync payment types between Tamara and local site
+    + Some minors fixed
+

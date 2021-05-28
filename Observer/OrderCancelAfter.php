@@ -19,6 +19,11 @@ class OrderCancelAfter extends AbstractObserver
 
     protected $config;
 
+    const EXPIRED_STATUSES = [
+        "expired",
+        "declined"
+    ];
+
     public function __construct(
         Logger $logger,
         TamaraAdapterFactory $adapter,
@@ -53,6 +58,8 @@ class OrderCancelAfter extends AbstractObserver
             return;
         }
 
+        $tamaraAdapter = $this->adapter->create();
+
         $tamaraOrder = $this->orderRepository->getTamaraOrderByOrderId($order->getId());
 
         $data['tamara_order_id'] = $tamaraOrder->getTamaraOrderId();
@@ -64,7 +71,6 @@ class OrderCancelAfter extends AbstractObserver
         $data['currency'] = $order->getOrderCurrencyCode();
         $data['items'] = $order->getAllVisibleItems();
 
-        $tamaraAdapter = $this->adapter->create();
         $tamaraAdapter->cancel($data);
 
         $this->logger->debug(['End to cancel event']);

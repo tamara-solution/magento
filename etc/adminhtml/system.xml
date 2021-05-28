@@ -91,7 +91,7 @@
                         <config_path>payment/tamara_checkout/block_web_view</config_path>
                         <comment>Enable it if you want to block the Tamara checkout from native mobile app.</comment>
                     </field>
-                    <field id="use_magento_success_page" translate="label" type="select" sortOrder="93" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="use_magento_success_page" translate="label" type="select" sortOrder="93" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Use magento checkout success page</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/tamara_checkout/use_magento_success_page</config_path>
@@ -103,7 +103,7 @@
                         <config_path>payment/tamara_checkout/enable_pdp_widget</config_path>
                         <comment>Enable it if you want to show Tamara widget in product detail page</comment>
                     </field>
-                    <field id="auto_generate_invoice" translate="label" type="select" sortOrder="97" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="auto_generate_invoice" translate="label" type="select" sortOrder="97" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Auto generate invoice</label>
                         <source_model>Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice</source_model>
                         <config_path>payment/tamara_checkout/auto_generate_invoice</config_path>

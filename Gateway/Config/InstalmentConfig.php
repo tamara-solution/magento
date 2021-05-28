@@ -15,6 +15,11 @@ class InstalmentConfig extends MagentoPaymentConfig
     const NUMBER_OF_INSTALMENTS = 3;
 
     /**
+     * @var \Tamara\Checkout\Helper\AbstractData
+     */
+    protected $tamaraHelper;
+
+    /**
      * @param ScopeConfigInterface $scopeConfig
      * @param Json $serializer
      * @param null|string $methodCode
@@ -23,11 +28,13 @@ class InstalmentConfig extends MagentoPaymentConfig
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         Json $serializer,
+        \Tamara\Checkout\Helper\AbstractData $tamaraHelper,
         $methodCode = self::PAYMENT_TYPE_CODE,
         $pathPattern = MagentoPaymentConfig::DEFAULT_PATH_PATTERN
     ) {
         parent::__construct($scopeConfig, $methodCode, $pathPattern);
         $this->serializer = $serializer;
+        $this->tamaraHelper = $tamaraHelper;
     }
 
     public function getPayByInstalmentsTitle($storeId = null)
@@ -36,6 +43,7 @@ class InstalmentConfig extends MagentoPaymentConfig
     }
 
     public function isEnabled($storeId = null) {
-        return (bool) $this->getValue(self::ACTIVE, $storeId);
+        return (bool) $this->getValue(self::ACTIVE, $storeId)
+            && isset($this->tamaraHelper->getPaymentTypesOfStore($storeId)[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]);
     }
 }
