@@ -26,6 +26,7 @@ use Tamara\Request\Webhook\RegisterWebhookRequest;
 use Tamara\Request\Webhook\RemoveWebhookRequest;
 use Tamara\Response\Checkout\CreateCheckoutResponse;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
+use Tamara\Response\Checkout\GetPaymentTypesResponse;
 
 class TamaraAdapter
 {
@@ -95,6 +96,11 @@ class TamaraAdapter
     private $orderCommentSender;
 
     /**
+     * @var \Magento\Sales\Api\OrderManagementInterface
+     */
+    private $orderManagement;
+
+    /**
      * @var \Tamara\Checkout\Gateway\Config\BaseConfig
      */
     protected $baseConfig;
@@ -124,6 +130,7 @@ class TamaraAdapter
         Config $resourceConfig,
         \Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory $orderStatusCollectionFactory,
         \Magento\Sales\Model\Order\Email\Sender\OrderCommentSender $orderCommentSender,
+        \Magento\Sales\Api\OrderManagementInterface $orderManagement,
         \Tamara\Checkout\Gateway\Config\BaseConfig $baseConfig,
         \Tamara\Checkout\Helper\Invoice $tamaraInvoiceHelper,
         \Tamara\Checkout\Helper\Transaction $tamaraTransactionHelper
@@ -143,6 +150,7 @@ class TamaraAdapter
         $this->resourceConfig = $resourceConfig;
         $this->orderStatusCollectionFactory = $orderStatusCollectionFactory;
         $this->orderCommentSender = $orderCommentSender;
+        $this->orderManagement = $orderManagement;
         $this->baseConfig = $baseConfig;
         $this->tamaraInvoiceHelper = $tamaraInvoiceHelper;
         $this->tamaraTransactionHelper = $tamaraTransactionHelper;
@@ -161,15 +169,26 @@ class TamaraAdapter
             $this->logger->debug($errorLogs);
             return [];
         }
+        return $this->parsePaymentTypesResponse($response);
+    }
 
+    /**
+     * @param $response GetPaymentTypesResponse
+     * @return array
+     */
+    public function parsePaymentTypesResponse($response) {
         $paymentTypes = [];
+        if ($response->isSuccess()) {
 
-        /** @var PaymentType $paymentType */
-        foreach ($response->getPaymentTypes() as $paymentType) {
-            $paymentTypes[$paymentType->getName()]['min_limit'] = $paymentType->getMinLimit()->getAmount();
-            $paymentTypes[$paymentType->getName()]['max_limit'] = $paymentType->getMaxLimit()->getAmount();
+            /** @var PaymentType $paymentType */
+            foreach ($response->getPaymentTypes() as $paymentType) {
+                $paymentTypeClone = $paymentType;
+                $paymentTypes[$paymentTypeClone->getName()] = $paymentType->toArray();
+                $paymentTypes[$paymentTypeClone->getName()]['min_limit'] = $paymentTypeClone->getMinLimit()->getAmount();
+                $paymentTypes[$paymentTypeClone->getName()]['max_limit'] = $paymentTypeClone->getMaxLimit()->getAmount();
+                $paymentTypes[$paymentTypeClone->getName()]['currency'] = $paymentTypeClone->getMaxLimit()->getCurrency();
+            }
         }
-
         return $paymentTypes;
     }
 
@@ -529,10 +548,19 @@ class TamaraAdapter
 
             /** @var \Magento\Sales\Model\Order $mageOrder */
             $mageOrder = $this->mageRepository->get($order->getOrderId());
+
+            if ($mageOrder->getState() == Order::STATE_CANCELED || $mageOrder->getState() == Order::STATE_CLOSED) {
+                $this->logger->debug([
+                    __("Magento order was canceled or closed, skip cancel by webhook")
+                ]);
+                return true;
+            }
+            $this->orderManagement->cancel($order->getOrderId());
+
             $mageOrder->setState(Order::STATE_CANCELED)->setStatus(Order::STATE_CANCELED);
             $comment = sprintf('Tamara - order was %s by webhook', $eventType);
             $mageOrder->addCommentToStatusHistory(__($comment));
-            $this->mageRepository->save($mageOrder);
+            $mageOrder->getResource()->save($mageOrder);
 
         } catch (\Exception $exception) {
             $this->logger->debug([$exception->getMessage()]);
@@ -568,5 +596,14 @@ class TamaraAdapter
      */
     public function getClient() {
         return $this->client;
+    }
+
+    /**
+     * @param $orderId
+     * @return \Tamara\Response\Order\GetOrderByReferenceIdResponse
+     * @throws RequestDispatcherException
+     */
+    public function getTamaraOrderFromRemote($orderId) {
+        return $this->getClient()->getOrderByReferenceId(new \Tamara\Request\Order\GetOrderByReferenceIdRequest($orderId));
     }
 }

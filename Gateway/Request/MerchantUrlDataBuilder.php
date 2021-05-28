@@ -57,16 +57,16 @@ class MerchantUrlDataBuilder implements BuilderInterface
             return [self::MERCHANT_URL => $merchantUrl];
         }
 
-        $urlPattern = '%s%s/%d/%s';
+        $urlPattern = '%s%s/%s';
         $notificationUrl = sprintf('%s%s/%s%s', $baseUrl, self::TAMARA_PAYMENT, 'notification', '?storeId=' . $storeId);
 
         if ($this->baseConfig->useMagentoCheckoutSuccessPage()) {
             $merchantUrl->setSuccessUrl($this->urlBuilder->getUrl('checkout/onepage/success/'));
         } else {
-            $merchantUrl->setSuccessUrl(sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'success'));
+            $merchantUrl->setSuccessUrl(sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, 'success'));
         }
-        $merchantUrl->setFailureUrl(sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'failure'));
-        $merchantUrl->setCancelUrl(sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'cancel'));
+        $merchantUrl->setFailureUrl(sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, 'failure'));
+        $merchantUrl->setCancelUrl(sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, 'cancel'));
         $merchantUrl->setNotificationUrl($notificationUrl);
 
         return [self::MERCHANT_URL => $merchantUrl];

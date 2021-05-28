@@ -2,6 +2,7 @@
 
 namespace Tamara\Checkout\Helper;
 
+use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Controller\Result\Json;
@@ -111,9 +112,9 @@ class AbstractData extends AbstractHelper
      * @return mixed
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getStoreCurrencyCode()
+    public function getStoreCurrencyCode($storeId = null)
     {
-        return $this->getCurrentStore()->getCurrentCurrencyCode();
+        return $this->storeManager->getStore($storeId)->getCurrentCurrencyCode();
     }
 
     /**
@@ -196,6 +197,30 @@ class AbstractData extends AbstractHelper
     }
 
     /**
+     * @param $storeId
+     * @return array|mixed
+     * @throws \Tamara\Exception\RequestDispatcherException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getPaymentTypesOfStore($storeId = null) {
+        if (is_null($storeId)) {
+            $storeId = $this->getCurrentStore()->getId();
+        }
+        $storeCountryCode = $this->getStoreCountryCode($storeId);
+        $paymentTypes = $this->getPaymentTypes($storeCountryCode);
+        $result = $paymentTypes;
+
+        //validate currency
+        $storeCurrencyCode = $this->getStoreCurrencyCode($storeId);
+        foreach ($paymentTypes as $type) {
+            if ($type['currency'] != $storeCurrencyCode) {
+                unset($result[$type['name']]);
+            }
+        }
+        return $result;
+    }
+
+    /**
      * @param array $paymentTypes
      * @param $countryCode
      */
@@ -223,5 +248,13 @@ class AbstractData extends AbstractHelper
      */
     protected function getPaymentTypesCacheIdentifier($countryCode) {
         return self::PAYMENT_TYPES_CACHE_IDENTIFIER . $countryCode;
+    }
+
+    /**
+     * @param null $storeId
+     * @return mixed
+     */
+    public function getStoreCountryCode($storeId = null) {
+        return $this->scopeConfig->getValue("general/country/default", ScopeInterface::SCOPE_STORES, $storeId);
     }
 }

@@ -67,15 +67,6 @@ class Payments extends Action
 
         if (empty($result)) {
             $resultJson->setData(['message' => __('Can not get the payment types')]);
-        } else {
-            if (isset($result[self::PAY_BY_INSTALMENTS])) {
-                $this->resourceConfig->saveConfig('payment/tamara_pay_by_instalments/min_limit', $result[self::PAY_BY_INSTALMENTS]['min_limit']);
-                $this->resourceConfig->saveConfig('payment/tamara_pay_by_instalments/max_limit', $result[self::PAY_BY_INSTALMENTS]['max_limit']);
-            }
-            if (isset($result[self::PAY_BY_LATER])) {
-                $this->resourceConfig->saveConfig('payment/tamara_pay_later/min_limit', $result[self::PAY_BY_LATER]['min_limit']);
-                $this->resourceConfig->saveConfig('payment/tamara_pay_later/max_limit', $result[self::PAY_BY_LATER]['max_limit']);
-            }
         }
 
         $resultJson->setData($result);

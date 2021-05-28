@@ -59,19 +59,25 @@ class ConfigProvider implements ConfigProviderInterface
      * Retrieve assoc array of checkout configuration
      *
      * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Tamara\Exception\RequestDispatcherException
      */
     public function getConfig()
     {
-
-        return [
-            'payment' => [
-                PayLaterConfig::PAYMENT_TYPE_CODE => $this->getMinMaxOrderPayLater(),
-                InstalmentConfig::PAYMENT_TYPE_CODE => $this->getMinMaxOrderPayByInstalments(),
-                self::TAMARA_IFRAME_CHECKOUT => $this->baseConfig->getEnableIframeCheckout(),
-                'tamara' => [
-                    'use_magento_checkout_success' => $this->baseConfig->useMagentoCheckoutSuccessPage()
-                ]
+        $config = [
+            self::TAMARA_IFRAME_CHECKOUT => $this->baseConfig->getEnableIframeCheckout(),
+            'tamara' => [
+                'use_magento_checkout_success' => $this->baseConfig->useMagentoCheckoutSuccessPage()
             ]
+        ];
+        if (isset($this->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER])) {
+            $config[PayLaterConfig::PAYMENT_TYPE_CODE] = $this->getMinMaxOrderPayLater();
+        }
+        if (isset($this->getPaymentTypes()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS])) {
+            $config[InstalmentConfig::PAYMENT_TYPE_CODE] = $this->getMinMaxOrderPayByInstalments();
+        }
+        return [
+            'payment' => $config
         ];
     }
 
@@ -102,10 +108,11 @@ class ConfigProvider implements ConfigProviderInterface
     /**
      * @return array|mixed
      * @throws \Tamara\Exception\RequestDispatcherException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getPaymentTypes() {
         if ($this->paymentTypes === null) {
-            $this->paymentTypes = $this->tamaraHelper->getPaymentTypes();
+            $this->paymentTypes = $this->tamaraHelper->getPaymentTypesOfStore();
         }
         return $this->paymentTypes;
     }

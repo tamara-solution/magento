@@ -28,6 +28,8 @@ class Cancel extends Action
      */
     private $checkoutSession;
 
+    private $orderManagement;
+
     private $tamaraOrderRepository;
 
     public function __construct(
@@ -36,6 +38,7 @@ class Cancel extends Action
         CartHelper $cartHelper,
         OrderRepositoryInterface $orderRepository,
         Session $checkoutSession,
+        \Magento\Sales\Api\OrderManagementInterface $orderManagement,
         BaseConfig $config,
         TamaraOrderRepository $tamaraOrderRepository
     ) {
@@ -43,6 +46,7 @@ class Cancel extends Action
         $this->cartHelper = $cartHelper;
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
+        $this->orderManagement = $orderManagement;
         $this->config = $config;
         $this->tamaraOrderRepository = $tamaraOrderRepository;
         parent::__construct($context);
@@ -67,11 +71,11 @@ class Cancel extends Action
 
             /** @var \Magento\Sales\Model\Order $order */
             $order = $this->orderRepository->get($orderId);
+            $this->cartHelper->restoreCartFromOrder($order);
+            $this->orderManagement->cancel($orderId);
             $order->setState(Order::STATE_CANCELED)->setStatus($this->config->getCheckoutCancelStatus());
             $order->addCommentToStatusHistory(__('Tamara - order was canceled'));
-            $this->orderRepository->save($order);
-
-            $this->cartHelper->restoreCartFromOrder($order);
+            $order->getResource()->save($order);
 
         } catch (\Exception $e) {
         }

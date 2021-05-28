@@ -308,6 +308,12 @@
         <plugin name="csrf_validator_skip" type="Tamara\Checkout\Plugin\CsrfValidatorSkip" />
     </type>
 
+    <!--    For magento 2.4.2-->
+    <type name="Magento\Theme\Model\Theme">
+        <plugin name="set_area_code_if_does_not_exist" type="Tamara\Checkout\Plugin\Theme\Model\Theme" />
+    </type>
+    <!--    end-->
+
     <preference for="Tamara\Checkout\Api\OrderInterface" type="Tamara\Checkout\Model\Order" />
     <preference for="Tamara\Checkout\Api\OrderRepositoryInterface" type="Tamara\Checkout\Model\OrderRepository" />
     <preference for="Tamara\Checkout\Api\CaptureRepositoryInterface" type="Tamara\Checkout\Model\CaptureRepository" />

@@ -14,6 +14,11 @@ class PayLaterConfig extends MagentoPaymentConfig
           ACTIVE = 'active';
 
     /**
+     * @var \Tamara\Checkout\Helper\AbstractData
+     */
+    protected $tamaraHelper;
+
+    /**
      * @param ScopeConfigInterface $scopeConfig
      * @param Json $serializer
      * @param null|string $methodCode
@@ -22,11 +27,13 @@ class PayLaterConfig extends MagentoPaymentConfig
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         Json $serializer,
+        \Tamara\Checkout\Helper\AbstractData $tamaraHelper,
         $methodCode = self::PAYMENT_TYPE_CODE,
         $pathPattern = MagentoPaymentConfig::DEFAULT_PATH_PATTERN
     ) {
         parent::__construct($scopeConfig, $methodCode, $pathPattern);
         $this->serializer = $serializer;
+        $this->tamaraHelper = $tamaraHelper;
     }
 
     public function getPayLaterTitle($storeId = null)
@@ -35,6 +42,8 @@ class PayLaterConfig extends MagentoPaymentConfig
     }
 
     public function isEnabled($storeId = null) {
-        return (bool) $this->getValue(self::ACTIVE, $storeId);
+        $paymentTypes = $this->tamaraHelper->getPaymentTypesOfStore($storeId);
+        return (bool) $this->getValue(self::ACTIVE, $storeId)
+            && isset($paymentTypes[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]);
     }
 }
