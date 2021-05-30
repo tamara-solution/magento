@@ -1,3 +1,8 @@
+1.12.3
+    New:
+    + Revert merchant url pattern
+    + Remove redundant code and di
+    + Add try catch of email sending exception
 1.12.2
     Bugs fixed:
     + Fixed an issue revert order when cancel order by webhook

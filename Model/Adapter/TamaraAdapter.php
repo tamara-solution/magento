@@ -286,7 +286,11 @@ class TamaraAdapter
                 $this->tamaraInvoiceHelper->log(["Create transaction after authorise payment"]);
                 $this->tamaraTransactionHelper->saveAuthoriseTransaction($authoriseComment, $mageOrder, $mageOrder->getIncrementId());
                 if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_AUTHORISE, $this->baseConfig->getSendEmailWhen())) {
-                    $this->orderCommentSender->send($mageOrder, true, $authoriseComment);
+                    try {
+                        $this->orderCommentSender->send($mageOrder, true, $authoriseComment);
+                    } catch (\Exception $exception) {
+                        $this->logger->debug(["Error when sending authorise notification: " . $exception->getMessage()]);
+                    }
                     $mageOrder->addStatusHistoryComment(
                         __('Notified customer about order #%1 was authorised.', $mageOrder->getIncrementId()),
                         $this->baseConfig->getCheckoutAuthoriseStatus()
@@ -417,7 +421,11 @@ class TamaraAdapter
             $this->tamaraTransactionHelper->createTransaction($magentoOrder, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND, $refundComment, $refundTransactionId);
             if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_REFUND_ORDER, $this->baseConfig->getSendEmailWhen())) {
                 $magentoOrder->setStatus($this->baseConfig->getOrderStatusShouldBeRefunded());
-                $this->orderCommentSender->send($magentoOrder, true, $refundComment);
+                try {
+                    $this->orderCommentSender->send($magentoOrder, true, $refundComment);
+                } catch (\Exception $exception) {
+                    $this->logger->debug(["Error when sending authorise notification: " . $exception->getMessage()]);
+                }
                 $magentoOrder->addStatusHistoryComment(
                     __('Notified customer about order #%1 was refunded.', $magentoOrder->getIncrementId()),
                     $this->baseConfig->getOrderStatusShouldBeRefunded()
@@ -454,7 +462,11 @@ class TamaraAdapter
             $mageOrder->addStatusHistoryComment(__($comment));
             $this->mageRepository->save($mageOrder);
             if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_CANCEL_ORDER, $this->baseConfig->getSendEmailWhen())) {
-                $this->orderCommentSender->send($mageOrder, true, $comment);
+                try {
+                    $this->orderCommentSender->send($mageOrder, true, $comment);
+                } catch (\Exception $exception) {
+                    $this->logger->debug(["Error when sending authorise notification: " . $exception->getMessage()]);
+                }
                 $mageOrder->addStatusHistoryComment(
                     __('Notified customer about order #%1 was canceled.', $mageOrder->getIncrementId()),
                     $this->baseConfig->getCheckoutCancelStatus()
