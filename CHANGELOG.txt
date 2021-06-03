@@ -1,3 +1,8 @@
+2.11.4
+    Bugs fixed:
+    + Fixed get title of payment type
+    New:
+    + Refactor code upgarde data
 2.11.3
     New:
     + Revert merchant url pattern

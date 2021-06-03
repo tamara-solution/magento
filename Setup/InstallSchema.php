@@ -15,7 +15,9 @@ class InstallSchema implements InstallSchemaInterface
         TABLE_CAPTURES = 'tamara_captures',
         TABLE_CAPTURE_ITEMS = 'tamara_capture_items',
         TABLE_REFUNDS = 'tamara_refunds',
-        TABLE_CANCELS = 'tamara_cancels';
+        TABLE_CANCELS = 'tamara_cancels',
+        TABLE_WHITELIST = 'tamara_email_whitelist',
+        TABLE_CUSTOMER_WHITELIST = 'tamara_customer_whitelist';
 
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
@@ -32,11 +34,8 @@ class InstallSchema implements InstallSchemaInterface
 
     private function createTableOrders(SchemaSetupInterface $setup)
     {
-        if ($setup->tableExists(self::TABLE_ORDERS)) {
-            return;
-        }
-
-        $table = $setup->getConnection()->newTable($setup->getTable(self::TABLE_ORDERS));
+        $fullOrdersTableName = $setup->getTable(self::TABLE_ORDERS);
+        $table = $setup->getConnection()->newTable($fullOrdersTableName);
 
         $table
             ->addColumn(
@@ -46,7 +45,7 @@ class InstallSchema implements InstallSchemaInterface
                 [
                     'identity' => true,
                     'unsigned' => true,
-                    'primary'  => true,
+                    'primary' => true,
                     'nullable' => false
                 ]
             )
@@ -76,7 +75,8 @@ class InstallSchema implements InstallSchemaInterface
                 Table::TYPE_SMALLINT,
                 null,
                 [
-                    'nullable' => false, 'default' => 0
+                    'nullable' => false,
+                    'default' => 0
                 ]
             )
             ->addColumn(
@@ -93,7 +93,7 @@ class InstallSchema implements InstallSchemaInterface
                 'Updated At')
             ->addIndex(
                 $setup->getIdxName(
-                    self::TABLE_ORDERS,
+                    $fullOrdersTableName,
                     ['tamara_id'],
                     AdapterInterface::INDEX_TYPE_UNIQUE
                 ),
@@ -105,11 +105,8 @@ class InstallSchema implements InstallSchemaInterface
 
     private function createTableCaptures(SchemaSetupInterface $setup)
     {
-        if ($setup->tableExists(self::TABLE_CAPTURES)) {
-            return;
-        }
-
-        $table = $setup->getConnection()->newTable($setup->getTable(self::TABLE_CAPTURES));
+        $fullCapturesTableName = $setup->getTable(self::TABLE_CAPTURES);
+        $table = $setup->getConnection()->newTable($fullCapturesTableName);
 
         $table
             ->addColumn(
@@ -117,7 +114,7 @@ class InstallSchema implements InstallSchemaInterface
                 Table::TYPE_TEXT,
                 255,
                 [
-                    'primary'  => true,
+                    'primary' => true,
                     'nullable' => false
                 ]
             )
@@ -195,7 +192,7 @@ class InstallSchema implements InstallSchemaInterface
                 'Updated At')
             ->addIndex(
                 $setup->getIdxName(
-                    self::TABLE_CAPTURES,
+                    $fullCapturesTableName,
                     ['capture_id'],
                     AdapterInterface::INDEX_TYPE_PRIMARY
                 ),
@@ -207,11 +204,8 @@ class InstallSchema implements InstallSchemaInterface
 
     private function createCaptureItems(SchemaSetupInterface $setup)
     {
-        if ($setup->tableExists(self::TABLE_CAPTURE_ITEMS)) {
-            return;
-        }
-
-        $table = $setup->getConnection()->newTable($setup->getTable(self::TABLE_CAPTURE_ITEMS));
+        $fullCaptureItemsTableName = $setup->getTable(self::TABLE_CAPTURE_ITEMS);
+        $table = $setup->getConnection()->newTable($fullCaptureItemsTableName);
 
         $table
             ->addColumn(
@@ -310,7 +304,7 @@ class InstallSchema implements InstallSchemaInterface
                 'Updated At')
             ->addIndex(
                 $setup->getIdxName(
-                    self::TABLE_CAPTURE_ITEMS,
+                    $fullCaptureItemsTableName,
                     ['order_item_id'],
                     AdapterInterface::INDEX_TYPE_PRIMARY
                 ),
@@ -322,11 +316,8 @@ class InstallSchema implements InstallSchemaInterface
 
     private function createRefundTable(SchemaSetupInterface $setup)
     {
-        if ($setup->tableExists(self::TABLE_REFUNDS)) {
-            return;
-        }
-
-        $table = $setup->getConnection()->newTable($setup->getTable(self::TABLE_REFUNDS));
+        $fullRefundsTableName = $setup->getTable(self::TABLE_REFUNDS);
+        $table = $setup->getConnection()->newTable($fullRefundsTableName);
 
         $table->addColumn(
             'refund_id',
@@ -342,7 +333,7 @@ class InstallSchema implements InstallSchemaInterface
                 Table::TYPE_TEXT,
                 255,
                 [
-                    'primary'  => true,
+                    'primary' => true,
                     'nullable' => false
                 ]
             )
@@ -405,7 +396,7 @@ class InstallSchema implements InstallSchemaInterface
                 'Updated At')
             ->addIndex(
                 $setup->getIdxName(
-                    self::TABLE_REFUNDS,
+                    $fullRefundsTableName,
                     ['capture_id'],
                     AdapterInterface::INDEX_TYPE_PRIMARY
                 ),
@@ -417,11 +408,8 @@ class InstallSchema implements InstallSchemaInterface
 
     private function createCancelTable(SchemaSetupInterface $setup)
     {
-        if ($setup->tableExists(self::TABLE_CANCELS)) {
-            return;
-        }
-
-        $table = $setup->getConnection()->newTable($setup->getTable(self::TABLE_CANCELS));
+        $fullCancelsTableName = $setup->getTable(self::TABLE_CANCELS);
+        $table = $setup->getConnection()->newTable($fullCancelsTableName);
 
         $table->addColumn(
             'cancel_id',
@@ -472,7 +460,7 @@ class InstallSchema implements InstallSchemaInterface
                 'Updated At')
             ->addIndex(
                 $setup->getIdxName(
-                    self::TABLE_CANCELS,
+                    $fullCancelsTableName,
                     ['capture_id'],
                     AdapterInterface::INDEX_TYPE_PRIMARY
                 ),

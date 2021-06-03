@@ -39,6 +39,9 @@ class InstalmentConfig extends MagentoPaymentConfig
 
     public function getPayByInstalmentsTitle($storeId = null)
     {
+        if ($storeId == null) {
+            $storeId = $this->tamaraHelper->getCurrentStore()->getId();
+        }
         return $this->getValue(self::TITLE, $storeId);
     }
 
