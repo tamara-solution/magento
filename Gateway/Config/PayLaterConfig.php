@@ -38,6 +38,9 @@ class PayLaterConfig extends MagentoPaymentConfig
 
     public function getPayLaterTitle($storeId = null)
     {
+        if ($storeId == null) {
+            $storeId = $this->tamaraHelper->getCurrentStore()->getId();
+        }
         return $this->getValue(self::TITLE, $storeId);
     }
 
