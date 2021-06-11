@@ -26,6 +26,8 @@ class CommonDataBuilder implements BuilderInterface
         SHIPPING_AMOUNT = 'shipping_amount',
         RISK_ASSESSMENT = 'risk_assessment';
 
+    protected $tamaraCoreHelper;
+
     /**
      * @var ProductMetadata
      */
@@ -35,9 +37,12 @@ class CommonDataBuilder implements BuilderInterface
      * CommonDataBuilder constructor.
      * @param ProductMetadata $productMetaData
      */
-    public function __construct(ProductMetadata $productMetaData)
+    public function __construct(ProductMetadata $productMetaData,
+        \Tamara\Checkout\Helper\Core $tamaraCoreHelper
+    )
     {
         $this->productMetaData = $productMetaData;
+        $this->tamaraCoreHelper = $tamaraCoreHelper;
     }
 
     public function build(array $buildSubject)
@@ -79,7 +84,7 @@ class CommonDataBuilder implements BuilderInterface
             self::DISCOUNT_AMOUNT => $discountAmount,
             self::COUNTRY_CODE => $order->getBillingAddress()->getCountryId(),
             self::PAYMENT_TYPE => $paymentType,
-            self::PLATFORM => 'Magento Version: ' . $this->productMetaData->getVersion(),
+            self::PLATFORM => 'Magento Version: ' . $this->productMetaData->getVersion() . ', Plugin Version: ' . $this->tamaraCoreHelper->getPluginVersion(),
             self::DESCRIPTION => 'Description',
             self::RISK_ASSESSMENT => ['phone_verified' => $phoneVerified]
         ];

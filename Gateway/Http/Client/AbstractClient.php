@@ -41,7 +41,7 @@ abstract class AbstractClient implements ClientInterface
 
     public function placeRequest(TransferInterface $transferObject): array
     {
-        $this->logger->debug(['Start place order client']);
+        $this->logger->debug(['Tamara - Start place order client']);
         $data = $transferObject->getBody();
 
         $log = [
@@ -58,7 +58,7 @@ abstract class AbstractClient implements ClientInterface
             throw $e;
         }
 
-        $this->logger->debug(['End place order client']);
+        $this->logger->debug(['Tamra - End place order client']);
         return $response;
     }
 

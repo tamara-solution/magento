@@ -220,4 +220,19 @@ class Popup extends Template
         }
         return $result;
     }
+
+    /**
+     * @return bool
+     */
+    public function availableToShow() {
+        $currentProduct = $this->getCurrentProduct();
+        if (!$this->config->getEnableTamaraPdpWidget($currentProduct->getStoreId())) {
+            return false;
+        }
+        $excludeProductIds = explode("," , $this->config->getExcludeProductIds($currentProduct->getStoreId()));
+        if (in_array($currentProduct->getEntityId(), $excludeProductIds)) {
+            return false;
+        }
+        return true;
+    }
 }

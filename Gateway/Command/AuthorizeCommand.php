@@ -116,7 +116,7 @@ class AuthorizeCommand implements CommandInterface
      */
     public function execute(array $commandSubject)
     {
-        $this->logger->debug(['Start authorize command']);
+        $this->logger->debug(['Tamara - Start authorize command']);
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $commandSubject['payment']->getPayment();
         /** @var \Magento\Sales\Model\Order $order */
@@ -156,7 +156,7 @@ class AuthorizeCommand implements CommandInterface
         } catch (Exception $e) {
             $orderResult->setState(Order::STATE_CANCELED)->setStatus(Order::STATE_CANCELED);
             $this->orderRepository->save($orderResult);
-            $this->logger->debug([$e->getMessage()]);
+            $this->logger->debug(["Tamara - " . $e->getMessage()]);
             throw $e;
         }
 
@@ -167,6 +167,6 @@ class AuthorizeCommand implements CommandInterface
             );
         }
 
-        $this->logger->debug(['End authorize command']);
+        $this->logger->debug(['Tamara - End authorize command']);
     }
 }

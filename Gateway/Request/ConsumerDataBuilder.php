@@ -72,7 +72,7 @@ class ConsumerDataBuilder implements BuilderInterface
             $consumer->setIsFirstOrder($this->isFirstOrder($order->getCustomerId()));
 
         } catch (\Exception $e) {
-            $this->logger->debug([$e->getMessage()]);
+            $this->logger->debug(["Tamara - " . $e->getMessage()]);
         }
 
         return [self::CONSUMER => $consumer];

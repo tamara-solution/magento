@@ -1,3 +1,18 @@
+1.12.5
+    Bugs fixed:
+    + Fixed success page template
+    + Fixed a bug when get store config data
+    New:
+    + Move api url config to dropdown
+    + Add function hide Tamara pay for specific product
+    + Add plugin version to checkout request to Tamara
+    + Add prefix Tamara to debug log
+    + Refactor code
+    + Remove all whitespaces including tabs, newlines, etc of token data before save the config
+    + Revert stock when order failed
+    + Remove Tamara about link config
+    + Remove Tamara login link config
+    + Add return url config after checkout
 1.12.4
     Bugs fixed:
     + Fixed get title of payment type

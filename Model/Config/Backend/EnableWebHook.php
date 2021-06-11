@@ -56,7 +56,7 @@ class EnableWebHook extends \Magento\Framework\App\Config\Value
                 $adapter->deleteWebhook($webhookId);
             }
         } catch (\Exception $exception) {
-            throw new \Exception("Tamara checkout config, error when delete web hook, error message: " . __($exception->getMessage()));
+            $this->_logger->debug("Tamara checkout config, error when delete web hook, error message: " . __($exception->getMessage()));
         }
         return parent::beforeSave();
     }

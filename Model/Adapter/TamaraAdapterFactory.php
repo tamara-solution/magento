@@ -111,7 +111,12 @@ class TamaraAdapterFactory
         $groups = $this->registry->registry('tamara_config_groups');
         if (is_array($groups) && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"])) {
             $notificationToken = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["notification_token"]["value"];
-            $apiUrl = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["api_url"]["value"];
+            $apiEnvironment = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["api_environment"]["value"];
+            if ($apiEnvironment == \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_ENVIRONMENT) {
+                $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_URL;
+            } else {
+                $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::SANDBOX_API_URL;
+            }
             $merchantToken = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["merchant_token"]["value"];
         } else {
             $notificationToken = $this->config->getNotificationToken($storeId);

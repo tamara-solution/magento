@@ -46,42 +46,57 @@ class Success extends Action
     public function execute()
     {
         $logger = $this->_objectManager->get('TamaraCheckoutLogger');
-        if (!$this->_objectManager->get(\Magento\Checkout\Model\Session\SuccessValidator::class)->isValid()) {
-            return $this->resultRedirectFactory->create()->setPath('checkout/cart');
+        try {
+            $orderId = $this->_request->getParam('order_id', 0);
+
+            /** @var \Magento\Sales\Model\Order $order */
+            $order = $this->orderRepository->get($orderId);
+            $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);
+            $isAllowed = false;
+            $magentoOrderState = $order->getState();
+            if ($magentoOrderState == \Magento\Sales\Model\Order::STATE_NEW) {
+                $isAllowed = true;
+            }
+            if ($magentoOrderState == \Magento\Sales\Model\Order::STATE_PROCESSING) {
+                if ($tamaraOrder->getIsAuthorised()) {
+                    $isAllowed = true;
+                }
+            }
+            if (!$isAllowed) {
+                return $this->redirectToCartPage();
+            }
+        } catch (\Exception $exception) {
+            return $this->redirectToCartPage();
         }
-        $orderId = $this->checkoutSession->getLastOrderId();
-        $magentoOrder = $this->checkoutSession->getLastRealOrder();
+        try {
+            if (!(bool) $tamaraOrder->getIsAuthorised()) {
+                $successStatus = $this->config->getCheckoutSuccessStatus();
+                $order->setState(Order::STATE_PENDING_PAYMENT)->setStatus($successStatus);
+                $order->addStatusHistoryComment(__('Tamara - order checkout success, we will confirm soon'));
+                $order->getResource()->save($order);
+            }
+        } catch (\Exception $e) {
+            $logger->debug(['Success has error' => $e->getMessage()]);
+        }
+
+        if ($this->config->useMagentoCheckoutSuccessPage()) {
+            return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success/');
+        }
 
         //dispatch event onepage
         $this->_eventManager->dispatch(
             'checkout_onepage_controller_success_action',
             [
                 'order_ids' => [$orderId],
-                'order' => $magentoOrder
+                'order' => $order
             ]
         );
-
-        try {
-            $successStatus = $this->config->getCheckoutSuccessStatus();
-
-            $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);
-
-            if (!$tamaraOrder->getIsAuthorised()) {
-                /** @var \Magento\Sales\Model\Order $order */
-                $order = $this->orderRepository->get($orderId);
-                $order->setState(Order::STATE_PENDING_PAYMENT)->setStatus($successStatus);
-                $order->addStatusHistoryComment(__('Tamara - order checkout success, we will confirm soon'));
-                $this->orderRepository->save($order);
-            }
-        } catch (\Exception $e) {
-            $logger->debug(['Success has error' => $e->getMessage()]);
-        }
 
         $page = $this->_pageFactory->create();
 
         $block = $page->getLayout()->getBlock('tamara_success');
         $block->setData('order_id', $orderId);
-        $block->setData('order_increment_id', $magentoOrder->getIncrementId());
+        $block->setData('order_increment_id', $order->getIncrementId());
 
         $quoteId = $this->checkoutSession->getQuoteId();
 
@@ -92,5 +107,10 @@ class Success extends Action
         $this->cartHelper->removeCartAfterSuccess($quoteId);
 
         return $page;
+    }
+
+    public function redirectToCartPage() {
+        $this->_redirect('checkout/cart');
+        return $this->getResponse()->sendResponse();
     }
 }

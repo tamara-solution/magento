@@ -21,10 +21,25 @@ class UpgradeData implements UpgradeDataInterface
      */
     private $blockRepository;
 
-    public function __construct(BlockFactory $blockFactory, BlockRepositoryInterface $blockRepository)
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
+     * @var \Magento\Framework\App\Config\Storage\WriterInterface
+     */
+    private $configWriter;
+
+    public function __construct(BlockFactory $blockFactory, BlockRepositoryInterface $blockRepository,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
+    )
     {
         $this->blockFactory = $blockFactory;
         $this->blockRepository = $blockRepository;
+        $this->scopeConfig = $scopeConfig;
+        $this->configWriter = $configWriter;
     }
 
     /**
@@ -48,6 +63,10 @@ class UpgradeData implements UpgradeDataInterface
 
         if (version_compare($context->getVersion(), '1.1.0', '<')) {
             $this->removeCmsBlock();
+        }
+
+        if (version_compare($context->getVersion(), '1.1.1', '<')) {
+            $this->updateApiUrlConfig();
         }
 
         $setup->endSetup();
@@ -150,5 +169,14 @@ class UpgradeData implements UpgradeDataInterface
     {
         $cmsBlock = $this->blockRepository->getById('tamara_cms_block_info');
         $this->blockRepository->deleteById($cmsBlock->getId());
+    }
+
+    private function updateApiUrlConfig() {
+        if ($this->scopeConfig->getValue("payment/tamara_checkout/api_url" ,\Magento\Store\Model\ScopeInterface::SCOPE_WEBSITES)
+            == \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_URL) {
+            $this->configWriter->save('payment/tamara_checkout/api_environment', \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_ENVIRONMENT);
+        } else {
+            $this->configWriter->save('payment/tamara_checkout/api_environment', \Tamara\Checkout\Api\Data\CheckoutInformationInterface::SANDBOX_API_ENVIRONMENT);
+        }
     }
 }

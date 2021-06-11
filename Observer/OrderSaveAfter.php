@@ -49,18 +49,26 @@ class OrderSaveAfter extends AbstractObserver
 
     public function execute(Observer $observer)
     {
-        $this->logger->debug(['Start to order save after event']);
-
-        if (!$this->config->getTriggerActions()) {
-            $this->logger->debug(['Turned off the trigger actions']);
+        /** @var Order $order */
+        $order = $observer->getEvent()->getOrder();
+        $payment = $order->getPayment();
+        if ($payment === null) {
+            return;
+        }
+        if (!$this->isTamaraPayment($payment->getMethod())) {
             return;
         }
 
-        /** @var Order $order */
-        $order = $observer->getEvent()->getOrder();
+        $this->logger->debug(['Tamara - Start to order save after event']);
+
+        if (!$this->config->getTriggerActions()) {
+            $this->logger->debug(['Tamara - Turned off the trigger actions']);
+            return;
+        }
+
         $this->captureOrderWhenChangeStatus($order);
 
-        $this->logger->debug(['End to order save after event']);
+        $this->logger->debug(['Tamara - End to order save after event']);
     }
 
 
@@ -72,7 +80,7 @@ class OrderSaveAfter extends AbstractObserver
     protected function captureOrderWhenChangeStatus(Order $order): void
     {
         if (empty($this->config->getOrderStatusShouldBeCaptured())) {
-            $this->logger->debug(['Capture when order status change is not set, skip capture'], null,
+            $this->logger->debug(['Tamara - Capture when order status change is not set, skip capture'], null,
                 $this->config->enabledDebug());
             return;
         }
