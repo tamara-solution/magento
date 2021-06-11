@@ -2,6 +2,9 @@
 /**
  * @var $block \Tamara\Checkout\Block\Product\Popup
  */
+if (!$block->availableToShow()) {
+    goto end;
+}
 $productFinalPrice = $block->getCurrentProductPrice();
 $availableMethod = $block->getPaymentMethodForPdpWidget($productFinalPrice);
 ?>
@@ -37,3 +40,6 @@ $availableMethod = $block->getPaymentMethodForPdpWidget($productFinalPrice);
         <div class="tamara-product-widget" id="tamara-product-widget" data-payment-type="paylater" data-disable-paylater="false" data-pay-later-max-amount="<?= $availableMethod['max_limit'] ?>" data-price="<?= $productFinalPrice; ?>" data-disable-installment="true"  data-lang="<?= $lang; ?>"></div>
     <?php endif; ?>
 <?php endif; ?>
+<?php
+    end:
+?>

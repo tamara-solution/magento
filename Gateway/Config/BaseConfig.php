@@ -38,7 +38,15 @@ class BaseConfig extends MagentoPaymentConfig
 
     public function getApiUrl($storeId = null)
     {
-        return $this->getValue('api_url', $storeId);
+        if ($this->getApiEnvironment($storeId) == \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_ENVIRONMENT) {
+            return \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_URL;
+        } else {
+            return \Tamara\Checkout\Api\Data\CheckoutInformationInterface::SANDBOX_API_URL;
+        }
+    }
+
+    public function getApiEnvironment($storeId = null) {
+        return $this->getValue('api_environment', $storeId);
     }
 
     public function getMerchantSuccessUrl($storeId = null)
@@ -102,12 +110,20 @@ class BaseConfig extends MagentoPaymentConfig
 
     public function getLinkAboutTamara($storeId = null)
     {
-        return $this->getValue('link_about_tamara', $storeId);
+        return "https://www.tamara.co/about-us.html";
+    }
+
+    public function isProductionApiEnvironment($storeId = null) {
+        return $this->getApiEnvironment($storeId) == \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_ENVIRONMENT;
     }
 
     public function getLinkLoginTamara($storeId = null)
     {
-        return $this->getValue('link_login_tamara', $storeId);
+        if ($this->isProductionApiEnvironment()) {
+            return "https://app.tamara.co";
+        } else {
+            return "https://app-sandbox.tamara.co";
+        }
     }
 
     public function getIsUseWhitelist($storeId = null)
@@ -174,5 +190,9 @@ class BaseConfig extends MagentoPaymentConfig
      */
     public function getEnableTamaraPdpWidget($storeId = null) {
         return (bool) $this->getValue('enable_pdp_widget', $storeId);
+    }
+
+    public function getExcludeProductIds($storeId = null) {
+        return $this->getValue('exclude_product_ids', $storeId);
     }
 }

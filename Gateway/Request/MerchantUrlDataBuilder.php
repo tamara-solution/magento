@@ -58,16 +58,23 @@ class MerchantUrlDataBuilder implements BuilderInterface
         }
 
         $urlPattern = '%s%s/%d/%s';
-        $notificationUrl = sprintf('%s%s/%s%s', $baseUrl, self::TAMARA_PAYMENT, 'notification', '?storeId=' . $storeId);
-
-        if ($this->baseConfig->useMagentoCheckoutSuccessPage()) {
-            $merchantUrl->setSuccessUrl($this->urlBuilder->getUrl('checkout/onepage/success/'));
-        } else {
-            $merchantUrl->setSuccessUrl(sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'success'));
+        $successUrl = $this->baseConfig->getMerchantSuccessUrl($storeId);
+        if (empty($successUrl)) {
+            $successUrl = sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'success');
         }
-        $merchantUrl->setFailureUrl(sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'failure'));
-        $merchantUrl->setCancelUrl(sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'cancel'));
+        $cancelUrl = $this->baseConfig->getMerchantCancelUrl($storeId);
+        if (empty($cancelUrl)) {
+            $cancelUrl = sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'cancel');
+        }
+        $failureUrl = $this->baseConfig->getMerchantFailureUrl($storeId);
+        if (empty($failureUrl)) {
+            $failureUrl = sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'failure');
+        }
+        $notificationUrl = sprintf('%s%s/%s%s', $baseUrl, self::TAMARA_PAYMENT, 'notification', '?storeId=' . $storeId);
         $merchantUrl->setNotificationUrl($notificationUrl);
+        $merchantUrl->setSuccessUrl($successUrl);
+        $merchantUrl->setCancelUrl($cancelUrl);
+        $merchantUrl->setFailureUrl($failureUrl);
 
         return [self::MERCHANT_URL => $merchantUrl];
     }

@@ -10,11 +10,10 @@
                         <label>Version</label>
                         <frontend_model>Tamara\Checkout\Block\Adminhtml\System\Config\Form\ExtensionVersion</frontend_model>
                     </field>
-                    <field id="api_url" translate="label" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Api Url</label>
-                        <config_path>payment/tamara_checkout/api_url</config_path>
-                        <validate>required-entry</validate>
-                        <backend_model>Tamara\Checkout\Model\Config\Backend\Value</backend_model>
+                    <field id="api_environment" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Api Environment</label>
+                        <config_path>payment/tamara_checkout/api_environment</config_path>
+                        <source_model>Tamara\Checkout\Model\Config\Source\ApiEnvironment</source_model>
                     </field>
                     <field id="merchant_token" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Merchant Token</label>
@@ -66,7 +65,7 @@
                         <config_path>payment/tamara_checkout/is_email_whitelist_enabled</config_path>
                     </field>
                     <field id="send_email_when" translate="label" type="multiselect" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Send email when</label>
+                        <label>Send email to customer when</label>
                         <source_model>Tamara\Checkout\Model\Config\Source\EmailTo\Options</source_model>
                         <config_path>payment/tamara_checkout/send_email_when</config_path>
                     </field>
@@ -91,6 +90,21 @@
                         <config_path>payment/tamara_checkout/block_web_view</config_path>
                         <comment>Enable it if you want to block the Tamara checkout from native mobile app.</comment>
                     </field>
+                    <field id="merchant_success_url" translate="label" type="text" sortOrder="83" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Checkout success url</label>
+                        <config_path>payment/tamara_checkout/merchant_success_url</config_path>
+                        <comment>If empty, Tamara will process this url automatically (Recommend)</comment>
+                    </field>
+                    <field id="merchant_cancel_url" translate="label" type="text" sortOrder="85" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Checkout cancel url</label>
+                        <config_path>payment/tamara_checkout/merchant_cancel_url</config_path>
+                        <comment>If empty, Tamara will process this url automatically (Recommend)</comment>
+                    </field>
+                    <field id="merchant_failure_url" translate="label" type="text" sortOrder="87" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Checkout failure url</label>
+                        <config_path>payment/tamara_checkout/merchant_failure_url</config_path>
+                        <comment>If empty, Tamara will process this url automatically (Recommend)</comment>
+                    </field>
                     <field id="use_magento_success_page" translate="label" type="select" sortOrder="93" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Use magento checkout success page</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -103,19 +117,16 @@
                         <config_path>payment/tamara_checkout/enable_pdp_widget</config_path>
                         <comment>Enable it if you want to show Tamara widget in product detail page</comment>
                     </field>
+                    <field id="exclude_product_ids" translate="label" type="text" sortOrder="96" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Exclude Tamara on product IDs</label>
+                        <config_path>payment/tamara_checkout/exclude_product_ids</config_path>
+                        <comment>Hide Tamara widget on these product detail pages and also hide Tamara payment on checkout page if your cart have these items. Each id is separated by a comma ","</comment>
+                    </field>
                     <field id="auto_generate_invoice" translate="label" type="select" sortOrder="97" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Auto generate invoice</label>
                         <source_model>Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice</source_model>
                         <config_path>payment/tamara_checkout/auto_generate_invoice</config_path>
                         <comment>Please select the state of the order when the invoice should be generated automatically</comment>
-                    </field>
-                    <field id="link_about_tamara" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Link About Tamara Payment</label>
-                        <config_path>payment/tamara_checkout/link_about_tamara</config_path>
-                    </field>
-                    <field id="link_login_tamara" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Link Login Tamara for Customer</label>
-                        <config_path>payment/tamara_checkout/link_login_tamara</config_path>
                     </field>
                 </group>
 

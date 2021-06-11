@@ -52,6 +52,19 @@ class Available
             $removeMethods[] = \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE;
         }
         $availableMethods = $this->removeMethod($availableMethods, $removeMethods);
+
+        $excludeProductIds = explode(",", $this->config->getExcludeProductIds($quote->getStoreId()));
+        $quoteItems = $quote->getItems();
+        foreach ($quoteItems as $item) {
+            
+            /**
+             * @var \Magento\Quote\Model\Quote\Item $item
+             */
+            if (in_array($item->getProductId(), $excludeProductIds)) {
+                return $this->removeTamaraMethod($availableMethods);
+            }
+        }
+
         $userAgent = $this->httpHeader->getHttpUserAgent();
         if ($this->config->isBlockWebViewEnabled()) {
             if (!$this->isWebView($userAgent) || $this->isRestful()) {
@@ -72,7 +85,8 @@ class Available
         return $this->removeTamaraMethod($availableMethods);
     }
 
-    private function removeMethod($availableMethods, $removeMethods) {
+    private function removeMethod($availableMethods, $removeMethods)
+    {
         foreach ($availableMethods as $key => $method) {
             if (in_array($method->getCode(), $removeMethods)) {
                 unset($availableMethods[$key]);
@@ -96,17 +110,6 @@ class Available
         return false;
     }
 
-    private function removeTamaraMethod($availableMethods): array
-    {
-        foreach ($availableMethods as $key => $method) {
-            if (PaymentHelper::isTamaraPayment($method->getCode())) {
-                unset($availableMethods[$key]);
-            }
-        }
-
-        return $availableMethods;
-    }
-
     private function isRestful(): bool
     {
         if ($this->isAjaxRequest()) {
@@ -126,5 +129,16 @@ class Available
         $request = $om->get(RequestInterface::class);
 
         return $request->isXmlHttpRequest();
+    }
+
+    private function removeTamaraMethod($availableMethods): array
+    {
+        foreach ($availableMethods as $key => $method) {
+            if (PaymentHelper::isTamaraPayment($method->getCode())) {
+                unset($availableMethods[$key]);
+            }
+        }
+
+        return $availableMethods;
     }
 }

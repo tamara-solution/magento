@@ -13,24 +13,23 @@ class OrderCancelAfter extends AbstractObserver
 {
     protected $logger;
 
+    protected $coreRegistry;
+
     protected $adapter;
 
     protected $orderRepository;
 
     protected $config;
 
-    const EXPIRED_STATUSES = [
-        "expired",
-        "declined"
-    ];
-
     public function __construct(
         Logger $logger,
+        \Magento\Framework\Registry $coreRegistry,
         TamaraAdapterFactory $adapter,
         OrderRepositoryInterface $orderRepository,
         BaseConfig $config
     ) {
         $this->logger = $logger;
+        $this->coreRegistry = $coreRegistry;
         $this->adapter = $adapter;
         $this->orderRepository = $orderRepository;
         $this->config = $config;
@@ -39,13 +38,6 @@ class OrderCancelAfter extends AbstractObserver
 
     public function execute(Observer $observer)
     {
-        $this->logger->debug(['Start to cancel event']);
-
-        if (!$this->config->getTriggerActions()) {
-            $this->logger->debug(['Turned off the trigger actions']);
-            return;
-        }
-
         /** @var Order $order */
         $order = $observer->getEvent()->getOrder();
         $payment = $order->getPayment();
@@ -55,6 +47,17 @@ class OrderCancelAfter extends AbstractObserver
         }
 
         if (!$this->isTamaraPayment($payment->getMethod())) {
+            return;
+        }
+
+        $this->logger->debug(['Tamara - Start to cancel event']);
+        if (!$this->config->getTriggerActions()) {
+            $this->logger->debug(['Tamara - Turned off the trigger actions']);
+            return;
+        }
+
+        if ($this->coreRegistry->registry("skip_tamara_cancel")) {
+            $this->logger->debug(['Tamara - Skip tamara cancel']);
             return;
         }
 
@@ -73,6 +76,6 @@ class OrderCancelAfter extends AbstractObserver
 
         $tamaraAdapter->cancel($data);
 
-        $this->logger->debug(['End to cancel event']);
+        $this->logger->debug(['Tamara - End to cancel event']);
     }
 }

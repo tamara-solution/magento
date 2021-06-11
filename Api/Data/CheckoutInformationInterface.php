@@ -11,6 +11,10 @@ interface CheckoutInformationInterface
     const CANCEL_REDIRECT_URL = 'checkout_cancel_url';
     const FAILURE_REDIRECT_URL = 'checkout_failure_url';
     const REDIRECT_URL = 'checkout_redirect_url';
+    const SANDBOX_API_URL = "https://api-sandbox.tamara.co";
+    const SANDBOX_API_ENVIRONMENT = "1";
+    const PRODUCTION_API_URL = "https://api.tamara.co";
+    const PRODUCTION_API_ENVIRONMENT = "2";
 
 
     /**

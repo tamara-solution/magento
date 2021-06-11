@@ -40,8 +40,18 @@ class Cancel extends \Tamara\Checkout\Helper\AbstractData
 
     public function cancelOrder($orderId): void
     {
-        $this->log(['Start to cancel order, order id: ' . $orderId]);
         $order = $this->magentoOrderRepository->get($orderId);
+
+        $payment = $order->getPayment();
+        if ($payment === null) {
+            return;
+        }
+        if (!$this->isTamaraPayment($payment->getMethod())) {
+            return;
+        }
+
+        $this->log(['Start to cancel order, order id: ' . $orderId]);
+
         $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);
 
         $data['tamara_order_id'] = $tamaraOrder->getTamaraOrderId();

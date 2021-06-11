@@ -12,7 +12,7 @@ class Value extends \Magento\Framework\App\Config\Value
         if (!$this->isValueChanged()) {
             return parent::beforeSave();
         }
-        $this->setValue(trim($this->getValue()));
+        $this->setValue(preg_replace("/\s+/", "", $this->getValue()));
         return parent::beforeSave();
     }
 }

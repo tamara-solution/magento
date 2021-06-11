@@ -69,16 +69,16 @@ class Capture extends \Tamara\Checkout\Helper\AbstractData
          */
         $order = $this->magentoOrderRepository->get($orderId);
 
-        if (!$this->canCapture($order)) {
-            $this->log(['Order cannot capture']);
-            return;
-        }
-
         $payment = $order->getPayment();
         if ($payment === null) {
             return;
         }
         if (!$this->isTamaraPayment($payment->getMethod())) {
+            return;
+        }
+
+        if (!$this->canCapture($order)) {
+            $this->log(['Order cannot capture']);
             return;
         }
 

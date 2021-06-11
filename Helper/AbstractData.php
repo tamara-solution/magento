@@ -3,15 +3,13 @@
 namespace Tamara\Checkout\Helper;
 
 use Magento\Store\Model\ScopeInterface;
-use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
-use Magento\Framework\Controller\Result\Json;
 use Magento\Store\Model\StoreManagerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
 use Tamara\Checkout\Model\Helper\PaymentHelper;
 
-class AbstractData extends AbstractHelper
+class AbstractData extends \Tamara\Checkout\Helper\Core
 {
     const PAYMENT_TYPES_CACHE_IDENTIFIER = 'payment_types_cache';
     const PAYMENT_TYPES_CACHE_LIFE_TIME = 1800; //30 minutes
@@ -20,11 +18,6 @@ class AbstractData extends AbstractHelper
      * @var \Magento\Framework\Locale\Resolver
      */
     protected $locale;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    protected $storeManager;
 
     /**
      * @var \Magento\Framework\App\CacheInterface
@@ -60,25 +53,10 @@ class AbstractData extends AbstractHelper
         \Tamara\Checkout\Model\Adapter\TamaraAdapterFactory $tamaraAdapterFactory
     ) {
         $this->locale = $locale;
-        $this->storeManager = $storeManager;
         $this->magentoCache = $magentoCache;
         $this->tamaraConfig = $tamaraConfig;
         $this->tamaraAdapterFactory = $tamaraAdapterFactory;
-        parent::__construct($context);
-    }
-
-    /**
-     * @param $haystack string
-     * @param $needle string
-     * @return bool
-     */
-    public function endsWith($haystack, $needle)
-    {
-        $length = strlen($needle);
-        if (!$length) {
-            return true;
-        }
-        return substr($haystack, -$length) === $needle;
+        parent::__construct($context, \Magento\Framework\App\ObjectManager::getInstance(), $storeManager);
     }
 
     /**
@@ -87,17 +65,6 @@ class AbstractData extends AbstractHelper
     public function isArabicLanguage()
     {
         return $this->startsWith($this->getLocale(), 'ar_');
-    }
-
-    /**
-     * @param $haystack string
-     * @param $needle string
-     * @return bool
-     */
-    public function startsWith($haystack, $needle)
-    {
-        $length = strlen($needle);
-        return substr($haystack, 0, $length) === $needle;
     }
 
     /**
@@ -160,20 +127,12 @@ class AbstractData extends AbstractHelper
     {
         if (!$this->tamaraPaymentLogger) {
             try {
-                $this->tamaraPaymentLogger = $this->getObjectManager()->get('TamaraCheckoutLogger');
+                $this->tamaraPaymentLogger = $this->getObject('TamaraCheckoutLogger');
             } catch (\Exception $exception) {
-                $this->tamaraPaymentLogger = $this->getObjectManager()->create('TamaraCheckoutLogger');
+                $this->tamaraPaymentLogger = $this->createObject('TamaraCheckoutLogger');
             }
         }
         return $this->tamaraPaymentLogger;
-    }
-
-    /**
-     * @return \Magento\Framework\App\ObjectManager
-     */
-    public function getObjectManager()
-    {
-        return \Magento\Framework\App\ObjectManager::getInstance();
     }
 
     public function isTamaraPayment($method)
@@ -206,6 +165,7 @@ class AbstractData extends AbstractHelper
         if (is_null($storeId)) {
             $storeId = $this->getCurrentStore()->getId();
         }
+
         $storeCountryCode = $this->getStoreCountryCode($storeId);
         $paymentTypes = $this->getPaymentTypes($storeCountryCode);
         $result = $paymentTypes;

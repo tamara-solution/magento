@@ -27,7 +27,13 @@ class Failure extends Action
      */
     private $checkoutSession;
 
+    private $orderManagement;
+
+    private $coreRegistry;
+
     private $tamaraOrderRepository;
+
+    private $tamaraAdapterFactory;
 
     public function __construct(
         Context $context,
@@ -35,44 +41,57 @@ class Failure extends Action
         CartHelper $cartHelper,
         OrderRepositoryInterface $orderRepository,
         Session $checkoutSession,
+        \Magento\Sales\Api\OrderManagementInterface $orderManagement,
+        \Magento\Framework\Registry $coreRegistry,
         BaseConfig $config,
-        TamaraOrderRepository $tamaraOrderRepository
+        TamaraOrderRepository $tamaraOrderRepository,
+        \Tamara\Checkout\Model\Adapter\TamaraAdapterFactory $tamaraAdapterFactory
     ) {
         $this->pageFactory = $pageFactory;
         $this->cartHelper = $cartHelper;
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
+        $this->orderManagement = $orderManagement;
+        $this->coreRegistry = $coreRegistry;
         $this->config = $config;
         $this->tamaraOrderRepository = $tamaraOrderRepository;
+        $this->tamaraAdapterFactory = $tamaraAdapterFactory;
         parent::__construct($context);
     }
 
     public function execute()
     {
         try {
-            $orderId = $this->checkoutSession->getLastOrderId();
-            $magentoOrder = $this->checkoutSession->getLastRealOrder();
-            if (empty($orderId) || empty($magentoOrder->getGrandTotal())) {
-                $this->_redirect('checkout/cart');
-                return $this->getResponse()->sendResponse();
-            }
-
-            $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);
-
-            if ((bool) $tamaraOrder->getIsAuthorised()) {
-                $this->_redirect('checkout/cart');
-                return $this->getResponse()->sendResponse();
-            }
+            $orderId = $this->_request->getParam('order_id', 0);
 
             /** @var \Magento\Sales\Model\Order $order */
             $order = $this->orderRepository->get($orderId);
+            if ($order->getState() != \Magento\Sales\Model\Order::STATE_NEW) {
+                throw new \Exception("Order status does not support");
+            }
+            $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);
+            if ((bool) $tamaraOrder->getIsAuthorised()) {
+                throw new \Exception("Order was authorized");
+            } else {
+                $tamaraAdapter = $this->tamaraAdapterFactory->create();
+                if ($tamaraAdapter->getTamaraOrderFromRemote($order->getIncrementId())->getStatus() == "approved") {
+                    throw new \Exception("Order was approved");
+                }
+            }
+        } catch (\Exception $exception) {
+            $this->_redirect('checkout/cart');
+            return $this->getResponse()->sendResponse();
+        }
+        try {
+            $this->cartHelper->restoreCartFromOrder($order);
+            $this->coreRegistry->register("skip_tamara_cancel", true);
+            $this->orderManagement->cancel($orderId);
             $order->setState(Order::STATE_CLOSED)->setStatus($this->config->getCheckoutFailureStatus());
             $order->addCommentToStatusHistory(__('Tamara - order was failure'));
-            $this->orderRepository->save($order);
-
-            $this->cartHelper->restoreCartFromOrder($order);
-
+            $order->getResource()->save($order);
         } catch (\Exception $e) {
+            $logger = $this->_objectManager->get('TamaraCheckoutLogger');
+            $logger->debug(["Error when process payment failure: " . $e->getMessage()]);
         }
 
         $message = __('Your order was failed.');

@@ -201,13 +201,13 @@ class TamaraAdapter
      */
     public function createCheckout(array $data): array
     {
-        $this->logger->debug(['Start create checkout']);
+        $this->logger->debug(['Tamara - Start create checkout']);
 
         try  {
             $orderRequest = OrderHelper::createTamaraOrderFromArray($data);
             $result = $this->client->createCheckout(new CreateCheckoutRequest($orderRequest));
         } catch (\Exception $e) {
-            $this->logger->debug([$e->getMessage()]);
+            $this->logger->debug(["Tamara - " . $e->getMessage()]);
             throw $e;
         }
 
@@ -221,7 +221,7 @@ class TamaraAdapter
         $checkoutResponse = $result->getCheckoutResponse();
 
         if ($checkoutResponse === null) {
-            $this->logger->debug(['CheckoutResponse was null, please check again']);
+            $this->logger->debug(['Tamara - CheckoutResponse was null, please check again']);
             throw new IntegrationException(__('The response is error, please ask administrator to help'));
         }
 
@@ -230,7 +230,7 @@ class TamaraAdapter
 
     public function notification(): bool
     {
-        $this->logger->debug(['Start to notification']);
+        $this->logger->debug(['Tamara - Start to notification']);
         try {
             $authoriseMessage = $this->notificationService->processAuthoriseNotification();
         } catch (\Exception $exception) {
@@ -289,7 +289,7 @@ class TamaraAdapter
                     try {
                         $this->orderCommentSender->send($mageOrder, true, $authoriseComment);
                     } catch (\Exception $exception) {
-                        $this->logger->debug(["Error when sending authorise notification: " . $exception->getMessage()]);
+                        $this->logger->debug(["Tamara - Error when sending authorise notification: " . $exception->getMessage()]);
                     }
                     $mageOrder->addCommentToStatusHistory(
                         __('Notified customer about order #%1 was authorised.', $mageOrder->getIncrementId()),
@@ -311,18 +311,18 @@ class TamaraAdapter
             }
 
         } catch (\Exception $exception) {
-            $this->logger->debug([$exception->getMessage()]);
+            $this->logger->debug(["Tamara - " . $exception->getMessage()]);
             return false;
         }
 
-        $this->logger->debug(['End notification']);
+        $this->logger->debug(['Tamara - End notification']);
 
         return true;
     }
 
     public function capture(array $data, Order $order): void
     {
-        $this->logger->debug(['Start to capture']);
+        $this->logger->debug(['Tamara - Start to capture']);
 
         try {
             $captureRequest = PaymentHelper::createCaptureRequestFromArray($data);
@@ -350,7 +350,7 @@ class TamaraAdapter
             $rows = $this->captureRepository->saveCaptureItems($captureItems);
 
             if (!$rows) {
-                $this->logger->debug(['Cannot save capture items']);
+                $this->logger->debug(['Tamara - Cannot save capture items']);
                 $this->logger->debug($captureItems);
                 throw new IntegrationException(__('Cannot save capture items, please check log'));
             }
@@ -363,20 +363,20 @@ class TamaraAdapter
             $this->mageRepository->save($order);
 
             if ($this->baseConfig->getAutoGenerateInvoice() == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_CAPTURE) {
-                $this->logger->debug(["Automatically generate invoice after capture payment"]);
+                $this->logger->debug(["Tamara - Automatically generate invoice after capture payment"]);
                 $this->tamaraInvoiceHelper->generateInvoice($order->getId());
             }
         } catch (\Exception $e) {
-            $this->logger->debug([$e->getMessage()]);
+            $this->logger->debug(["Tamara - " . $e->getMessage()]);
             throw new IntegrationException(__($e->getMessage()));
         }
 
-        $this->logger->debug(['End capture']);
+        $this->logger->debug(['Tamara - End capture']);
     }
 
     public function refund(array $data): void
     {
-        $this->logger->debug(['Start to refund']);
+        $this->logger->debug(['Tamara - Start to refund']);
 
         try {
             $refundRequest = PaymentHelper::createRefundRequestFromArray($data);
@@ -424,7 +424,7 @@ class TamaraAdapter
                 try {
                     $this->orderCommentSender->send($magentoOrder, true, $refundComment);
                 } catch (\Exception $exception) {
-                    $this->logger->debug(["Error when sending authorise notification: " . $exception->getMessage()]);
+                    $this->logger->debug(["Tamara - Error when sending authorise notification: " . $exception->getMessage()]);
                 }
                 $magentoOrder->addCommentToStatusHistory(
                     __('Notified customer about order #%1 was refunded.', $magentoOrder->getIncrementId()),
@@ -432,16 +432,16 @@ class TamaraAdapter
                 )->setIsCustomerNotified(true)->save();
             }
         } catch (\Exception $e) {
-            $this->logger->debug([$e->getMessage()]);
+            $this->logger->debug(["Tamara - " . $e->getMessage()]);
             throw new IntegrationException(__($e->getMessage()));
         }
 
-        $this->logger->debug(['End to refund']);
+        $this->logger->debug(['Tamara - End to refund']);
     }
 
     public function cancel(array $data): void
     {
-        $this->logger->debug(['Start to cancel']);
+        $this->logger->debug(['Tamara - Start to cancel']);
 
         try {
             $cancelRequest = PaymentHelper::createCancelRequestFromArray($data);
@@ -465,7 +465,7 @@ class TamaraAdapter
                 try {
                     $this->orderCommentSender->send($mageOrder, true, $comment);
                 } catch (\Exception $exception) {
-                    $this->logger->debug(["Error when sending authorise notification: " . $exception->getMessage()]);
+                    $this->logger->debug(["Tamara - Error when sending authorise notification: " . $exception->getMessage()]);
                 }
                 $mageOrder->addCommentToStatusHistory(
                     __('Notified customer about order #%1 was canceled.', $mageOrder->getIncrementId()),
@@ -473,16 +473,16 @@ class TamaraAdapter
                 )->setIsCustomerNotified(true)->save();
             }
         } catch (\Exception $e) {
-            $this->logger->debug([$e->getMessage()]);
+            $this->logger->debug(["Tamara - " . $e->getMessage()]);
             throw new IntegrationException(__($e->getMessage()));
         }
 
-        $this->logger->debug(['End to cancel']);
+        $this->logger->debug(['Tamara - End to cancel']);
     }
 
     public function registerWebhook(): void
     {
-        $this->logger->debug(['Start to register webhook']);
+        $this->logger->debug(['Tamara - Start to register webhook']);
 
         try {
             $baseUrl = StoreHelper::getBaseUrl();
@@ -508,17 +508,21 @@ class TamaraAdapter
                 $webhookId
             );
         } catch (\Exception $exception) {
-            $this->logger->debug([$exception->getMessage()]);
+            $this->logger->debug(["Tamara - " . $exception->getMessage()]);
 
             throw $exception;
         }
 
-        $this->logger->debug(['End of register webhook']);
+        $this->logger->debug(['Tamara - End of register webhook']);
     }
 
     public function deleteWebhook($webhookId): void
     {
-        $this->logger->debug(['Start to delete webhook']);
+        $this->logger->debug(['Tamara - Start to delete webhook']);
+
+        $this->resourceConfig->deleteConfig(
+            'payment/tamara_checkout/webhook_id'
+        );
 
         $request = new RemoveWebhookRequest($webhookId);
 
@@ -530,16 +534,12 @@ class TamaraAdapter
             throw new IntegrationException(__($response->getMessage()));
         }
 
-        $this->resourceConfig->deleteConfig(
-            'payment/tamara_checkout/webhook_id'
-        );
-
-        $this->logger->debug(['End of delete webhook']);
+        $this->logger->debug(['Tamara - End of delete webhook']);
     }
 
     public function webhook(): bool
     {
-        $this->logger->debug(['Start to webhook']);
+        $this->logger->debug(['Tamara - Start to webhook']);
 
         try {
             $webhookMessage = $this->notificationService->processWebhook();
@@ -563,7 +563,7 @@ class TamaraAdapter
 
             if ($mageOrder->getState() == Order::STATE_CANCELED || $mageOrder->getState() == Order::STATE_CLOSED) {
                 $this->logger->debug([
-                    __("Magento order was canceled or closed, skip cancel by webhook")
+                    __("Tamara - Magento order was canceled or closed, skip cancel by webhook")
                 ]);
                 return true;
             }
@@ -575,11 +575,11 @@ class TamaraAdapter
             $mageOrder->getResource()->save($mageOrder);
 
         } catch (\Exception $exception) {
-            $this->logger->debug([$exception->getMessage()]);
+            $this->logger->debug(["Tamara - " . $exception->getMessage()]);
             return false;
         }
 
-        $this->logger->debug(['End Webhook']);
+        $this->logger->debug(['Tamara - End Webhook']);
         return true;
     }
 
@@ -611,11 +611,11 @@ class TamaraAdapter
     }
 
     /**
-     * @param $orderId
+     * @param $magentoOrderIncrementId
      * @return \Tamara\Response\Order\GetOrderByReferenceIdResponse
      * @throws RequestDispatcherException
      */
-    public function getTamaraOrderFromRemote($orderId) {
-        return $this->getClient()->getOrderByReferenceId(new \Tamara\Request\Order\GetOrderByReferenceIdRequest($orderId));
+    public function getTamaraOrderFromRemote($magentoOrderIncrementId) {
+        return $this->getClient()->getOrderByReferenceId(new \Tamara\Request\Order\GetOrderByReferenceIdRequest($magentoOrderIncrementId));
     }
 }

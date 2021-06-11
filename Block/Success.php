@@ -13,20 +13,26 @@ class Success extends Template
 
     protected $config;
 
+    protected $tamaraOrderRepository;
+
     public function __construct(
         Template\Context $context,
         AssetRepository $assetRepository,
-        BaseConfig $config
+        BaseConfig $config,
+        \Tamara\Checkout\Api\OrderRepositoryInterface $tamaraOrderRepository
     ){
         parent::__construct($context);
         $this->assetRepository = $assetRepository;
         $this->config = $config;
+        $this->tamaraOrderRepository = $tamaraOrderRepository;
     }
 
     public function getTamaraConfig() {
+        $orderId = $this->getData('order_id');
+        $tamaraOrderId = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId)->getTamaraOrderId();
         $successLogo = sprintf('Tamara_Checkout::images/success_%s.svg', LocaleHelper::getCurrentLanguage());
         $output['tamaraSuccessLogo'] = $this->getViewFileUrl($successLogo);
-        $output['tamaraLoginLink'] = $this->config->getLinkLoginTamara() . '?locale=' . LocaleHelper::getLocale();
+        $output['tamaraLoginLink'] = $this->config->getLinkLoginTamara() . '/orders/' . $tamaraOrderId . '?locale=' . LocaleHelper::getLocale();
         $output['order_increment_id'] = $this->getData('order_increment_id');
         return $output;
     }
