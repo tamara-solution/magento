@@ -43,16 +43,7 @@ class Available
         $availableMethods,
         \Magento\Quote\Api\Data\CartInterface $quote = null
     ) {
-        $removeMethods = [];
-        $paymentTypes = $this->tamaraHelper->getPaymentTypesOfStore();
-        if (!isset($paymentTypes[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER])) {
-            $removeMethods[] = \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE;
-        }
-        if (!isset($paymentTypes[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS])) {
-            $removeMethods[] = \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE;
-        }
-        $availableMethods = $this->removeMethod($availableMethods, $removeMethods);
-
+        //Remove Tamara payment for these products
         $excludeProductIds = explode(",", $this->config->getExcludeProductIds($quote->getStoreId()));
         $quoteItems = $quote->getItems();
         foreach ($quoteItems as $item) {
@@ -65,6 +56,7 @@ class Available
             }
         }
 
+        //If block webview
         $userAgent = $this->httpHeader->getHttpUserAgent();
         if ($this->config->isBlockWebViewEnabled()) {
             if (!$this->isWebView($userAgent) || $this->isRestful()) {
@@ -72,23 +64,33 @@ class Available
             }
         }
 
-        if (!$this->config->getIsUseWhitelist()) {
-            return $availableMethods;
+        //If enable whitelist
+        if ($this->config->getIsUseWhitelist()) {
+            if ($quote->getCustomerIsGuest()) {
+                return $this->removeTamaraMethod($availableMethods);
+            }
+
+            $email = $quote->getCustomer()->getEmail();
+            if (!$email || !$this->emailWhiteListRepository->isEmailWhitelisted($email)) {
+                return $this->removeTamaraMethod($availableMethods);
+            }
         }
+        $availableMethods = $this->filterUnAvailableMethods($availableMethods);
 
-        $email = $quote->getCustomer()->getEmail();
-
-        if ($email && $this->emailWhiteListRepository->isEmailWhitelisted($email)) {
-            return $availableMethods;
+        //If disable warning message under / over limit
+        if (!$this->config->isDisplayWarningMessageIfOrderOverUnderLimit()) {
+            $quoteTotal = $quote->getGrandTotal();
+            return $this->filterUnderOverLimit($availableMethods, $quoteTotal);
         }
-
-        return $this->removeTamaraMethod($availableMethods);
+        return $availableMethods;
     }
 
-    private function removeMethod($availableMethods, $removeMethods)
+    private function filterUnAvailableMethods($availableMethods)
     {
+        $paymentTypes = $this->tamaraHelper->getPaymentTypesOfStore();
         foreach ($availableMethods as $key => $method) {
-            if (in_array($method->getCode(), $removeMethods)) {
+            $methodCode = $method->getCode();
+            if (PaymentHelper::isTamaraPayment($methodCode) && !isset($paymentTypes[$methodCode])) {
                 unset($availableMethods[$key]);
             }
         }
@@ -139,6 +141,20 @@ class Available
             }
         }
 
+        return $availableMethods;
+    }
+
+    private function filterUnderOverLimit($availableMethods, $price) {
+        $paymentTypes = $this->tamaraHelper->getPaymentTypesOfStore();
+        foreach ($availableMethods as $key => $method) {
+            $methodCode = $method->getCode();
+            if (!PaymentHelper::isTamaraPayment($methodCode)) {
+                continue;
+            }
+            if ($price < $paymentTypes[$methodCode]['min_limit'] || $price > $paymentTypes[$methodCode]['max_limit']) {
+                unset($availableMethods[$key]);
+            }
+        }
         return $availableMethods;
     }
 }

@@ -33,7 +33,7 @@ define(
 
         return Component.extend({
             defaults: {
-                template: 'Tamara_Checkout/payment/tamara_pay_later',
+                redirectAfterPlaceOrder: false
             },
             tamaraImageSrc: window.populateTamara.tamaraLogoImageUrl,
             tamaraLink: window.populateTamara.tamaraAboutLink,
@@ -49,16 +49,7 @@ define(
                 this.createTamaraOrder();
             },
 
-            initObservable: function () {
-                this._super()
-                    .observe([
-                        'tamaraPayLater'
-                    ]);
-
-                return this;
-            },
-
-            successPayLater: function () {
+            successPayByInstalments: function () {
                 if (window.checkoutConfig.payment.tamara.use_magento_checkout_success) {
                     window.location.replace(url.build(window.checkoutConfig.defaultSuccessPageUrl));
                 } else {
@@ -67,32 +58,20 @@ define(
                 }
             },
 
-            failedPayLater: function () {
+            failedPayByInstalments: function () {
                 let orderId = window.magentoOrderId;
                 window.location.replace(url.build('tamara/payment/' + orderId + '/failure'));
             },
 
-            cancelPayLater: function () {
+            cancelPayByInstalments: function () {
                 let orderId = window.magentoOrderId;
                 window.location.replace(url.build('tamara/payment/' + orderId + '/cancel'));
-            },
-
-            getCode: function () {
-                return 'tamara_pay_later';
             },
 
             getData: function () {
                 return {
                     'method': this.item.method
                 };
-            },
-
-            getMinLimit: function () {
-                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_later.min_limit);
-            },
-
-            getMaxLimit: function () {
-                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_later.max_limit);
             },
 
             getGrandTotal: function () {
@@ -105,29 +84,12 @@ define(
                 return grandTotal;
             },
 
-            isTotalAmountInLimit: function () {
-                var tamaraConfig = window.checkoutConfig.payment.tamara_pay_later;
-                var grandTotal = this.getGrandTotal();
-                return !(grandTotal < parseFloat(tamaraConfig.min_limit) || grandTotal > parseFloat(tamaraConfig.max_limit));
-            },
-
             shouldShowError: function () {
                 return !this.isTotalAmountInLimit();
             },
 
             isPlaceOrderActive: function () {
                 return !!this.isTotalAmountInLimit();
-            },
-
-            isArabicLanguage: function () {
-                return (window.checkoutConfig.payment.tamara.locale_code).includes("ar_");
-            },
-
-            getPaymentLanguage: function () {
-                if (this.isArabicLanguage()) {
-                    return 'ar';
-                }
-                return 'en';
             },
 
             /**
@@ -153,10 +115,10 @@ define(
                                 }
                             }
                         ).always(
-                            function () {
-                                self.isPlaceOrderActionAllowed(true);
-                            }
-                        );
+                        function () {
+                            self.isPlaceOrderActionAllowed(true);
+                        }
+                    );
 
                     return true;
                 }
@@ -174,7 +136,8 @@ define(
             },
 
             createTamaraOrder: function () {
-                jQuery('#error-iframe').addClass('hidden-error-iframe');
+                var errorElement = "#error-iframe-pay-by-instalments-" + this.getNumberOfInstalments();
+                jQuery(errorElement).addClass('hidden-error-iframe');
                 fullScreenLoader.startLoader();
                 $.ajax({
                     url: url.build('tamara/payment/placeOrder'),
@@ -187,8 +150,8 @@ define(
                             window.magentoOrderId = response.orderId;
                             window.location.replace(response.redirectUrl);
                         } else {
-                            jQuery('#error-iframe').removeClass('hidden-error-iframe').text(response.error);
-                            setTimeout(() => jQuery('#error-iframe').addClass('hidden-error-iframe').text(''), 10000);
+                            jQuery(errorElement).removeClass('hidden-error-iframe').text(response.error);
+                            setTimeout(() => jQuery(errorElement).addClass('hidden-error-iframe').text(''), 10000);
 
                             return false;
                         }
@@ -197,6 +160,51 @@ define(
                         fullScreenLoader.stopLoader(true);
                     }
                 });
+            },
+
+            getInstalmentPeriods: function () {
+                let periods = [];
+                let numberOfInstalments = this.getNumberOfInstalments();
+                let grandTotal = this.getGrandTotal() * 100;
+                let mod = grandTotal % numberOfInstalments;
+                let payForEachMonth = (grandTotal - mod) / numberOfInstalments / 100;
+                let dueToDay = parseFloat(((grandTotal - mod)/numberOfInstalments/100) + (mod/100)).toFixed(2);
+
+                periods.push({'label': $.mage.__('Due today'), 'amount': dueToDay, 'formatted_amount': priceUtils.formatPrice(dueToDay)});
+                for(let i = 1; i < numberOfInstalments; i++) {
+                    let label = i;
+                    if (i > 1) {
+                        if (i == 2) {
+                            label = $.mage.__("2 months later");
+                        } else {
+                            let labelTmpl = i + ' months later';
+                            label = $.mage.__(labelTmpl);
+                        }
+                    } else {
+                        label = $.mage.__('1 month later');
+                    }
+                    periods.push({'label': label, 'amount': payForEachMonth, 'formatted_amount': priceUtils.formatPrice(payForEachMonth)});
+                }
+                return periods;
+            },
+
+            getInstalmentPeriodsForArabic: function () {
+                return this.getInstalmentPeriods().reverse();
+            },
+
+            getPeriodTitle: function () {
+                return $.mage.__('3 interest-free installments');
+            },
+
+            isArabicLanguage: function () {
+                return (window.checkoutConfig.payment.tamara.locale_code).includes("ar_");
+            },
+
+            getPaymentLanguage: function () {
+                if (this.isArabicLanguage()) {
+                    return 'ar';
+                }
+                return 'en';
             },
 
             renderProductWidget: function () {
@@ -210,6 +218,23 @@ define(
                     }
                     if (++countExistTamaraProductWidget > 33) {
                         clearInterval(existTamaraPaymentProductWidget);
+                    }
+                }, 300);
+                return false;
+            },
+
+            renderInstallmentsPlanWidget: function (numberOfInstallments) {
+                var countExistTamaraInstallmentsPlan = 0;
+                var existTamaraInstallmentsPlan = setInterval(function() {
+                    if ($('.tamara-installment-plan-widget').length) {
+                        if (window.TamaraInstallmentPlan) {
+                            $('.tamara-installment-plan-widget').empty();
+                            window.TamaraInstallmentPlan.render();
+                            clearInterval(existTamaraInstallmentsPlan);
+                        }
+                    }
+                    if (++countExistTamaraInstallmentsPlan > 33) {
+                        clearInterval(existTamaraInstallmentsPlan);
                     }
                 }, 300);
                 return false;

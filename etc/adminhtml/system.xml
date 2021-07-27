@@ -128,6 +128,12 @@
                         <config_path>payment/tamara_checkout/auto_generate_invoice</config_path>
                         <comment>Please select the state of the order when the invoice should be generated automatically</comment>
                     </field>
+                    <field id="display_limit_warning" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Display over/under limit amount warning</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/tamara_checkout/display_limit_warning</config_path>
+                        <comment>If yes, The extension will display warning message at checkout page if the cart total amount is over / under Tamara limit amount for payment, Otherwise, hide unavailable payment method</comment>
+                    </field>
                 </group>
 
                 <group id="payment_types" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -198,6 +204,321 @@
                             <label>Sort Order</label>
                             <frontend_class>validate-number</frontend_class>
                             <config_path>payment/tamara_pay_by_instalments/sort_order</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                    </group>
+
+                    <group id="type_pay_by_instalments_4" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Pay in 4 instalments</label>
+
+                        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled Pay in 4 instalments</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_4/active</config_path>
+                            <backend_model>Tamara\Checkout\Model\Config\Backend\EnablePaymentType</backend_model>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/tamara_pay_by_instalments_4/title</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Payment Action</label>
+                            <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_4/payment_action</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
+                               showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/tamara_pay_by_instalments_4/sort_order</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                    </group>
+
+                    <group id="type_pay_by_instalments_5" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Pay in 5 instalments</label>
+
+                        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled Pay in 5 instalments</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_5/active</config_path>
+                            <backend_model>Tamara\Checkout\Model\Config\Backend\EnablePaymentType</backend_model>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/tamara_pay_by_instalments_5/title</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Payment Action</label>
+                            <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_5/payment_action</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
+                               showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/tamara_pay_by_instalments_5/sort_order</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                    </group>
+
+                    <group id="type_pay_by_instalments_6" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Pay in 6 instalments</label>
+
+                        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled Pay in 6 instalments</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_6/active</config_path>
+                            <backend_model>Tamara\Checkout\Model\Config\Backend\EnablePaymentType</backend_model>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/tamara_pay_by_instalments_6/title</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Payment Action</label>
+                            <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_6/payment_action</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
+                               showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/tamara_pay_by_instalments_6/sort_order</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                    </group>
+
+                    <group id="type_pay_by_instalments_7" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Pay in 7 instalments</label>
+
+                        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled Pay in 7 instalments</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_7/active</config_path>
+                            <backend_model>Tamara\Checkout\Model\Config\Backend\EnablePaymentType</backend_model>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/tamara_pay_by_instalments_7/title</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Payment Action</label>
+                            <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_7/payment_action</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
+                               showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/tamara_pay_by_instalments_7/sort_order</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                    </group>
+
+                    <group id="type_pay_by_instalments_8" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Pay in 8 instalments</label>
+
+                        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled Pay in 8 instalments</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_8/active</config_path>
+                            <backend_model>Tamara\Checkout\Model\Config\Backend\EnablePaymentType</backend_model>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/tamara_pay_by_instalments_8/title</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Payment Action</label>
+                            <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_8/payment_action</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
+                               showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/tamara_pay_by_instalments_8/sort_order</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                    </group>
+
+                    <group id="type_pay_by_instalments_9" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Pay in 9 instalments</label>
+
+                        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled Pay in 9 instalments</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_9/active</config_path>
+                            <backend_model>Tamara\Checkout\Model\Config\Backend\EnablePaymentType</backend_model>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/tamara_pay_by_instalments_9/title</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Payment Action</label>
+                            <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_9/payment_action</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
+                               showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/tamara_pay_by_instalments_9/sort_order</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                    </group>
+
+                    <group id="type_pay_by_instalments_10" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Pay in 10 instalments</label>
+
+                        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled Pay in 10 instalments</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_10/active</config_path>
+                            <backend_model>Tamara\Checkout\Model\Config\Backend\EnablePaymentType</backend_model>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/tamara_pay_by_instalments_10/title</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Payment Action</label>
+                            <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_10/payment_action</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
+                               showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/tamara_pay_by_instalments_10/sort_order</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                    </group>
+
+                    <group id="type_pay_by_instalments_11" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Pay in 11 instalments</label>
+
+                        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled Pay in 11 instalments</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_11/active</config_path>
+                            <backend_model>Tamara\Checkout\Model\Config\Backend\EnablePaymentType</backend_model>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/tamara_pay_by_instalments_11/title</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Payment Action</label>
+                            <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_11/payment_action</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
+                               showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/tamara_pay_by_instalments_11/sort_order</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                    </group>
+
+                    <group id="type_pay_by_instalments_12" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Pay in 12 instalments</label>
+
+                        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled Pay in 12 instalments</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_12/active</config_path>
+                            <backend_model>Tamara\Checkout\Model\Config\Backend\EnablePaymentType</backend_model>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/tamara_pay_by_instalments_12/title</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Payment Action</label>
+                            <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_12/payment_action</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
+                               showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/tamara_pay_by_instalments_12/sort_order</config_path>
                             <depends>
                                 <field id="active">1</field>
                             </depends>

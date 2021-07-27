@@ -16,13 +16,14 @@
                 <can_use_checkout>1</can_use_checkout>
                 <use_magento_success_page>0</use_magento_success_page>
                 <group>tamara</group>
+                <display_limit_warning>1</display_limit_warning>
             </tamara_checkout>
             <tamara_pay_later>
                 <active>0</active>
                 <model>TamaraFacade</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Pay later in 30 days</title>
+                <title>Buy now and pay in 30 days with Tamara</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
@@ -36,7 +37,7 @@
                 <model>Tamara\Checkout\Model\PayByInstalments</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Pay in 3 instalments</title>
+                <title>Split into 3 payments, without fees with Tamara</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
@@ -45,6 +46,133 @@
                 <sort_order>1</sort_order>
                 <group>tamara</group>
             </tamara_pay_by_instalments>
+            <tamara_pay_by_instalments_4>
+                <active>0</active>
+                <model>Tamara\Checkout\Model\PayByInstalments4</model>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <title>Split into 4 payments, without fees with Tamara</title>
+                <currency>SAR</currency>
+                <order_history_use_phone>1</order_history_use_phone>
+                <can_authorize>1</can_authorize>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>1</can_use_internal>
+                <sort_order>1</sort_order>
+                <group>tamara</group>
+            </tamara_pay_by_instalments_4>
+            <tamara_pay_by_instalments_5>
+                <active>0</active>
+                <model>Tamara\Checkout\Model\PayByInstalments5</model>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <title>Split into 5 payments, without fees with Tamara</title>
+                <currency>SAR</currency>
+                <order_history_use_phone>1</order_history_use_phone>
+                <can_authorize>1</can_authorize>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>1</can_use_internal>
+                <sort_order>1</sort_order>
+                <group>tamara</group>
+            </tamara_pay_by_instalments_5>
+            <tamara_pay_by_instalments_6>
+                <active>0</active>
+                <model>Tamara\Checkout\Model\PayByInstalments6</model>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <title>Split into 6 payments, without fees with Tamara</title>
+                <currency>SAR</currency>
+                <order_history_use_phone>1</order_history_use_phone>
+                <can_authorize>1</can_authorize>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>1</can_use_internal>
+                <sort_order>1</sort_order>
+                <group>tamara</group>
+            </tamara_pay_by_instalments_6>
+            <tamara_pay_by_instalments_7>
+                <active>0</active>
+                <model>Tamara\Checkout\Model\PayByInstalments7</model>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <title>Split into 7 payments, without fees with Tamara</title>
+                <currency>SAR</currency>
+                <order_history_use_phone>1</order_history_use_phone>
+                <can_authorize>1</can_authorize>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>1</can_use_internal>
+                <sort_order>1</sort_order>
+                <group>tamara</group>
+            </tamara_pay_by_instalments_7>
+            <tamara_pay_by_instalments_8>
+                <active>0</active>
+                <model>Tamara\Checkout\Model\PayByInstalments8</model>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <title>Split into 8 payments, without fees with Tamara</title>
+                <currency>SAR</currency>
+                <order_history_use_phone>1</order_history_use_phone>
+                <can_authorize>1</can_authorize>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>1</can_use_internal>
+                <sort_order>1</sort_order>
+                <group>tamara</group>
+            </tamara_pay_by_instalments_8>
+            <tamara_pay_by_instalments_9>
+                <active>0</active>
+                <model>Tamara\Checkout\Model\PayByInstalments9</model>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <title>Split into 9 payments, without fees with Tamara</title>
+                <currency>SAR</currency>
+                <order_history_use_phone>1</order_history_use_phone>
+                <can_authorize>1</can_authorize>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>1</can_use_internal>
+                <sort_order>1</sort_order>
+                <group>tamara</group>
+            </tamara_pay_by_instalments_9>
+            <tamara_pay_by_instalments_10>
+                <active>0</active>
+                <model>Tamara\Checkout\Model\PayByInstalments10</model>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <title>Split into 10 payments, without fees with Tamara</title>
+                <currency>SAR</currency>
+                <order_history_use_phone>1</order_history_use_phone>
+                <can_authorize>1</can_authorize>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>1</can_use_internal>
+                <sort_order>1</sort_order>
+                <group>tamara</group>
+            </tamara_pay_by_instalments_10>
+            <tamara_pay_by_instalments_11>
+                <active>0</active>
+                <model>Tamara\Checkout\Model\PayByInstalments11</model>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <title>Split into 11 payments, without fees with Tamara</title>
+                <currency>SAR</currency>
+                <order_history_use_phone>1</order_history_use_phone>
+                <can_authorize>1</can_authorize>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>1</can_use_internal>
+                <sort_order>1</sort_order>
+                <group>tamara</group>
+            </tamara_pay_by_instalments_11>
+            <tamara_pay_by_instalments_12>
+                <active>0</active>
+                <model>Tamara\Checkout\Model\PayByInstalments12</model>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <title>Split into 12 payments, without fees with Tamara</title>
+                <currency>SAR</currency>
+                <order_history_use_phone>1</order_history_use_phone>
+                <can_authorize>1</can_authorize>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>1</can_use_internal>
+                <sort_order>1</sort_order>
+                <group>tamara</group>
+            </tamara_pay_by_instalments_12>
+
         </payment>
     </default>
 </config>

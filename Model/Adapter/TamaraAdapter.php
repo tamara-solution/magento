@@ -183,10 +183,36 @@ class TamaraAdapter
             /** @var PaymentType $paymentType */
             foreach ($response->getPaymentTypes() as $paymentType) {
                 $paymentTypeClone = $paymentType;
-                $paymentTypes[$paymentTypeClone->getName()] = $paymentType->toArray();
-                $paymentTypes[$paymentTypeClone->getName()]['min_limit'] = $paymentTypeClone->getMinLimit()->getAmount();
-                $paymentTypes[$paymentTypeClone->getName()]['max_limit'] = $paymentTypeClone->getMaxLimit()->getAmount();
-                $paymentTypes[$paymentTypeClone->getName()]['currency'] = $paymentTypeClone->getMaxLimit()->getCurrency();
+                if ($paymentTypeClone->getName() == \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER) {
+                    $paymentTypes[\Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE] = [
+                        'name' => \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE,
+                        'min_limit' => $paymentTypeClone->getMinLimit()->getAmount(),
+                        'max_limit' => $paymentTypeClone->getMaxLimit()->getAmount(),
+                        'currency' => $paymentTypeClone->getMinLimit()->getCurrency(),
+                        'description' => $paymentTypeClone->getDescription()
+                    ];
+                }
+                if ($paymentTypeClone->getName() == \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS) {
+                    $description = $paymentTypeClone->getDescription();
+                    if (count($installments = $paymentTypeClone->getSupportedInstalments())) {
+                        foreach ($installments as $installment) {
+
+                            /**
+                             * @var \Tamara\Model\Checkout\Instalment $installment
+                             */
+                            $installmentMethodCode = \Tamara\Checkout\Gateway\Config\InstalmentConfig::getInstallmentPaymentCode($installment->getInstalments());
+                            $installmentData = [
+                                'name' => $installmentMethodCode,
+                                'min_limit' => $installment->getMinLimit()->getAmount(),
+                                'max_limit' => $installment->getMaxLimit()->getAmount(),
+                                'currency' => $installment->getMinLimit()->getCurrency(),
+                                'number_of_instalments' => $installment->getInstalments(),
+                                'description' => $description
+                            ];
+                            $paymentTypes[$installmentMethodCode] = $installmentData;
+                        }
+                    }
+                }
             }
         }
         return $paymentTypes;

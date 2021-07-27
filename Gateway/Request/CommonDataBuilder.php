@@ -24,7 +24,8 @@ class CommonDataBuilder implements BuilderInterface
         TAX_AMOUNT = 'tax_amount',
         DISCOUNT_AMOUNT = 'discount_amount',
         SHIPPING_AMOUNT = 'shipping_amount',
-        RISK_ASSESSMENT = 'risk_assessment';
+        RISK_ASSESSMENT = 'risk_assessment',
+        NUMBER_OF_INSTALLMENTS = 'number_of_installments';
 
     protected $tamaraCoreHelper;
 
@@ -57,20 +58,21 @@ class CommonDataBuilder implements BuilderInterface
         $order = $buildSubject['order'];
         $currencyCode = $buildSubject['order_currency_code'];
         $phoneVerified = $buildSubject['phone_verified'];
+        $numberOfInstallments = null;
 
         $discountName = $order->getCouponCode() ?? 'N/A';
         $discountAmount = new Discount($discountName, new Money($order->getDiscountAmount(), $currencyCode));
         $paymentMethod = $order->getPayment()->getMethod();
         $paymentType = "";
-        switch ($paymentMethod) {
-            case "tamara_pay_by_instalments":
-                $paymentType = "PAY_BY_INSTALMENTS";
-                break;
-            case "tamara_pay_later":
-                $paymentType = "PAY_BY_LATER";
-                break;
-            default:
+        if (\Tamara\Checkout\Gateway\Config\InstalmentConfig::isInstallmentsPayment($paymentMethod)) {
+            $paymentType = \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS;
+            $numberOfInstallments = \Tamara\Checkout\Gateway\Config\InstalmentConfig::getInstallmentsNumberByPaymentCode($paymentMethod);
+        } else {
+            if ($paymentMethod == \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE) {
+                $paymentType = \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER;
+            } else {
                 throw new \InvalidArgumentException("Tamara payment method is not supported");
+            }
         }
 
         return [
@@ -86,7 +88,8 @@ class CommonDataBuilder implements BuilderInterface
             self::PAYMENT_TYPE => $paymentType,
             self::PLATFORM => 'Magento Version: ' . $this->productMetaData->getVersion() . ', Plugin Version: ' . $this->tamaraCoreHelper->getPluginVersion(),
             self::DESCRIPTION => 'Description',
-            self::RISK_ASSESSMENT => ['phone_verified' => $phoneVerified]
+            self::RISK_ASSESSMENT => ['phone_verified' => $phoneVerified],
+            self::NUMBER_OF_INSTALLMENTS => $numberOfInstallments
         ];
     }
 }

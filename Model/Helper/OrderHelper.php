@@ -32,6 +32,7 @@ class OrderHelper
         $order->setConsumer($data[ConsumerDataBuilder::CONSUMER]);
         $order->setItems($data[ItemsDataBuilder::ITEMS]);
         $order->setRiskAssessment(new \Tamara\Model\Order\RiskAssessment($data[CommonDataBuilder::RISK_ASSESSMENT]));
+        $order->setInstalments($data[\Tamara\Checkout\Gateway\Request\CommonDataBuilder::NUMBER_OF_INSTALLMENTS]);
 
         return $order;
     }

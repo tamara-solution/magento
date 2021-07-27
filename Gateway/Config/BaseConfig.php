@@ -4,28 +4,35 @@ namespace Tamara\Checkout\Gateway\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Payment\Gateway\Config\Config as MagentoPaymentConfig;
+use Magento\Store\Model\StoreManagerInterface;
 
 class BaseConfig extends MagentoPaymentConfig
 {
     const CODE = 'tamara_checkout';
-
     const MERCHANT_TOKEN = 'merchant_token';
     const NOTIFICATION_TOKEN = 'notification_token';
 
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * @param ScopeConfigInterface $scopeConfig
      * @param Json $serializer
+     * @param StoreManagerInterface $storeManager
      * @param null|string $methodCode
      * @param string $pathPattern
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         Json $serializer,
+        StoreManagerInterface $storeManager,
         $methodCode = self::CODE,
         $pathPattern = MagentoPaymentConfig::DEFAULT_PATH_PATTERN
     ) {
         parent::__construct($scopeConfig, $methodCode, $pathPattern);
-        $this->serializer = $serializer;
+        $this->storeManager = $storeManager;
     }
 
     public function getMerchantToken($storeId = null) {
@@ -194,5 +201,17 @@ class BaseConfig extends MagentoPaymentConfig
 
     public function getExcludeProductIds($storeId = null) {
         return $this->getValue('exclude_product_ids', $storeId);
+    }
+
+    public function isDisplayWarningMessageIfOrderOverUnderLimit($storeId = null) {
+        return $this->getValue('display_limit_warning', $storeId);
+    }
+
+    public function getValue($field, $storeId = null)
+    {
+        if ($storeId === null) {
+            $storeId = $this->storeManager->getStore()->getId();
+        }
+        return parent::getValue($field, $storeId);
     }
 }

@@ -23,6 +23,15 @@ class PaymentHelper
     public const ALLOWED_PAYMENTS = [
         PayLaterConfig::PAYMENT_TYPE_CODE,
         InstalmentConfig::PAYMENT_TYPE_CODE,
+        InstalmentConfig::PAYMENT_TYPE_CODE_4,
+        InstalmentConfig::PAYMENT_TYPE_CODE_5,
+        InstalmentConfig::PAYMENT_TYPE_CODE_6,
+        InstalmentConfig::PAYMENT_TYPE_CODE_7,
+        InstalmentConfig::PAYMENT_TYPE_CODE_8,
+        InstalmentConfig::PAYMENT_TYPE_CODE_9,
+        InstalmentConfig::PAYMENT_TYPE_CODE_10,
+        InstalmentConfig::PAYMENT_TYPE_CODE_11,
+        InstalmentConfig::PAYMENT_TYPE_CODE_12
     ];
 
     public static function createCaptureRequestFromArray(array $data): CaptureRequest
