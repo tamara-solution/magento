@@ -1,3 +1,10 @@
+2.11.6
+    New:
+    + Add multiple installments payments
+    + Remove get Tamara config api
+    + Refactor code
+    + Add config to display warning at checkout if total amount is under / over Tamara limit
+    + Add console command to cancel abandoned orders
 2.11.5
     Bugs fixed:
     + Fixed success page template

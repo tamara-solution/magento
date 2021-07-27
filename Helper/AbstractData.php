@@ -170,11 +170,11 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
         $paymentTypes = $this->getPaymentTypes($storeCountryCode);
         $result = $paymentTypes;
 
-        //validate currency
+        //validate method is disabled and currency
         $storeCurrencyCode = $this->getStoreCurrencyCode($storeId);
-        foreach ($paymentTypes as $type) {
-            if ($type['currency'] != $storeCurrencyCode) {
-                unset($result[$type['name']]);
+        foreach ($paymentTypes as $methodCode => $type) {
+            if (!$this->isPaymentMethodEnabled($methodCode) || $type['currency'] != $storeCurrencyCode) {
+                unset($result[$methodCode]);
             }
         }
         return $result;
@@ -216,5 +216,22 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
      */
     public function getStoreCountryCode($storeId = null) {
         return $this->scopeConfig->getValue("general/country/default", ScopeInterface::SCOPE_STORES, $storeId);
+    }
+
+    /**
+     * @param $paymentMethodCode
+     * @param $storeId
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function isPaymentMethodEnabled($paymentMethodCode, $storeId = null) {
+        if ($storeId === null) {
+            $storeId = $this->getCurrentStore()->getId();
+        }
+        return boolval($this->scopeConfig->getValue(
+            sprintf(\Magento\Payment\Gateway\Config\Config::DEFAULT_PATH_PATTERN, $paymentMethodCode, "active"),
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        ));
     }
 }

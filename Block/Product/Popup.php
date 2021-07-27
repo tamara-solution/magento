@@ -64,8 +64,6 @@ class Popup extends Template
             return true;
         }
         return $this->isAllowWhitelistEmail();
-
-
     }
 
     private function isAllowWhitelistEmail(): bool
@@ -125,45 +123,14 @@ class Popup extends Template
     }
 
     /**
-     * @return bool
-     */
-    public function isEnabledPayLaterMethod() {
-        return $this->payLaterConfig->isEnabled();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEnabledInstallmentsMethod() {
-        return $this->instalmentConfig->isEnabled();
-    }
-
-    /**
      * @param float $price
      * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Tamara\Exception\RequestDispatcherException
      */
     public function getAvailablePaymentMethods(float $price) {
-        $enabledMethods = $this->getEnabledMethods();
-        $inLimitMethods = $this->filterUnderOver($enabledMethods, $price);
-        return $this->markHighPriorityMethod($inLimitMethods);
-    }
-
-    protected function markHighPriorityMethod(array $methods) {
-        if (!empty($methods)) {
-            $isExistedHighPriorityMethod = false;
-            foreach ($methods as &$method) {
-                if ($method['name'] == \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS) {
-                    $method['checked'] = true;
-                    $isExistedHighPriorityMethod = true;
-                } else {
-                    $method['checked'] = false;
-                }
-            }
-            if (!$isExistedHighPriorityMethod) {
-                $methods[0]['checked'] = true;
-            }
-        }
-        return $methods;
+        $enabledMethods = $this->tamaraHelper->getPaymentTypesOfStore();
+        return $this->filterUnderOver($enabledMethods, $price);
     }
 
     /**
@@ -177,46 +144,31 @@ class Popup extends Template
             if ($price < $method['min_limit'] || $price > $method['max_limit']) {
                 continue;
             }
-            $result[] = $method;
+            $result[$method['name']] = $method;
         }
         return $result;
     }
 
     /**
-     * @return array
-     */
-    public function getEnabledMethods() {
-        $enabledMethods = [];
-        if ($this->isEnabledPayLaterMethod()) {
-            $enabledMethods[] = [
-                'name' => \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER,
-                'min_limit' => $this->tamaraHelper->getPaymentTypesOfStore()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['min_limit'],
-                'max_limit' => $this->tamaraHelper->getPaymentTypesOfStore()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER]['max_limit']
-            ];
-        }
-        if ($this->isEnabledInstallmentsMethod()) {
-            $enabledMethods[] = [
-                'name' => \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS,
-                'min_limit' => $this->tamaraHelper->getPaymentTypesOfStore()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['min_limit'],
-                'max_limit' => $this->tamaraHelper->getPaymentTypesOfStore()[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS]['max_limit']
-            ];
-        }
-        return $enabledMethods;
-    }
-
-    /**
      * @param $price
      * @return array|mixed
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Tamara\Exception\RequestDispatcherException
      */
     public function getPaymentMethodForPdpWidget($price) {
         $result = [];
         $availableMethods = $this->getAvailablePaymentMethods($price);
         if (!empty($availableMethods)) {
-            foreach ($availableMethods as $method) {
-                if ($method['checked']) {
+            $firstElement = [];
+            foreach ($availableMethods as $methodCode => $method) {
+                if (\Tamara\Checkout\Gateway\Config\InstalmentConfig::isInstallmentsPayment($methodCode)) {
                     return $method;
                 }
+                if (empty($firstElement)) {
+                    $firstElement = $method;
+                }
             }
+            $result = $firstElement;
         }
         return $result;
     }

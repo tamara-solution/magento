@@ -20,9 +20,4 @@ interface ConfigInterface
      * @return string
      */
     public function getNotificationUrl(): string;
-
-    /**
-     * @return string
-     */
-    public function getPaymentLimits(): string;
 }

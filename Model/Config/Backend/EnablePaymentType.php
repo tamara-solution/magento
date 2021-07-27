@@ -48,13 +48,58 @@ class EnablePaymentType extends \Magento\Framework\App\Config\Value
             }
             $paymentTypes = $adapter->parsePaymentTypesResponse($response);
             if ($this->getPath() == "payment/tamara_pay_later/active") {
-                if (!isset($paymentTypes[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER])) {
+                if (!isset($paymentTypes[\Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE])) {
                     throw new \Exception("Pay later is not allowed for this merchant, please contact Tamara support");
                 }
             }
             if ($this->getPath() == "payment/tamara_pay_by_instalments/active") {
-                if (!isset($paymentTypes[\Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS])) {
-                    throw new \Exception("Pay by installments is not allowed for this merchant, please contact Tamara support");
+                if (!isset($paymentTypes[\Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE])) {
+                    throw new \Exception("Pay in 3 installments is not allowed for this merchant, please contact Tamara support");
+                }
+            }
+            if ($this->getPath() == "payment/tamara_pay_by_instalments_4/active") {
+                if (!isset($paymentTypes[\Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE_4])) {
+                    throw new \Exception("Pay in 4 installments is not allowed for this merchant, please contact Tamara support");
+                }
+            }
+            if ($this->getPath() == "payment/tamara_pay_by_instalments_5/active") {
+                if (!isset($paymentTypes[\Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE_5])) {
+                    throw new \Exception("Pay in 5 installments is not allowed for this merchant, please contact Tamara support");
+                }
+            }
+            if ($this->getPath() == "payment/tamara_pay_by_instalments_6/active") {
+                if (!isset($paymentTypes[\Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE_6])) {
+                    throw new \Exception("Pay in 6 installments is not allowed for this merchant, please contact Tamara support");
+                }
+            }
+            if ($this->getPath() == "payment/tamara_pay_by_instalments_7/active") {
+                if (!isset($paymentTypes[\Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE_7])) {
+                    throw new \Exception("Pay in 7 installments is not allowed for this merchant, please contact Tamara support");
+                }
+            }
+            if ($this->getPath() == "payment/tamara_pay_by_instalments_8/active") {
+                if (!isset($paymentTypes[\Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE_8])) {
+                    throw new \Exception("Pay in 8 installments is not allowed for this merchant, please contact Tamara support");
+                }
+            }
+            if ($this->getPath() == "payment/tamara_pay_by_instalments_9/active") {
+                if (!isset($paymentTypes[\Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE_9])) {
+                    throw new \Exception("Pay in 9 installments is not allowed for this merchant, please contact Tamara support");
+                }
+            }
+            if ($this->getPath() == "payment/tamara_pay_by_instalments_10/active") {
+                if (!isset($paymentTypes[\Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE_10])) {
+                    throw new \Exception("Pay in 10 installments is not allowed for this merchant, please contact Tamara support");
+                }
+            }
+            if ($this->getPath() == "payment/tamara_pay_by_instalments_11/active") {
+                if (!isset($paymentTypes[\Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE_11])) {
+                    throw new \Exception("Pay in 11 installments is not allowed for this merchant, please contact Tamara support");
+                }
+            }
+            if ($this->getPath() == "payment/tamara_pay_by_instalments_12/active") {
+                if (!isset($paymentTypes[\Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE_12])) {
+                    throw new \Exception("Pay in 12 installments is not allowed for this merchant, please contact Tamara support");
                 }
             }
         }

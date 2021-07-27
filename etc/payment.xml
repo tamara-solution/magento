@@ -12,5 +12,32 @@
         <method name="tamara_pay_by_instalments">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="tamara_pay_by_instalments_4">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="tamara_pay_by_instalments_5">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="tamara_pay_by_instalments_6">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="tamara_pay_by_instalments_7">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="tamara_pay_by_instalments_8">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="tamara_pay_by_instalments_9">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="tamara_pay_by_instalments_10">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="tamara_pay_by_instalments_11">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="tamara_pay_by_instalments_12">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
     </methods>
 </payment>
