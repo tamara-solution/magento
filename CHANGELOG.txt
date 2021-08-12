@@ -1,5 +1,7 @@
-2.11.7:
-    + Update php sdk, fixed for 2.11.6
+2.11.9
+    New:
+    + Redirect to success / cancel/ failure url after go back to Magento site
+    + Support running multiple merchant account
 2.11.6
     New:
     + Add multiple installments payments
@@ -26,7 +28,7 @@
     Bugs fixed:
     + Fixed get title of payment type
     New:
-    + Refactor code upgarde data
+    + Refactor code upgrade data
 2.11.3
     New:
     + Revert merchant url pattern

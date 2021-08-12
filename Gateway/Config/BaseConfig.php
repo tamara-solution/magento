@@ -18,6 +18,21 @@ class BaseConfig extends MagentoPaymentConfig
     protected $storeManager;
 
     /**
+     * @var \Magento\Framework\App\RequestInterface
+     */
+    protected $request;
+
+    /**
+     * @var \Tamara\Checkout\Helper\Core
+     */
+    protected $tamaraCore;
+
+    /**
+     * @var ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
      * @param ScopeConfigInterface $scopeConfig
      * @param Json $serializer
      * @param StoreManagerInterface $storeManager
@@ -28,11 +43,16 @@ class BaseConfig extends MagentoPaymentConfig
         ScopeConfigInterface $scopeConfig,
         Json $serializer,
         StoreManagerInterface $storeManager,
+        \Magento\Framework\App\RequestInterface $request,
+        \Tamara\Checkout\Helper\Core $tamaraCore,
         $methodCode = self::CODE,
         $pathPattern = MagentoPaymentConfig::DEFAULT_PATH_PATTERN
     ) {
         parent::__construct($scopeConfig, $methodCode, $pathPattern);
         $this->storeManager = $storeManager;
+        $this->request = $request;
+        $this->tamaraCore = $tamaraCore;
+        $this->scopeConfig = $scopeConfig;
     }
 
     public function getMerchantToken($storeId = null) {
@@ -210,8 +230,24 @@ class BaseConfig extends MagentoPaymentConfig
     public function getValue($field, $storeId = null)
     {
         if ($storeId === null) {
-            $storeId = $this->storeManager->getStore()->getId();
+            if ($this->tamaraCore->isAdminArea()) {
+                $storeId = $this->request->getParam('store', 0);
+            } else {
+                $storeId = $this->storeManager->getStore()->getId();
+            }
         }
         return parent::getValue($field, $storeId);
+    }
+
+    public function getRequest() {
+        return $this->request;
+    }
+
+    public function getScopeConfig() {
+        return $this->scopeConfig;
+    }
+
+    public function getTamaraCore() {
+        return $this->tamaraCore;
     }
 }

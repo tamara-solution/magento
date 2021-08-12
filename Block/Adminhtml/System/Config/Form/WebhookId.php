@@ -31,8 +31,11 @@ class WebhookId extends \Magento\Config\Block\System\Config\Form\Field
 
     protected function _renderValue(AbstractElement $element)
     {
-        $webhookId = !empty($this->config->getWebhookId())
-                     ? $this->config->getWebhookId()
+        $scopeId = $this->config->getTamaraCore()->getCurrentScopeId();
+        $scope = $this->config->getTamaraCore()->getCurrentScope();
+        $webhookId = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/webhook_id', $scope, $scopeId);
+        $webhookId = !empty($webhookId)
+                     ? $webhookId
                      : __('You should enable webhook function to get webhook id.');
 
         return '<td class="value">' . $webhookId . '</td>';

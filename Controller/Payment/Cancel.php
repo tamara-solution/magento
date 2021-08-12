@@ -67,6 +67,18 @@ class Cancel extends Action
 
             /** @var \Magento\Sales\Model\Order $order */
             $order = $this->orderRepository->get($orderId);
+
+            //Check order is processed by webhook
+            $orderHistories = $order->getStatusHistories();
+            foreach ($orderHistories as $history) {
+                $comment = $history->getComment();
+                if (strpos($comment, "by webhook") !== false) {
+                    if (time() - strtotime($history->getCreatedAt()) < 20) {
+                        return $this->redirectToCancelUrl($order);
+                    }
+                }
+            }
+
             if ($order->getState() != \Magento\Sales\Model\Order::STATE_NEW) {
                 throw new \Exception("Order status does not support");
             }
@@ -83,21 +95,33 @@ class Cancel extends Action
             $this->_redirect('checkout/cart');
             return $this->getResponse()->sendResponse();
         }
-        try {
-            $this->cartHelper->restoreCartFromOrder($order);
-            $this->coreRegistry->register("skip_tamara_cancel", true);
-            $this->orderManagement->cancel($orderId);
-            $order->setState(Order::STATE_CANCELED)->setStatus($this->config->getCheckoutCancelStatus());
-            $order->addCommentToStatusHistory(__('Tamara - order was canceled'));
-            $order->getResource()->save($order);
-        } catch (\Exception $e) {
-            $logger = $this->_objectManager->get('TamaraCheckoutLogger');
-            $logger->debug(["Error when process payment cancel: " . $e->getMessage()]);
+        return $this->redirectToCancelUrl($order, true);
+    }
+
+    public function redirectToCancelUrl($order, $restoreCart = true) {
+        /** @var \Magento\Sales\Model\Order $order */
+        if ($restoreCart) {
+            try {
+                $this->cartHelper->restoreCartFromOrder($order);
+                $this->coreRegistry->register("skip_tamara_cancel", true);
+                $this->orderManagement->cancel($order->getEntityId());
+                $order->setState(Order::STATE_CANCELED)->setStatus($this->config->getCheckoutCancelStatus($order->getStoreId()));
+                $order->addCommentToStatusHistory(__('Tamara - order was canceled'));
+                $order->getResource()->save($order);
+            } catch (\Exception $e) {
+                $logger = $this->_objectManager->get('TamaraCheckoutLogger');
+                $logger->debug(["Error when process payment cancel: " . $e->getMessage()]);
+            }
         }
 
         $message = __('Your order was cancelled.');
         $this->messageManager->addErrorMessage($message);
 
+        if (!empty($merchantCancelUrl = $this->config->getMerchantCancelUrl($order->getStoreId()))) {
+            $resultRedirect = $this->resultRedirectFactory->create();
+            $resultRedirect->setUrl($merchantCancelUrl);
+            return $resultRedirect;
+        }
         $this->_redirect('checkout/cart');
         $this->getResponse()->sendResponse();
     }

@@ -15,7 +15,7 @@
         </label>
         <!-- ko if: isTotalAmountInLimit() -->
         <div style="width: 255px; display: inline-block; margin-left: 16px;">
-            <a class="tamara-product-widget" data-bind="attr: {'data-lang': getPaymentLanguage(), 'data-disable-paylater': 'false', 'data-inject-template': 'false', 'data-pay-later-max-amount': getMaxLimit(), 'href': 'javascript:void(0)'}">
+            <a class="tamara-product-widget" data-payment-type="paylater" data-disable-product-limit="true" data-bind="attr: {'data-lang': getPaymentLanguage(), 'data-disable-paylater': 'false', 'data-inject-template': 'false', 'data-pay-later-max-amount': getMaxLimit(), 'href': 'javascript:void(0)'}">
                 <img data-bind="attr: {src: tamaraImageSrc, alt: $t('Tamara'), height: '36', width: '208' }" class="payment-icon" />
             </a>
         </div>

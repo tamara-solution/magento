@@ -109,20 +109,38 @@ class TamaraAdapterFactory
      */
     public function create($storeId = null): TamaraAdapter
     {
+        $scope = $this->config->getTamaraCore()->getCurrentScope();
+        $scopeId = $this->config->getTamaraCore()->getCurrentScopeId();
         $groups = $this->registry->registry('tamara_config_groups');
-        if (is_array($groups) && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"])) {
+        $isInAdminConfig = is_array($groups);
+        if ($isInAdminConfig && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["notification_token"]["value"])) {
             $notificationToken = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["notification_token"]["value"];
+        } else {
+            $notificationToken = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/notification_token', $scope, $scopeId);
+        }
+        if ($isInAdminConfig && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["api_environment"]["value"])) {
             $apiEnvironment = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["api_environment"]["value"];
             if ($apiEnvironment == \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_ENVIRONMENT) {
                 $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_URL;
             } else {
                 $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::SANDBOX_API_URL;
             }
+        } else {
+            $apiUrl = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/api_url', $scope, $scopeId);
+        }
+        if ($isInAdminConfig && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["merchant_token"]["value"])) {
             $merchantToken = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["merchant_token"]["value"];
         } else {
-            $notificationToken = $this->config->getNotificationToken($storeId);
-            $apiUrl = $this->config->getApiUrl($storeId);
-            $merchantToken = $this->config->getMerchantToken($storeId);
+            $merchantToken = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/merchant_token', $scope, $scopeId);
+        }
+        if (empty($apiUrl)) {
+            $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::SANDBOX_API_URL;
+        }
+        if (empty($merchantToken)) {
+            $merchantToken = "";
+        }
+        if (empty($notificationToken)) {
+            $notificationToken = "";
         }
         return $this->objectManager->create(
             TamaraAdapter::class,

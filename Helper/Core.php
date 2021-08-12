@@ -158,4 +158,40 @@ class Core extends AbstractHelper
 
         return $path;
     }
+
+    public function getCurrentScope() {
+        if ($this->isAdminArea()) {
+            $storeId = $this->_getRequest()->getParam('store');
+            if ($storeId) {
+                return \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
+            } else {
+                $websiteId = $this->_getRequest()->getParam('website');
+                if ($websiteId) {
+                    return \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITES;
+                } else {
+                    return \Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
+                }
+            }
+        } else {
+            return \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
+        }
+    }
+
+    public function getCurrentScopeId() {
+        if ($this->isAdminArea()) {
+            $storeId = $this->_getRequest()->getParam('store');
+            if ($storeId) {
+                return $storeId;
+            } else {
+                $websiteId = $this->_getRequest()->getParam('website');
+                if ($websiteId) {
+                    return $websiteId;
+                } else {
+                    return 0;
+                }
+            }
+        } else {
+            $this->storeManager->getStore()->getId();
+        }
+    }
 }

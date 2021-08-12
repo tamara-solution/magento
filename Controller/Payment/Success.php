@@ -51,6 +51,7 @@ class Success extends Action
 
             /** @var \Magento\Sales\Model\Order $order */
             $order = $this->orderRepository->get($orderId);
+            $storeId = $order->getStoreId();
             $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);
             $isAllowed = false;
             $magentoOrderState = $order->getState();
@@ -70,7 +71,7 @@ class Success extends Action
         }
         try {
             if (!(bool) $tamaraOrder->getIsAuthorised()) {
-                $successStatus = $this->config->getCheckoutSuccessStatus();
+                $successStatus = $this->config->getCheckoutSuccessStatus($storeId);
                 $order->setState(Order::STATE_PENDING_PAYMENT)->setStatus($successStatus);
                 $order->addCommentToStatusHistory(__('Tamara - order checkout success, we will confirm soon'));
                 $order->getResource()->save($order);
@@ -79,7 +80,7 @@ class Success extends Action
             $logger->debug(['Success has error' => $e->getMessage()]);
         }
 
-        if ($this->config->useMagentoCheckoutSuccessPage()) {
+        if ($this->config->useMagentoCheckoutSuccessPage($storeId)) {
             return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success/');
         }
 
@@ -92,20 +93,21 @@ class Success extends Action
             ]
         );
 
-        $page = $this->_pageFactory->create();
+        $quoteId = $this->checkoutSession->getQuoteId();
+        if ($quoteId) {
+            $this->cartHelper->removeCartAfterSuccess($quoteId);
+        }
 
+        if (!empty($merchantSuccessUrl = $this->config->getMerchantSuccessUrl($storeId))) {
+            $resultRedirect = $this->resultRedirectFactory->create();
+            $resultRedirect->setUrl($merchantSuccessUrl);
+            return $resultRedirect;
+        }
+
+        $page = $this->_pageFactory->create();
         $block = $page->getLayout()->getBlock('tamara_success');
         $block->setData('order_id', $orderId);
         $block->setData('order_increment_id', $order->getIncrementId());
-
-        $quoteId = $this->checkoutSession->getQuoteId();
-
-        if ($quoteId === null) {
-            return $page;
-        }
-
-        $this->cartHelper->removeCartAfterSuccess($quoteId);
-
         return $page;
     }
 

@@ -58,23 +58,11 @@ class MerchantUrlDataBuilder implements BuilderInterface
         }
 
         $urlPattern = '%s%s/%d/%s';
-        $successUrl = $this->baseConfig->getMerchantSuccessUrl($storeId);
-        if (empty($successUrl)) {
-            $successUrl = sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'success');
-        }
-        $cancelUrl = $this->baseConfig->getMerchantCancelUrl($storeId);
-        if (empty($cancelUrl)) {
-            $cancelUrl = sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'cancel');
-        }
-        $failureUrl = $this->baseConfig->getMerchantFailureUrl($storeId);
-        if (empty($failureUrl)) {
-            $failureUrl = sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'failure');
-        }
         $notificationUrl = sprintf('%s%s/%s%s', $baseUrl, self::TAMARA_PAYMENT, 'notification', '?storeId=' . $storeId);
         $merchantUrl->setNotificationUrl($notificationUrl);
-        $merchantUrl->setSuccessUrl($successUrl);
-        $merchantUrl->setCancelUrl($cancelUrl);
-        $merchantUrl->setFailureUrl($failureUrl);
+        $merchantUrl->setSuccessUrl(sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'success'));
+        $merchantUrl->setCancelUrl(sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'cancel'));
+        $merchantUrl->setFailureUrl(sprintf($urlPattern, $baseUrl, self::TAMARA_PAYMENT, $orderId, 'failure'));
 
         return [self::MERCHANT_URL => $merchantUrl];
     }
