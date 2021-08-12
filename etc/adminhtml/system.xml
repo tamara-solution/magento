@@ -4,24 +4,24 @@
         <section id="payment">
             <group id="tamara_checkout" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Tamara Checkout</label>
-                <group id="api_configuration" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                <group id="api_configuration" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>API Configuration</label>
                     <field id="extension_version" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Version</label>
                         <frontend_model>Tamara\Checkout\Block\Adminhtml\System\Config\Form\ExtensionVersion</frontend_model>
                     </field>
-                    <field id="api_environment" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="api_environment" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Api Environment</label>
                         <config_path>payment/tamara_checkout/api_environment</config_path>
                         <source_model>Tamara\Checkout\Model\Config\Source\ApiEnvironment</source_model>
                     </field>
-                    <field id="merchant_token" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="merchant_token" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Merchant Token</label>
                         <config_path>payment/tamara_checkout/merchant_token</config_path>
                         <validate>required-entry</validate>
                         <backend_model>Tamara\Checkout\Model\Config\Backend\Value</backend_model>
                     </field>
-                    <field id="notification_token" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="notification_token" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Notification Token</label>
                         <config_path>payment/tamara_checkout/notification_token</config_path>
                         <validate>required-entry</validate>
@@ -33,14 +33,14 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment>Please check this if you verify the phone number on your side</comment>
                     </field>
-                    <field id="enable_webhook" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="enable_webhook" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Enable Webhook</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/tamara_checkout/enable_webhook</config_path>
                         <comment>Enable it if you want register webhook from tamara payment</comment>
                         <backend_model>Tamara\Checkout\Model\Config\Backend\EnableWebHook</backend_model>
                     </field>
-                    <field id="webhook_id" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="webhook_id" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Webhook Id</label>
                         <config_path>payment/tamara_checkout/webhook_id</config_path>
                         <frontend_model>Tamara\Checkout\Block\Adminhtml\System\Config\Form\WebhookId</frontend_model>
@@ -105,7 +105,7 @@
                         <config_path>payment/tamara_checkout/merchant_failure_url</config_path>
                         <comment>If empty, Tamara will process this url automatically (Recommend)</comment>
                     </field>
-                    <field id="use_magento_success_page" translate="label" type="select" sortOrder="93" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="use_magento_success_page" translate="label" type="select" sortOrder="93" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Use magento checkout success page</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/tamara_checkout/use_magento_success_page</config_path>

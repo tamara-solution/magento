@@ -160,15 +160,20 @@ class Popup extends Template
         $availableMethods = $this->getAvailablePaymentMethods($price);
         if (!empty($availableMethods)) {
             $firstElement = [];
+            $installmentsMethod = [];
             foreach ($availableMethods as $methodCode => $method) {
                 if (\Tamara\Checkout\Gateway\Config\InstalmentConfig::isInstallmentsPayment($methodCode)) {
-                    return $method;
+                    $installmentsMethod = $method;
                 }
                 if (empty($firstElement)) {
                     $firstElement = $method;
                 }
             }
-            $result = $firstElement;
+            if (empty($installmentsMethod)) {
+                $result = $firstElement;
+            } else {
+                $result = $installmentsMethod;
+            }
         }
         return $result;
     }

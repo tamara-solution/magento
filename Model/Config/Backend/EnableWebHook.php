@@ -37,7 +37,9 @@ class EnableWebHook extends \Magento\Framework\App\Config\Value
             $webhookEnabled = true;
         }
 
-        $webhookId = $this->tamaraConfig->getWebhookId();
+        $scopeId = $this->tamaraConfig->getTamaraCore()->getCurrentScopeId();
+        $scope = $this->tamaraConfig->getTamaraCore()->getCurrentScope();
+        $webhookId = $this->tamaraConfig->getScopeConfig()->getValue('payment/tamara_checkout/webhook_id', $scope, $scopeId);
         try {
             if ($webhookEnabled && empty($webhookId)) {
                 $adapter = $this->tamaraAdapterFactory->create();

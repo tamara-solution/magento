@@ -163,6 +163,9 @@ class TamaraAdapter
      */
     public function getPaymentTypes(string $countryCode)
     {
+        if (empty($this->baseConfig->getMerchantToken())) {
+            return [];
+        }
         $response = $this->client->getPaymentTypes($countryCode);
         if (!$response->isSuccess()) {
             $errorLogs = [$response->getContent()];
@@ -511,7 +514,13 @@ class TamaraAdapter
         $this->logger->debug(['Tamara - Start to register webhook']);
 
         try {
-            $baseUrl = StoreHelper::getBaseUrl();
+            $scopeId = $this->baseConfig->getTamaraCore()->getCurrentScopeId();
+            $scope = $this->baseConfig->getTamaraCore()->getCurrentScope();
+            $baseUrl = $this->baseConfig->getScopeConfig()->getValue('web/secure/base_url', $scope, $scopeId);
+            if (empty($baseUrl)) {
+                $baseUrl = $this->baseConfig->getScopeConfig()->getValue('web/unsecure/base_url', $scope, $scopeId);
+            }
+
             $webhookUrl = $baseUrl . self::WEBHOOK_URL;
 
             $request = new RegisterWebhookRequest(
@@ -531,7 +540,9 @@ class TamaraAdapter
 
             $this->resourceConfig->saveConfig(
                 'payment/tamara_checkout/webhook_id',
-                $webhookId
+                $webhookId,
+                $scope,
+                $scopeId
             );
         } catch (\Exception $exception) {
             $this->logger->debug(["Tamara - " . $exception->getMessage()]);
@@ -545,9 +556,13 @@ class TamaraAdapter
     public function deleteWebhook($webhookId): void
     {
         $this->logger->debug(['Tamara - Start to delete webhook']);
+        $scope = $this->baseConfig->getTamaraCore()->getCurrentScope();
+        $scopeId = $this->baseConfig->getTamaraCore()->getCurrentScopeId();
 
         $this->resourceConfig->deleteConfig(
-            'payment/tamara_checkout/webhook_id'
+            'payment/tamara_checkout/webhook_id',
+            $scope,
+            $scopeId
         );
 
         $request = new RemoveWebhookRequest($webhookId);
