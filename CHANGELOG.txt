@@ -1,3 +1,8 @@
+2.11.10
+    New:
+    + Supported Kuwait, Bahrain, Qatar
+    Bug fixed:
+    + Fix an issue get API url
 2.11.9
     New:
     + Redirect to success / cancel/ failure url after go back to Magento site
