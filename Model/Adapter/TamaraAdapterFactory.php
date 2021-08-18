@@ -119,13 +119,13 @@ class TamaraAdapterFactory
         }
         if ($isInAdminConfig && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["api_environment"]["value"])) {
             $apiEnvironment = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["api_environment"]["value"];
-            if ($apiEnvironment == \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_ENVIRONMENT) {
-                $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_URL;
-            } else {
-                $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::SANDBOX_API_URL;
-            }
         } else {
-            $apiUrl = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/api_url', $scope, $scopeId);
+            $apiEnvironment = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/api_environment', $scope, $scopeId);
+        }
+        if ($apiEnvironment == \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_ENVIRONMENT) {
+            $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_URL;
+        } else {
+            $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::SANDBOX_API_URL;
         }
         if ($isInAdminConfig && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["merchant_token"]["value"])) {
             $merchantToken = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["merchant_token"]["value"];
