@@ -172,7 +172,7 @@ class Refund extends \Tamara\Checkout\Helper\AbstractData
         $data['tamara_order_id'] = $tamaraOrder->getTamaraOrderId();
         $data['refunds'] = $captureItemFounds;
 
-        $tamaraAdapter = $this->tamaraAdapterFactory->create();
+        $tamaraAdapter = $this->tamaraAdapterFactory->create($order->getStoreId());
         $tamaraAdapter->refund($data);
     }
 
@@ -328,7 +328,7 @@ class Refund extends \Tamara\Checkout\Helper\AbstractData
         $data['tamara_order_id'] = $tamaraOrder->getTamaraOrderId();
         $data['refunds'] = $captureItemFounds;
 
-        $tamaraAdapter = $this->tamaraAdapterFactory->create();
+        $tamaraAdapter = $this->tamaraAdapterFactory->create($order->getStoreId());
         $tamaraAdapter->refund($data);
     }
 

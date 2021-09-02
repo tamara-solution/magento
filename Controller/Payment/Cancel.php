@@ -86,7 +86,7 @@ class Cancel extends Action
             if ((bool) $tamaraOrder->getIsAuthorised()) {
                 throw new \Exception("Order was authorized");
             } else {
-                $tamaraAdapter = $this->tamaraAdapterFactory->create();
+                $tamaraAdapter = $this->tamaraAdapterFactory->create($order->getStoreId());
                 if ($tamaraAdapter->getTamaraOrderFromRemote($order->getIncrementId())->getStatus() == "approved") {
                     throw new \Exception("Order was approved");
                 }

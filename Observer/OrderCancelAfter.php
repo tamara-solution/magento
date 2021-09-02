@@ -60,7 +60,7 @@ class OrderCancelAfter extends AbstractObserver
             return;
         }
 
-        $tamaraAdapter = $this->adapter->create();
+        $tamaraAdapter = $this->adapter->create($order->getStoreId());
 
         $tamaraOrder = $this->orderRepository->getTamaraOrderByOrderId($order->getId());
 

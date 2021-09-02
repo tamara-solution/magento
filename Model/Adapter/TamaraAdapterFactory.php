@@ -109,31 +109,36 @@ class TamaraAdapterFactory
      */
     public function create($storeId = null): TamaraAdapter
     {
-        $scope = $this->config->getTamaraCore()->getCurrentScope();
-        $scopeId = $this->config->getTamaraCore()->getCurrentScopeId();
-        $groups = $this->registry->registry('tamara_config_groups');
-        $isInAdminConfig = is_array($groups);
-        if ($isInAdminConfig && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["notification_token"]["value"])) {
-            $notificationToken = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["notification_token"]["value"];
+        if ($storeId === null) {
+            $scope = $this->config->getTamaraCore()->getCurrentScope();
+            $scopeId = $this->config->getTamaraCore()->getCurrentScopeId();
+            $groups = $this->registry->registry('tamara_config_groups');
+            $isInAdminConfig = is_array($groups);
+            if ($isInAdminConfig && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["notification_token"]["value"])) {
+                $notificationToken = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["notification_token"]["value"];
+            } else {
+                $notificationToken = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/notification_token', $scope, $scopeId);
+            }
+            if ($isInAdminConfig && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["api_environment"]["value"])) {
+                $apiEnvironment = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["api_environment"]["value"];
+            } else {
+                $apiEnvironment = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/api_environment', $scope, $scopeId);
+            }
+            if ($isInAdminConfig && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["merchant_token"]["value"])) {
+                $merchantToken = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["merchant_token"]["value"];
+            } else {
+                $merchantToken = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/merchant_token', $scope, $scopeId);
+            }
         } else {
+            $scopeId = $storeId;
+            $scope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
             $notificationToken = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/notification_token', $scope, $scopeId);
-        }
-        if ($isInAdminConfig && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["api_environment"]["value"])) {
-            $apiEnvironment = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["api_environment"]["value"];
-        } else {
             $apiEnvironment = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/api_environment', $scope, $scopeId);
+            $merchantToken = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/merchant_token', $scope, $scopeId);
         }
         if ($apiEnvironment == \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_ENVIRONMENT) {
             $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_URL;
         } else {
-            $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::SANDBOX_API_URL;
-        }
-        if ($isInAdminConfig && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["merchant_token"]["value"])) {
-            $merchantToken = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["merchant_token"]["value"];
-        } else {
-            $merchantToken = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/merchant_token', $scope, $scopeId);
-        }
-        if (empty($apiUrl)) {
             $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::SANDBOX_API_URL;
         }
         if (empty($merchantToken)) {

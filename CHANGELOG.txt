@@ -1,3 +1,6 @@
+2.11.11
+    Bug fixed:
+        + Fix an issue when use multiple merchants
 2.11.10
     New:
     + Supported Kuwait, Bahrain, Qatar
