@@ -521,7 +521,11 @@ class TamaraAdapter
                 $baseUrl = $this->baseConfig->getScopeConfig()->getValue('web/unsecure/base_url', $scope, $scopeId);
             }
 
-            $webhookUrl = $baseUrl . self::WEBHOOK_URL;
+            $param = "";
+            if ($scope == \Magento\Store\Model\ScopeInterface::SCOPE_STORES) {
+                $param = ("?storeId=" . $scopeId);
+            }
+            $webhookUrl = $baseUrl . self::WEBHOOK_URL . $param;
 
             $request = new RegisterWebhookRequest(
                 $webhookUrl,

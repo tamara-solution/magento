@@ -112,7 +112,7 @@ class Capture extends \Tamara\Checkout\Helper\AbstractData
             $data['items'][] = $itemTemp;
         }
 
-        $tamaraAdapter = $this->tamaraAdapterFactory->create();
+        $tamaraAdapter = $this->tamaraAdapterFactory->create($order->getStoreId());
         $this->log([sprintf('Capture when order status is %s', $order->getStatus())]);
         $tamaraAdapter->capture($data, $order);
     }

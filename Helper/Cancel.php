@@ -63,7 +63,7 @@ class Cancel extends \Tamara\Checkout\Helper\AbstractData
         $data['currency'] = $order->getOrderCurrencyCode();
         $data['items'] = $order->getAllVisibleItems();
 
-        $tamaraAdapter = $this->tamaraAdapterFactory->create();
+        $tamaraAdapter = $this->tamaraAdapterFactory->create($order->getStoreId());
         $tamaraAdapter->cancel($data);
     }
 
