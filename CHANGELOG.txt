@@ -1,6 +1,9 @@
+2.11.12
+    New
+    + Compatible with Magento 2.3.0
 2.11.11
     Bug fixed:
-        + Fix an issue when use multiple merchants
+    + Fix an issue when use multiple merchants
 2.11.10
     New:
     + Supported Kuwait, Bahrain, Qatar

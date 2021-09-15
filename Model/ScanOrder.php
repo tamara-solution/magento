@@ -187,6 +187,7 @@ class ScanOrder
         } else {
             $this->tamaraRefundHelper->refundOrder($orderId);
         }
+        $this->log(["Refunded order id: " . $orderId]);
         $this->totalOrderProcessed++;
     }
 
@@ -205,6 +206,7 @@ class ScanOrder
         } else {
             $this->tamaraCaptureHelper->captureOrder($orderId);
         }
+        $this->log(["Captured order id: " . $orderId]);
         $this->totalOrderProcessed++;
     }
 
@@ -223,6 +225,7 @@ class ScanOrder
         } else {
             $this->tamaraCancelHelper->cancelOrder($orderId);
         }
+        $this->log(["Cancelled order id: " . $orderId]);
         $this->totalOrderProcessed++;
     }
 

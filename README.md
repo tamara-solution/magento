@@ -1,12 +1,17 @@
-# Tamara Mangeto extension
+# Available Versions
+* Tamara payment for Magento 2.3 & 2.4
+* [Tamara payment for Magento 2.2](https://github.com/tamara-solution/magento)
+# Tamara extension for Magento 2.3 & 2.4
 
-This extension allows you to use tamara as a payment gateway in your Magento 2.3 store.
+This extension allows you to use tamara as a payment gateway in your Magento store.
 
 # Installation steps
 
 ### Installation Using Composer (Recommended)
-
+```bash
 composer require tamara-solution/magento
+
+php bin/magento module:enable Tamara_Checkout
 
 php bin/magento setup:upgrade
 
@@ -14,24 +19,26 @@ php bin/magento setup:di:compile
 
 php bin/magento setup:static-content:deploy
 
-php bin/magento cache:clean
-
+php bin/magento cache:flush
+```
 ### Manual Setup
-In your Magento 2.3 [ROOT]/app/code/ create folder called Tamara/Checkout.
+* Create folder called Tamara/Checkout in [ROOT]/app/code/
 
-Download and extract files from this github repository to the folder.
+* Download and extract files from this github repository to the folder.
 
-Open the command line interface.
+* Open the command line interface.
 
-Run the following command to install our php sdk:
+* Run the following command to install our php sdk:
 
 ```bash
 composer require tamara-solution/php-sdk
 ```
 
-Enable tamara Checkout by running below command: 
+* Enable Tamara Checkout by running below command: 
 
-```php bin/magento module:enable Tamara_Checkout```
+```bash
+php bin/magento module:enable Tamara_Checkout
+```
 
 Magento setup upgrade: 
 
@@ -50,9 +57,10 @@ Magento Static Content deployment:
 ```bash
 php bin/magento setup:static-content:deploy
 ```
-Login to Magento Admin and navigate to System/Cache Management
-
-Flush the cache storage by selecting Flush Cache Storage
+* Flush cache
+```bash
+php bin/magento cache:flush
+```
 
 ### Admin Configuration
 Login to your Magento Admin
@@ -71,10 +79,6 @@ Link to tamara introduction page, this link will be attached onto the tamara pay
 Link login tamara for the customer, this link will be attached onto the tamara customer profile logo after redirecting back from tamara checkout for success case. Please put https://app.tamara.co
 
 Enable trigger to Tamara, this option will allow you to automatically trigger Capture, Refund or Cancellation to tamara when you perform corresponding action with Magento or not. If disabled, you have to integrate with our API directly.
-
-Payment Types
-
-Please click on the Update config button after you finished the previous step with API Configuration to get the latest data from us. This will impact to the user experience on the checkout about allowing to pay with tamara or not base on the limitation.
 
 ### Checkout Order Statuses
 

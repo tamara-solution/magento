@@ -15,11 +15,6 @@ class CancelAbandonedOrder extends Command
     const STORE_ID = 'store_id';
 
     /**
-     * @var \Magento\Sales\Api\OrderManagementInterface
-     */
-    protected $orderManagement;
-
-    /**
      * @var \Tamara\Checkout\Helper\AbstractData
      */
     protected $helper;
@@ -57,7 +52,6 @@ class CancelAbandonedOrder extends Command
     public function __construct(
         \Magento\Framework\App\State $state,
         \Magento\Framework\Registry $coreRegistry,
-        \Magento\Sales\Api\OrderManagementInterface $orderManagement,
         \Tamara\Checkout\Helper\AbstractData $helper,
         \Tamara\Checkout\Model\ResourceModel\Order\CollectionFactory $tamaraOrderCollectionFactory,
         BaseConfig $config,
@@ -65,7 +59,6 @@ class CancelAbandonedOrder extends Command
     ) {
         $this->state = $state;
         $this->coreRegistry = $coreRegistry;
-        $this->orderManagement = $orderManagement;
         $this->helper = $helper;
         $this->tamaraOrderCollectionFactory = $tamaraOrderCollectionFactory;
         $this->config = $config;
@@ -136,9 +129,11 @@ class CancelAbandonedOrder extends Command
         }
         $this->coreRegistry->register('cancel_abandoned_order', true);
         $totalOrderCancelled = 0;
+        $orderManagement = \Magento\Framework\App\ObjectManager::getInstance()->get(\Magento\Sales\Api\OrderManagementInterface::class);
         foreach ($orderIds as $id) {
             try {
-                $this->orderManagement->cancel($id);
+                $orderManagement->cancel($id);
+                $this->helper->log(["Cancelled order " . $id]);
                 $totalOrderCancelled++;
             } catch (\Exception $exception) {
                 $this->helper->log(["Cannot cancel order " . $id . ", error: " . $exception->getMessage()]);

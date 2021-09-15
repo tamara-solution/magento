@@ -28,33 +28,31 @@ class ScanOrder extends Command
      */
     private $output;
 
-    /**
-     * @var \Tamara\Checkout\Model\ScanOrder
-     */
-    private $scanOrder;
-
     public function __construct(
         \Magento\Framework\App\State $state,
         \Tamara\Checkout\Helper\AbstractData $helper,
-        \Tamara\Checkout\Model\ScanOrder $scanOrder,
         string $name = null
     ) {
         $this->state = $state;
         $this->helper = $helper;
-        $this->scanOrder = $scanOrder;
         parent::__construct($name);
     }
 
     protected function process()
     {
         $this->helper->log(["Run scan orders from console"]);
-        $this->scanOrder->setScanFromConsole(true);
+
+        /**
+         * @var $scanOrder \Tamara\Checkout\Model\ScanOrder
+         */
+        $scanOrder = \Magento\Framework\App\ObjectManager::getInstance()->get(\Tamara\Checkout\Model\ScanOrder::class);
+        $scanOrder->setScanFromConsole(true);
         try {
             if ($this->input->getOption(self::END_TIME)) {
-                $this->scanOrder->scan($this->input->getOption(self::START_TIME),
+                $scanOrder->scan($this->input->getOption(self::START_TIME),
                     $this->input->getOption(self::END_TIME));
             } else {
-                $this->scanOrder->scan($this->input->getOption(self::START_TIME));
+                $scanOrder->scan($this->input->getOption(self::START_TIME));
             }
         } catch (\Exception $exception) {
             // just log the error and don't break the job
