@@ -137,6 +137,7 @@ class CancelAbandonedOrder extends Command
         foreach ($orderIds as $id) {
             try {
                 $orderManagement->cancel($id);
+                $this->helper->log(["Cancelled order " . $id]);
                 $totalOrderCancelled++;
             } catch (\Exception $exception) {
                 $this->helper->log(["Cannot cancel order " . $id . ", error: " . $exception->getMessage()]);
