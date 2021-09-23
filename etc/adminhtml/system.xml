@@ -14,6 +14,7 @@
                         <label>Api Environment</label>
                         <config_path>payment/tamara_checkout/api_environment</config_path>
                         <source_model>Tamara\Checkout\Model\Config\Source\ApiEnvironment</source_model>
+                        <backend_model>Tamara\Checkout\Model\Config\Backend\ApiEnvironment</backend_model>
                     </field>
                     <field id="merchant_token" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Merchant Token</label>
