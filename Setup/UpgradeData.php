@@ -69,6 +69,10 @@ class UpgradeData implements UpgradeDataInterface
             $this->updateApiUrlConfig();
         }
 
+        if (version_compare($context->getVersion(), '1.1.2', '<')) {
+            $this->saveApiUrlFromApiEnvironment();
+        }
+
         $setup->endSetup();
     }
 
@@ -177,6 +181,15 @@ class UpgradeData implements UpgradeDataInterface
             $this->configWriter->save('payment/tamara_checkout/api_environment', \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_ENVIRONMENT);
         } else {
             $this->configWriter->save('payment/tamara_checkout/api_environment', \Tamara\Checkout\Api\Data\CheckoutInformationInterface::SANDBOX_API_ENVIRONMENT);
+        }
+    }
+
+    private function saveApiUrlFromApiEnvironment() {
+        if ($this->scopeConfig->getValue("payment/tamara_checkout/api_environment" ,\Magento\Store\Model\ScopeInterface::SCOPE_WEBSITES)
+            == \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_ENVIRONMENT) {
+            $this->configWriter->save('payment/tamara_checkout/api_url', \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_URL);
+        } else {
+            $this->configWriter->save('payment/tamara_checkout/api_url', \Tamara\Checkout\Api\Data\CheckoutInformationInterface::SANDBOX_API_URL);
         }
     }
 }

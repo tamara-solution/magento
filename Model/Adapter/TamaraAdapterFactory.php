@@ -121,8 +121,13 @@ class TamaraAdapterFactory
             }
             if ($isInAdminConfig && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["api_environment"]["value"])) {
                 $apiEnvironment = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["api_environment"]["value"];
+                if ($apiEnvironment == \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_ENVIRONMENT) {
+                    $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_URL;
+                } else {
+                    $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::SANDBOX_API_URL;
+                }
             } else {
-                $apiEnvironment = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/api_environment', $scope, $scopeId);
+                $apiUrl = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/api_url', $scope, $scopeId);
             }
             if ($isInAdminConfig && !empty($groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["merchant_token"]["value"])) {
                 $merchantToken = $groups["tamara_checkout"]["groups"]["api_configuration"]["fields"]["merchant_token"]["value"];
@@ -132,14 +137,12 @@ class TamaraAdapterFactory
         } else {
             $scopeId = $storeId;
             $scope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
+            $apiUrl = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/api_url', $scope, $scopeId);
             $notificationToken = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/notification_token', $scope, $scopeId);
-            $apiEnvironment = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/api_environment', $scope, $scopeId);
             $merchantToken = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/merchant_token', $scope, $scopeId);
         }
-        if ($apiEnvironment == \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_ENVIRONMENT) {
-            $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_URL;
-        } else {
-            $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::SANDBOX_API_URL;
+        if (empty($apiUrl)) {
+            $apiUrl = "";
         }
         if (empty($merchantToken)) {
             $merchantToken = "";

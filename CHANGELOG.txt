@@ -1,3 +1,6 @@
+2.11.13
+    New
+    + Updated new logo
 2.11.12
     New
     + Compatible with Magento 2.3.0

@@ -1,11 +1,19 @@
 <div id="content-success">
     <div class="text-center">
-        <span data-bind="i18n: 'Thank you for your purchase.'"></span>
-        <span data-bind="i18n: 'Order id #'"></span><span data-bind="text: orderIncrementId"></span>
-    </div>
-    <div id="tamara-logo-success">
-        <a class="tamara-logo-succes-image" data-bind="attr: {href: tamaraLoginLink, target: '_blank'}">
-            <img data-bind="attr: {src: tamaraSuccessLogo, alt: $t('Tamara'), height: '76', width: '294' }" />
-        </a>
+        <p>
+            <span data-bind="i18n: 'Thank you for your purchase with '"></span>
+            <a class="tamara-logo-succes-image" data-bind="attr: {href: tamaraLoginLink, target: '_blank'}">
+                <img data-bind="attr: {src: tamaraSuccessLogo, alt: $t('Tamara')}" style="width: 100px; height: 25px"/>
+            </a>
+        </p>
+        <p>
+            <span data-bind="i18n: 'Order id #'"></span><b data-bind="text: orderIncrementId"></b>
+        </p>
+        <p>
+            You can view your order
+            <a class="tamara-logo-succes-image" data-bind="attr: {href: tamaraLoginLink, target: '_blank'}">
+                here
+            </a>
+        </p>
     </div>
 </div>
