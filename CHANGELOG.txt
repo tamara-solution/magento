@@ -1,3 +1,6 @@
+2.11.14
+    Bug fixed:
+    + Fixed an issue of partial refund
 2.11.13
     New
     + Updated new logo
