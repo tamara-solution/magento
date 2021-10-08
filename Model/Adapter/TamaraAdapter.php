@@ -490,19 +490,24 @@ class TamaraAdapter
             $cancel->setRequest($cancelRequest->toArray());
             $this->cancelRepository->save($cancel);
             $mageOrder = $this->mageRepository->get($data['order_id']);
-            $comment = __('Tamara - order was canceled');
+            $canceledAmount = $mageOrder->getOrderCurrency()->formatTxt(
+                $data['total_amount']
+            );
+            $comment = __('Tamara - order was canceled, canceled amount is ' . $canceledAmount);
             $mageOrder->addCommentToStatusHistory(__($comment));
             $this->mageRepository->save($mageOrder);
             if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_CANCEL_ORDER, $this->baseConfig->getSendEmailWhen())) {
-                try {
-                    $this->orderCommentSender->send($mageOrder, true, $comment);
-                } catch (\Exception $exception) {
-                    $this->logger->debug(["Tamara - Error when sending authorise notification: " . $exception->getMessage()]);
+                if (!empty($data['is_authorised'])) {
+                    try {
+                        $this->orderCommentSender->send($mageOrder, true, $comment);
+                    } catch (\Exception $exception) {
+                        $this->logger->debug(["Tamara - Error when sending authorise notification: " . $exception->getMessage()]);
+                    }
+                    $mageOrder->addCommentToStatusHistory(
+                        __('Notified customer about order #%1 was canceled.', $mageOrder->getIncrementId()),
+                        $this->baseConfig->getCheckoutCancelStatus()
+                    )->setIsCustomerNotified(true)->save();
                 }
-                $mageOrder->addCommentToStatusHistory(
-                    __('Notified customer about order #%1 was canceled.', $mageOrder->getIncrementId()),
-                    $this->baseConfig->getCheckoutCancelStatus()
-                )->setIsCustomerNotified(true)->save();
             }
         } catch (\Exception $e) {
             $this->logger->debug(["Tamara - " . $e->getMessage()]);

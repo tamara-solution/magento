@@ -1,3 +1,6 @@
+2.11.15
+    New:
+    + Support partial cancel when create partial refund by Creditmemo
 2.11.14
     Bug fixed:
     + Fixed an issue of partial refund

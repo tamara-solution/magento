@@ -67,4 +67,25 @@ class Cancel extends \Tamara\Checkout\Helper\AbstractData
         $tamaraAdapter->cancel($data);
     }
 
+    /**
+     * @param $creditMemo \Magento\Sales\Model\Order\Creditmemo
+     * @throws \Magento\Framework\Exception\IntegrationException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function cancelOrderByCreditMemo($creditMemo) {
+        $order = $creditMemo->getOrder();
+        $this->log(['Start to cancel order by creditmemo, order id: ' . $order->getEntityId()]);
+        $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($order->getEntityId());
+        $data['tamara_order_id'] = $tamaraOrder->getTamaraOrderId();
+        $data['order_id'] = $order->getId();
+        $data['total_amount'] = $creditMemo->getGrandTotal();
+        $data['tax_amount'] = $creditMemo->getTaxAmount();
+        $data['shipping_amount'] = $creditMemo->getShippingAmount();
+        $data['discount_amount'] = $creditMemo->getDiscountAmount();
+        $data['currency'] = $order->getOrderCurrencyCode();
+        $data['items'] = [];
+        $data['is_authorised'] = $tamaraOrder->getIsAuthorised();
+        $tamaraAdapter = $this->tamaraAdapterFactory->create($order->getStoreId());
+        $tamaraAdapter->cancel($data);
+    }
 }
