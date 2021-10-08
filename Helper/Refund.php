@@ -129,7 +129,7 @@ class Refund extends \Tamara\Checkout\Helper\AbstractData
         //cancel if the order was not captured
         $captures = $this->captureRepository->getCaptureByConditions(['order_id' => $order->getId()]);
         if (!count($captures)) {
-            $this->tamaraCancelHelper->cancelOrder($order->getId());
+            $this->tamaraCancelHelper->cancelOrderByCreditMemo($creditMemo);
             return;
         }
 
