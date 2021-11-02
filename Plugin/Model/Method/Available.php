@@ -43,6 +43,10 @@ class Available
         $availableMethods,
         \Magento\Quote\Api\Data\CartInterface $quote = null
     ) {
+        if ($this->tamaraHelper->isAdminArea()) {
+            return $this->removeTamaraMethod($availableMethods);
+        }
+
         //Remove Tamara payment for these products
         $excludeProductIds = explode(",", $this->config->getExcludeProductIds($quote->getStoreId()));
         $quoteItems = $quote->getItems();

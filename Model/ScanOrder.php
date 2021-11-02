@@ -114,7 +114,7 @@ class ScanOrder
 
             //scan cancel
             $orderIds = array_diff($orderIds, $orderIdsFiltered);
-            $magentoOrderCollection = $this->getMagentoOrderCollection($orderIds, 'canceled');
+            $magentoOrderCollection = $this->getMagentoOrderCollection($orderIds, $this->config->getCheckoutCancelStatus());
             $orderIdsFiltered = $this->getOrderIdsFromCollection($magentoOrderCollection);
             $this->doAction($orderIdsFiltered, 'cancel');
         }
@@ -180,14 +180,12 @@ class ScanOrder
     {
         $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);
         if ($this->isScanFromConsole()) {
-            if (!$tamaraOrder->getRefundedFromConsole()) {
-                $this->tamaraRefundHelper->refundOrder($orderId);
-                $tamaraOrder->setRefundedFromConsole(true)->save();
-            }
+            $this->tamaraRefundHelper->refundOrder($orderId);
+            $tamaraOrder->setRefundedFromConsole(true)->save();
         } else {
             $this->tamaraRefundHelper->refundOrder($orderId);
         }
-        $this->log(["Refunded order id: " . $orderId]);
+        $this->log(["Processed refund order id: " . $orderId]);
         $this->totalOrderProcessed++;
     }
 
@@ -206,7 +204,7 @@ class ScanOrder
         } else {
             $this->tamaraCaptureHelper->captureOrder($orderId);
         }
-        $this->log(["Captured order id: " . $orderId]);
+        $this->log(["Processed capture order id: " . $orderId]);
         $this->totalOrderProcessed++;
     }
 
@@ -218,14 +216,12 @@ class ScanOrder
     {
         $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);
         if ($this->isScanFromConsole()) {
-            if (!$tamaraOrder->getCanceledFromConsole()) {
-                $this->tamaraCancelHelper->cancelOrder($orderId);
-                $tamaraOrder->setCanceledFromConsole(true)->save();
-            }
+            $this->tamaraCancelHelper->cancelOrder($orderId);
+            $tamaraOrder->setCanceledFromConsole(true)->save();
         } else {
             $this->tamaraCancelHelper->cancelOrder($orderId);
         }
-        $this->log(["Cancelled order id: " . $orderId]);
+        $this->log(["Processed cancel order id: " . $orderId]);
         $this->totalOrderProcessed++;
     }
 

@@ -14,4 +14,10 @@ interface RefundRepositoryInterface
      * @throws CouldNotSaveException
      */
     public function save(Refund $refund);
+
+    /**
+     * @param $orderId
+     * @return Refund[]
+     */
+    public function getRefundsByOrderId($orderId);
 }

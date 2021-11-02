@@ -14,4 +14,10 @@ interface CancelRepositoryInterface
      * @throws CouldNotSaveException
      */
     public function save(Cancel $cancel);
+
+    /**
+     * @param int $orderId
+     * @return Cancel[]
+     */
+    public function getCancelsByOrderId($orderId);
 }

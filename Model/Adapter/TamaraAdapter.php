@@ -460,9 +460,6 @@ class TamaraAdapter
                     $this->baseConfig->getOrderStatusShouldBeRefunded()
                 )->setIsCustomerNotified(true)->save();
             }
-            if (!$data['refund_from_memo']) {
-                $magentoOrder->setTotalRefunded($data['refund_grand_total'])->setTotalOnlineRefunded($data['refund_grand_total'])->save();
-            }
         } catch (\Exception $e) {
             $this->logger->debug(["Tamara - " . $e->getMessage()]);
             throw new IntegrationException(__("Cannot refund from Tamara, error: " . $e->getMessage()));

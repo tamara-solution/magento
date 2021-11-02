@@ -1,3 +1,10 @@
+2.11.16
+    New:
+    + Support partial cancel, partial refund from console
+    + Hide Tamara payment when create order from admin dashboard
+    + Remove redundant code
+    Bug fixed:
+    + Fix an issue related to router that makes 404 not found with Shop by brand url
 2.11.15
     New:
     + Support partial cancel when create partial refund by Creditmemo

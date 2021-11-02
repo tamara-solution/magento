@@ -13,13 +13,18 @@ class RefundRepository implements RefundRepositoryInterface
      */
     private $resourceModel;
 
+    protected $refundCollectionFactory;
+
     /**
      * RefundRepository constructor.
      * @param RefundResource $resourceModel
      */
-    public function __construct(RefundResource $resourceModel)
+    public function __construct(RefundResource $resourceModel,
+        \Tamara\Checkout\Model\ResourceModel\Refund\CollectionFactory $refundCollectionFactory
+    )
     {
         $this->resourceModel = $resourceModel;
+        $this->refundCollectionFactory = $refundCollectionFactory;
     }
 
     public function save(Refund $refund)
@@ -29,5 +34,15 @@ class RefundRepository implements RefundRepositoryInterface
         } catch (\Exception $e) {
             throw new CouldNotSaveException(__($e->getMessage()));
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getRefundsByOrderId($orderId) {
+        $refundCollection = $this->refundCollectionFactory->create()
+            ->addFieldToFilter('order_id', $orderId)
+            ->load();
+        return $refundCollection->getItems();
     }
 }
