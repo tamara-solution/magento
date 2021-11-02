@@ -19,4 +19,7 @@
     <event name="sales_order_save_after">
         <observer name="tamara_capture_payment_when_order_status_change" instance="Tamara\Checkout\Observer\OrderSaveAfter"/>
     </event>
+    <event name="payment_method_is_active">
+        <observer name="disable_payment" instance="Tamara\Checkout\Observer\PaymentMethodDisable" />
+    </event>
 </config>

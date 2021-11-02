@@ -12,9 +12,14 @@ class CancelRepository implements CancelRepositoryInterface
      */
     private $resourceModel;
 
-    public function __construct(ResourceModel\Cancel $resourceModel)
+    protected $cancelCollectionFactory;
+
+    public function __construct(ResourceModel\Cancel $resourceModel,
+        \Tamara\Checkout\Model\ResourceModel\Cancel\CollectionFactory $cancelCollectionFactory
+    )
     {
         $this->resourceModel = $resourceModel;
+        $this->cancelCollectionFactory = $cancelCollectionFactory;
     }
 
     public function save(Cancel $cancel)
@@ -24,5 +29,16 @@ class CancelRepository implements CancelRepositoryInterface
         } catch (\Exception $e) {
             throw new CouldNotSaveException(__($e->getMessage()));
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCancelsByOrderId($orderId)
+    {
+        $cancelCollection = $this->cancelCollectionFactory->create()
+            ->addFieldToFilter('order_id', $orderId)
+            ->load();
+        return $cancelCollection->getItems();
     }
 }

@@ -75,18 +75,16 @@ class Router implements RouterInterface
         $identifier = trim($request->getPathInfo(), '/');
         $urlParts = explode('/', $identifier);
 
-        if (!$this->isCorrectUrl($urlParts)) {
-            $request->setModuleName('cms')->setControllerName('noroute')->setActionName('index');
-            return $this->actionFactory->create(\Magento\Framework\App\Action\Forward::class);
-        }
-
-        $request->setModuleName(self::MODULE_NAME)
+        if ($this->isCorrectUrl($urlParts)) {
+            $request->setModuleName(self::MODULE_NAME)
                 ->setControllerName(self::CONTROLLER_NAME)
                 ->setActionName($urlParts[3])
                 ->setParam('order_id', $urlParts[2]);
 
-        $request->setAlias(\Magento\Framework\Url::REWRITE_REQUEST_PATH_ALIAS, $identifier);
-        return $this->actionFactory->create(\Magento\Framework\App\Action\Forward::class);
+            $request->setAlias(\Magento\Framework\Url::REWRITE_REQUEST_PATH_ALIAS, $identifier);
+            return $this->actionFactory->create(\Magento\Framework\App\Action\Forward::class);
+        }
+        return;
     }
 
     private function isCorrectUrl($urlParts): bool
