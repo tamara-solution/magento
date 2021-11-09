@@ -62,14 +62,14 @@ class Available
 
         //If block webview
         $userAgent = $this->httpHeader->getHttpUserAgent();
-        if ($this->config->isBlockWebViewEnabled()) {
+        if ($this->config->isBlockWebViewEnabled($quote->getStoreId())) {
             if (!$this->isWebView($userAgent) || $this->isRestful()) {
                 return $this->removeTamaraMethod($availableMethods);
             }
         }
 
         //If enable whitelist
-        if ($this->config->getIsUseWhitelist()) {
+        if ($this->config->getIsUseWhitelist($quote->getStoreId())) {
             if ($quote->getCustomerIsGuest()) {
                 return $this->removeTamaraMethod($availableMethods);
             }
@@ -82,7 +82,7 @@ class Available
         $availableMethods = $this->filterUnAvailableMethods($availableMethods);
 
         //If disable warning message under / over limit
-        if (!$this->config->isDisplayWarningMessageIfOrderOverUnderLimit()) {
+        if (!$this->config->isDisplayWarningMessageIfOrderOverUnderLimit($quote->getStoreId())) {
             $quoteTotal = $quote->getGrandTotal();
             return $this->filterUnderOverLimit($availableMethods, $quoteTotal);
         }

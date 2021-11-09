@@ -314,7 +314,7 @@ class TamaraAdapter
                 $authoriseComment = __('Tamara - order was authorised. The authorised amount is %1.', $authorisedAmount);
                 $this->tamaraInvoiceHelper->log(["Create transaction after authorise payment"]);
                 $this->tamaraTransactionHelper->saveAuthoriseTransaction($authoriseComment, $mageOrder, $mageOrder->getIncrementId());
-                if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_AUTHORISE, $this->baseConfig->getSendEmailWhen())) {
+                if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_AUTHORISE, $this->baseConfig->getSendEmailWhen($mageOrder->getStoreId()))) {
                     try {
                         $this->orderCommentSender->send($mageOrder, true, $authoriseComment);
                     } catch (\Exception $exception) {
@@ -322,12 +322,12 @@ class TamaraAdapter
                     }
                     $mageOrder->addStatusHistoryComment(
                         __('Notified customer about order #%1 was authorised.', $mageOrder->getIncrementId()),
-                        $this->baseConfig->getCheckoutAuthoriseStatus()
+                        $this->baseConfig->getCheckoutAuthoriseStatus($mageOrder->getStoreId())
                     )->setIsCustomerNotified(true)->save();
                 }
                 $this->mageRepository->save($mageOrder);
 
-                if ($this->baseConfig->getAutoGenerateInvoice() == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_AUTHORISE) {
+                if ($this->baseConfig->getAutoGenerateInvoice($mageOrder->getStoreId()) == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_AUTHORISE) {
                     $this->tamaraInvoiceHelper->log(["Automatically generate invoice after authorise payment"]);
                     $this->tamaraInvoiceHelper->generateInvoice($mageOrder->getId());
                 }
@@ -391,7 +391,7 @@ class TamaraAdapter
             $order->addStatusHistoryComment($captureComment);
             $this->mageRepository->save($order);
 
-            if ($this->baseConfig->getAutoGenerateInvoice() == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_CAPTURE) {
+            if ($this->baseConfig->getAutoGenerateInvoice($order->getStoreId()) == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_CAPTURE) {
                 $this->logger->debug(["Tamara - Automatically generate invoice after capture payment"]);
                 $this->tamaraInvoiceHelper->generateInvoice($order->getId());
             }
@@ -448,8 +448,8 @@ class TamaraAdapter
             $refundTransactionId = $magentoOrder->getIncrementId() . '-refund';
                 $refundComment = __('Tamara - order was refunded. The refunded amount is %1.', $creditMemoRefundedAmount);
             $this->tamaraTransactionHelper->createTransaction($magentoOrder, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND, $refundComment, $refundTransactionId);
-            if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_REFUND_ORDER, $this->baseConfig->getSendEmailWhen())) {
-                $magentoOrder->setStatus($this->baseConfig->getOrderStatusShouldBeRefunded());
+            if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_REFUND_ORDER, $this->baseConfig->getSendEmailWhen($magentoOrder->getStoreId()))) {
+                $magentoOrder->setStatus($this->baseConfig->getOrderStatusShouldBeRefunded($magentoOrder->getStoreId()));
                 try {
                     $this->orderCommentSender->send($magentoOrder, true, $refundComment);
                 } catch (\Exception $exception) {
@@ -457,7 +457,7 @@ class TamaraAdapter
                 }
                 $magentoOrder->addStatusHistoryComment(
                     __('Notified customer about order #%1 was refunded.', $magentoOrder->getIncrementId()),
-                    $this->baseConfig->getOrderStatusShouldBeRefunded()
+                    $this->baseConfig->getOrderStatusShouldBeRefunded($magentoOrder->getStoreId())
                 )->setIsCustomerNotified(true)->save();
             }
         } catch (\Exception $e) {
@@ -493,7 +493,7 @@ class TamaraAdapter
             $comment = __('Tamara - order was canceled, canceled amount is ' . $canceledAmount);
             $mageOrder->addStatusHistoryComment(__($comment));
             $this->mageRepository->save($mageOrder);
-            if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_CANCEL_ORDER, $this->baseConfig->getSendEmailWhen())) {
+            if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_CANCEL_ORDER, $this->baseConfig->getSendEmailWhen($mageOrder->getStoreId()))) {
                 if (!empty($data['is_authorised'])) {
                     try {
                         $this->orderCommentSender->send($mageOrder, true, $comment);
@@ -502,7 +502,7 @@ class TamaraAdapter
                     }
                     $mageOrder->addStatusHistoryComment(
                         __('Notified customer about order #%1 was canceled.', $mageOrder->getIncrementId()),
-                        $this->baseConfig->getCheckoutCancelStatus()
+                        $this->baseConfig->getCheckoutCancelStatus($mageOrder->getStoreId())
                     )->setIsCustomerNotified(true)->save();
                 }
             }

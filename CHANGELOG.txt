@@ -1,3 +1,6 @@
+1.12.17
+    Bug fixed:
+    + Fix an issue when get config with scope website if default config is null
 1.12.16
     New:
     + Support partial cancel, partial refund from console

@@ -26,9 +26,6 @@ class ApiEnvironment extends \Magento\Framework\App\Config\Value
      */
     public function beforeSave()
     {
-        if (!$this->isValueChanged()) {
-            return parent::beforeSave();
-        }
         if ($this->getValue() == \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_ENVIRONMENT) {
             $this->resourceConfig->saveConfig('payment/tamara_checkout/api_url', \Tamara\Checkout\Api\Data\CheckoutInformationInterface::PRODUCTION_API_URL, $this->getScope(), $this->getScopeId());
         } else {

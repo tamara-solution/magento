@@ -132,7 +132,7 @@ class AuthorizeCommand implements CommandInterface
         $commandSubject['order_result_id'] = $entityId;
         $commandSubject['order_currency_code'] = $currencyCode;
         $commandSubject['order'] = $orderResult;
-        $commandSubject['phone_verified'] = $this->config->isPhoneVerified();
+        $commandSubject['phone_verified'] = $this->config->isPhoneVerified($orderResult->getStoreId());
 
         $transferO = $this->transferFactory->create(
             $this->requestBuilder->build($commandSubject)
@@ -142,7 +142,7 @@ class AuthorizeCommand implements CommandInterface
             $response = $this->client->placeRequest($transferO);
 
             //set state for new order
-            $order->setState(Order::STATE_NEW)->setStatus($this->config->getCheckoutOrderCreateStatus());
+            $order->setState(Order::STATE_NEW)->setStatus($this->config->getCheckoutOrderCreateStatus($orderResult->getStoreId()));
 
             $tamaraOrder = $this->tamaraOrderFactory->create();
             $tamaraOrder->setData([

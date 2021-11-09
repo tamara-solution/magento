@@ -38,13 +38,14 @@ class CreditmemoSaveAfter extends AbstractObserver
     {
         $this->logger->debug(['Tamara - Start to creditmemo']);
 
-        if (!$this->config->getTriggerActions()) {
+        /** @var Creditmemo $creditMemo */
+        $creditMemo = $observer->getEvent()->getCreditmemo();
+
+        if (!$this->config->getTriggerActions($creditMemo->getStoreId())) {
             $this->logger->debug(['Tamara - Turned off the trigger actions']);
             return;
         }
 
-        /** @var Creditmemo $creditMemo */
-        $creditMemo = $observer->getEvent()->getCreditmemo();
         $this->refundHelper->refundOrderByCreditMemo($creditMemo);
         $this->logger->debug(['Tamara - End to creditmemo']);
     }

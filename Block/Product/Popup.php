@@ -59,7 +59,7 @@ class Popup extends Template
 
     public function isShowPopup(): bool
     {
-        $whitelistConfig = $this->config->getIsUseWhitelist();
+        $whitelistConfig = $this->config->getIsUseWhitelist($this->tamaraHelper->getCurrentStore()->getId());
         if (!$whitelistConfig) {
             return true;
         }

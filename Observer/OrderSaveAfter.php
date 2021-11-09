@@ -61,7 +61,7 @@ class OrderSaveAfter extends AbstractObserver
 
         $this->logger->debug(['Tamara - Start to order save after event']);
 
-        if (!$this->config->getTriggerActions()) {
+        if (!$this->config->getTriggerActions($order->getStoreId())) {
             $this->logger->debug(['Tamara - Turned off the trigger actions']);
             return;
         }
@@ -79,13 +79,13 @@ class OrderSaveAfter extends AbstractObserver
      */
     protected function captureOrderWhenChangeStatus(Order $order): void
     {
-        if (empty($this->config->getOrderStatusShouldBeCaptured())) {
+        if (empty($this->config->getOrderStatusShouldBeCaptured($order->getStoreId()))) {
             $this->logger->debug(['Tamara - Capture when order status change is not set, skip capture'], null,
-                $this->config->enabledDebug());
+                $this->config->enabledDebug($order->getStoreId()));
             return;
         }
 
-        if ($order->getStatus() != $this->config->getOrderStatusShouldBeCaptured()) {
+        if ($order->getStatus() != $this->config->getOrderStatusShouldBeCaptured($order->getStoreId())) {
             return;
         }
 
