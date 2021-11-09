@@ -51,7 +51,7 @@ class OrderCancelAfter extends AbstractObserver
         }
 
         $this->logger->debug(['Tamara - Start to cancel event']);
-        if (!$this->config->getTriggerActions()) {
+        if (!$this->config->getTriggerActions($order->getStoreId())) {
             $this->logger->debug(['Tamara - Turned off the trigger actions']);
             return;
         }

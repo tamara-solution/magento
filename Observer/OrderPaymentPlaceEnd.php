@@ -32,6 +32,6 @@ class OrderPaymentPlaceEnd extends AbstractObserver
             return;
         }
 
-        $payment->getOrder()->setState(Order::STATE_NEW)->setStatus($this->config->getCheckoutOrderCreateStatus());
+        $payment->getOrder()->setState(Order::STATE_NEW)->setStatus($this->config->getCheckoutOrderCreateStatus($payment->getOrder()->getStoreId()));
     }
 }
