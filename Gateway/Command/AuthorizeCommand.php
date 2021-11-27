@@ -119,6 +119,8 @@ class AuthorizeCommand implements CommandInterface
         $this->logger->debug(['Tamara - Start authorize command']);
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $commandSubject['payment']->getPayment();
+        $payment->setIsTransactionPending(true);
+
         /** @var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
 

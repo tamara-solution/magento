@@ -36,6 +36,8 @@ class Checkout extends AbstractMethod {
 
 	const ALLOWED_COUNTRIES = 'SA,AE,KW,BH,QA';
 
+	const ALLOWED_CURRENCIES = 'SAR,AED,KWD,BHD,QAR';
+
 	/**
 	 * @var string
 	 */

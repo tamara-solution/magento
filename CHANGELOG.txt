@@ -1,3 +1,7 @@
+2.11.18
+    New:
+    + Supports multiple currencies per country
+    + Skip move to processing when create order
 2.11.17
     Bug fixed:
     + Fix an issue when get config with scope website if default config is null
