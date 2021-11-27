@@ -142,16 +142,17 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
 
     /**
      * @param string $countryCode
+     * @param string $currencyCode
      * @param int $storeId
      * @return array|mixed
      * @throws \Tamara\Exception\RequestDispatcherException
      */
-    public function getPaymentTypes($countryCode = 'SA', $storeId = 0) {
-        $cachedPaymentTypes = $this->getPaymentTypesCached($countryCode, $storeId);
+    public function getPaymentTypes($countryCode = 'SA', $currencyCode = '',  $storeId = 0) {
+        $cachedPaymentTypes = $this->getPaymentTypesCached($countryCode, $currencyCode, $storeId);
         if (empty($cachedPaymentTypes)) {
             $adapter = $this->tamaraAdapterFactory->create($storeId);
-            $cachedPaymentTypes = $adapter->getPaymentTypes($countryCode);
-            $this->cachePaymentTypes($cachedPaymentTypes, $countryCode, $storeId);
+            $cachedPaymentTypes = $adapter->getPaymentTypes($countryCode, $currencyCode);
+            $this->cachePaymentTypes($cachedPaymentTypes, $countryCode, $currencyCode, $storeId);
         }
         return $cachedPaymentTypes;
     }
@@ -168,37 +169,30 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
         }
 
         $storeCountryCode = $this->getStoreCountryCode($storeId);
-        $paymentTypes = $this->getPaymentTypes($storeCountryCode, $storeId);
-        $result = $paymentTypes;
-
-        //validate method is disabled and currency
         $storeCurrencyCode = $this->getStoreCurrencyCode($storeId);
-        foreach ($paymentTypes as $methodCode => $type) {
-            if (!$this->isPaymentMethodEnabled($methodCode) || $type['currency'] != $storeCurrencyCode) {
-                unset($result[$methodCode]);
-            }
-        }
-        return $result;
+        return $this->getPaymentTypes($storeCountryCode, $storeCurrencyCode, $storeId);
     }
 
     /**
      * @param array $paymentTypes
      * @param $countryCode
+     * @param $currencyCode
      * @param int $storeId
      */
-    private function cachePaymentTypes(array $paymentTypes, $countryCode, $storeId) {
+    private function cachePaymentTypes(array $paymentTypes, $countryCode, $currencyCode, $storeId) {
         $paymentTypesAsStr = json_encode($paymentTypes);
-        $this->magentoCache->save($paymentTypesAsStr, $this->getPaymentTypesCacheIdentifier($countryCode, $storeId), [],
+        $this->magentoCache->save($paymentTypesAsStr, $this->getPaymentTypesCacheIdentifier($countryCode, $currencyCode, $storeId), [],
             self::PAYMENT_TYPES_CACHE_LIFE_TIME);
     }
 
     /**
      * @param $countryCode
+     * @param $currencyCode
      * @param $storeId
      * @return array|mixed
      */
-    private function getPaymentTypesCached($countryCode, $storeId) {
-        $cachedStr = $this->magentoCache->load($this->getPaymentTypesCacheIdentifier($countryCode, $storeId));
+    private function getPaymentTypesCached($countryCode, $currencyCode, $storeId) {
+        $cachedStr = $this->magentoCache->load($this->getPaymentTypesCacheIdentifier($countryCode, $currencyCode, $storeId));
         if (empty($cachedStr)) {
             return [];
         }
@@ -207,11 +201,12 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
 
     /**
      * @param $countryCode
+     * @param $currencyCode
      * @param $storeId
      * @return string
      */
-    protected function getPaymentTypesCacheIdentifier($countryCode, $storeId) {
-        return self::PAYMENT_TYPES_CACHE_IDENTIFIER . $countryCode. $storeId;
+    protected function getPaymentTypesCacheIdentifier($countryCode, $currencyCode, $storeId) {
+        return self::PAYMENT_TYPES_CACHE_IDENTIFIER . $countryCode. $currencyCode . $storeId;
     }
 
     /**
@@ -237,5 +232,9 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
             ScopeInterface::SCOPE_STORE,
             $storeId
         ));
+    }
+
+    public function getTamaraConfig() {
+        return $this->tamaraConfig;
     }
 }

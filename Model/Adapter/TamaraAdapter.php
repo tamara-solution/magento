@@ -158,15 +158,16 @@ class TamaraAdapter
 
     /**
      * @param string $countryCode
+     * @param string $currencyCode
      * @return array
      * @throws RequestDispatcherException
      */
-    public function getPaymentTypes(string $countryCode)
+    public function getPaymentTypes(string $countryCode, $currencyCode = '')
     {
         if (empty($this->baseConfig->getMerchantToken())) {
             return [];
         }
-        $response = $this->client->getPaymentTypes($countryCode);
+        $response = $this->client->getPaymentTypes($countryCode, $currencyCode);
         if (!$response->isSuccess()) {
             $errorLogs = [$response->getContent()];
             $this->logger->debug($errorLogs);
