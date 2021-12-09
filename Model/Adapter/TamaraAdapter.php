@@ -187,7 +187,7 @@ class TamaraAdapter
             /** @var PaymentType $paymentType */
             foreach ($response->getPaymentTypes() as $paymentType) {
                 $paymentTypeClone = $paymentType;
-                if ($paymentTypeClone->getName() == \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER) {
+                if ($paymentTypeClone->getName() == \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAY_BY_LATER) {
                     $paymentTypes[\Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE] = [
                         'name' => \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE,
                         'min_limit' => $paymentTypeClone->getMinLimit()->getAmount(),
@@ -196,7 +196,7 @@ class TamaraAdapter
                         'description' => $paymentTypeClone->getDescription()
                     ];
                 }
-                if ($paymentTypeClone->getName() == \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS) {
+                if ($paymentTypeClone->getName() == \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAY_BY_INSTALMENTS) {
                     $description = $paymentTypeClone->getDescription();
                     if (count($installments = $paymentTypeClone->getSupportedInstalments())) {
                         foreach ($installments as $installment) {
@@ -608,6 +608,9 @@ class TamaraAdapter
 
             $tamaraOrderId = $webhookMessage->getOrderId();
             $order = $this->orderRepository->getTamaraOrderByTamaraOrderId($tamaraOrderId);
+            if ($order->getIsAuthorised()) {
+                return false;
+            }
 
             /** @var \Magento\Sales\Model\Order $mageOrder */
             $mageOrder = $this->mageRepository->get($order->getOrderId());

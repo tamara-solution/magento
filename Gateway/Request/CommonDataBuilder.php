@@ -66,11 +66,11 @@ class CommonDataBuilder implements BuilderInterface
         $paymentMethod = $order->getPayment()->getMethod();
         $paymentType = "";
         if (\Tamara\Checkout\Gateway\Config\InstalmentConfig::isInstallmentsPayment($paymentMethod)) {
-            $paymentType = \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_INSTALMENTS;
+            $paymentType = \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAY_BY_INSTALMENTS;
             $numberOfInstallments = \Tamara\Checkout\Gateway\Config\InstalmentConfig::getInstallmentsNumberByPaymentCode($paymentMethod);
         } else {
             if ($paymentMethod == \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE) {
-                $paymentType = \Tamara\Checkout\Controller\Adminhtml\System\Payments::PAY_BY_LATER;
+                $paymentType = \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAY_BY_LATER;
             } else {
                 throw new \InvalidArgumentException("Tamara payment method is not supported");
             }
