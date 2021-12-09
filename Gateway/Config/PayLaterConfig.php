@@ -7,6 +7,7 @@ use Magento\Payment\Gateway\Config\Config as MagentoPaymentConfig;
 
 class PayLaterConfig extends MagentoPaymentConfig
 {
+    const PAY_BY_LATER = 'PAY_BY_LATER';
     const PAYMENT_TYPE_CODE = 'tamara_pay_later',
           TITLE = 'title',
           ACTIVE = 'active';

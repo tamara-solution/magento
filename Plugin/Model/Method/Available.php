@@ -79,19 +79,21 @@ class Available
                 return $this->removeTamaraMethod($availableMethods);
             }
         }
-        $availableMethods = $this->filterUnAvailableMethods($availableMethods);
+        $availableMethods = $this->filterUnAvailableMethods($availableMethods, $quote->getStoreId());
 
         //If disable warning message under / over limit
         if (!$this->config->isDisplayWarningMessageIfOrderOverUnderLimit($quote->getStoreId())) {
             $quoteTotal = $quote->getGrandTotal();
-            return $this->filterUnderOverLimit($availableMethods, $quoteTotal);
+            return $this->filterUnderOverLimit($availableMethods, $quoteTotal, $quote->getStoreId());
         }
         return $availableMethods;
     }
 
-    private function filterUnAvailableMethods($availableMethods)
+    private function filterUnAvailableMethods($availableMethods, $storeId)
     {
-        $paymentTypes = $this->tamaraHelper->getPaymentTypesOfStore();
+        $storeCurrency = $this->tamaraHelper->getStoreCurrencyCode($storeId);
+        $paymentTypes = $this->tamaraHelper->getPaymentTypes(\Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$storeCurrency],
+            $storeCurrency, $storeId);
         foreach ($availableMethods as $key => $method) {
             $methodCode = $method->getCode();
             if (PaymentHelper::isTamaraPayment($methodCode) && !isset($paymentTypes[$methodCode])) {
@@ -148,8 +150,10 @@ class Available
         return $availableMethods;
     }
 
-    private function filterUnderOverLimit($availableMethods, $price) {
-        $paymentTypes = $this->tamaraHelper->getPaymentTypesOfStore();
+    private function filterUnderOverLimit($availableMethods, $price, $storeId) {
+        $storeCurrency = $this->tamaraHelper->getStoreCurrencyCode($storeId);
+        $paymentTypes = $this->tamaraHelper->getPaymentTypes(\Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$storeCurrency],
+            $storeCurrency, $storeId);
         foreach ($availableMethods as $key => $method) {
             $methodCode = $method->getCode();
             if (!PaymentHelper::isTamaraPayment($methodCode)) {

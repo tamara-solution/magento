@@ -38,14 +38,20 @@ class AddressDataBuilder implements BuilderInterface
         $regionBilling = empty($billingAddress->getRegionCode()) ? self::EMPTY : $billingAddress->getRegionCode();
         $regionShipping = empty($shippingAddress->getRegionCode()) ? self::EMPTY : $shippingAddress->getRegionCode();
 
-        $shipping->setFirstName($shippingAddress->getFirstname());
-        $shipping->setLastName($shippingAddress->getLastname());
-        $shipping->setLine1($shippingAddress->getStreetLine1());
+        $shippingAddressFirstName = empty($shippingAddress->getFirstname()) ? self::EMPTY : $shippingAddress->getFirstname();
+        $shipping->setFirstName($shippingAddressFirstName);
+        $shippingAddressLastName = empty($shippingAddress->getLastname()) ? self::EMPTY : $shippingAddress->getLastname();
+        $shipping->setLastName($shippingAddressLastName);
+        $shippingAddressLine1 = empty($shippingAddress->getStreetLine1()) ? self::EMPTY : $shippingAddress->getStreetLine1();
+        $shipping->setLine1($shippingAddressLine1);
         $shipping->setLine2($shippingAddress->getStreetLine2() ?? '');
         $shipping->setRegion($regionShipping);
-        $shipping->setCity($shippingAddress->getCity());
-        $shipping->setPhoneNumber($shippingAddress->getTelephone());
-        $shipping->setCountryCode($shippingAddress->getCountryId());
+        $shippingAddressCity = empty($shippingAddress->getCity()) ? self::EMPTY : $shippingAddress->getCity();
+        $shipping->setCity($shippingAddressCity);
+        $shippingAddressPhoneNumber = empty($shippingAddress->getTelephone()) ? self::EMPTY : $shippingAddress->getTelephone();
+        $shipping->setPhoneNumber($shippingAddressPhoneNumber);
+        $shippingAddressCountryCode = empty($shippingAddress->getCountryId()) ? self::EMPTY : $shippingAddress->getCountryId();
+        $shipping->setCountryCode($shippingAddressCountryCode);
         $shipping->setPostalCode($shippingAddress->getPostcode());
 
         $billing->setLastName($billingAddress->getLastname());
@@ -53,7 +59,8 @@ class AddressDataBuilder implements BuilderInterface
         $billing->setFirstName($billingAddress->getFirstname());
         $billing->setLine2($billingAddress->getStreetLine2() ?? '');
         $billing->setRegion($regionBilling);
-        $billing->setCity($billingAddress->getCity());
+        $billingAddressCity = empty($billingAddress->getCity()) ? self::EMPTY : $billingAddress->getCity();
+        $billing->setCity($billingAddressCity);
         $billing->setPhoneNumber($billingAddress->getTelephone());
         $billing->setCountryCode($billingAddress->getCountryId());
         $billing->setPostalCode($billingAddress->getPostcode());

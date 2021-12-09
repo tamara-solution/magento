@@ -64,7 +64,11 @@ class ConfigProvider implements ConfigProviderInterface
                 'locale_code' => $this->getLocale()
             ]
         ];
-        foreach ($this->tamaraHelper->getPaymentTypesOfStore() as $methodCode => $type) {
+        $storeId = $this->tamaraHelper->getCurrentStore()->getId();
+        $storeCurrency = $this->tamaraHelper->getStoreCurrencyCode($storeId);
+        $paymentTypes = $this->tamaraHelper->getPaymentTypes(\Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$storeCurrency],
+            $storeCurrency, $storeId);
+        foreach ($paymentTypes as $methodCode => $type) {
             $config[$methodCode] = $type;
         }
         return [

@@ -1,3 +1,7 @@
+1.12.19
+    New:
+    + Doesn't process webhook if the order is authorised
+    + Improve code
 1.12.18
     New:
     + Supports multiple currencies per country
