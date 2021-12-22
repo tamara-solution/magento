@@ -54,7 +54,7 @@ abstract class AbstractClient implements ClientInterface
         } catch (\Exception $e) {
             $message = __($e->getMessage() ?: "Something went wrong during Gateway request.");
             $log['error'] = $message;
-            $this->logger->debug($log);
+            $this->logger->debug(["Tamara" => $log]);
             throw $e;
         }
 

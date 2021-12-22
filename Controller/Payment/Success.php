@@ -77,7 +77,7 @@ class Success extends Action
                 $order->getResource()->save($order);
             }
         } catch (\Exception $e) {
-            $logger->debug(['Success has error' => $e->getMessage()]);
+            $logger->debug(['Tamara - Success has error' => $e->getMessage()]);
         }
 
         if ($this->config->useMagentoCheckoutSuccessPage($storeId)) {

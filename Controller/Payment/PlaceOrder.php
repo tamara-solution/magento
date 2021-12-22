@@ -50,7 +50,7 @@ class PlaceOrder extends Action
             $response['redirectUrl'] = $tamaraOrder->getRedirectUrl();
         } catch (NoSuchEntityException $exception) {
             $response['success'] = false;
-            $logger->debug(['Error when retrieve tamara order: ' => $exception->getMessage()]);
+            $logger->debug(['Tamara - Error when retrieve tamara order: ' => $exception->getMessage()]);
             $response['error'] = $exception->getMessage();
         }
         return $result->setData($response);

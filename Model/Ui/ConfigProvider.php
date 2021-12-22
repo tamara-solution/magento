@@ -66,6 +66,11 @@ class ConfigProvider implements ConfigProviderInterface
         ];
         $storeId = $this->tamaraHelper->getCurrentStore()->getId();
         $storeCurrency = $this->tamaraHelper->getStoreCurrencyCode($storeId);
+        if (!$this->tamaraHelper->isAllowedCurrency($storeCurrency, $storeId)) {
+            return [
+                'payment' => $config
+            ];
+        }
         $paymentTypes = $this->tamaraHelper->getPaymentTypes(\Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$storeCurrency],
             $storeCurrency, $storeId);
         foreach ($paymentTypes as $methodCode => $type) {
