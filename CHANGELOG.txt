@@ -1,3 +1,8 @@
+2.11.20
+    New:
+    + Set total paid for order after authorise by Tamara
+    + Add more logs
+    + Use full path for return tag in REST API to avoid issue with Swagger
 2.11.19
     New:
     + Doesn't process webhook if the order is authorised

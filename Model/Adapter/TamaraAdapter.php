@@ -169,7 +169,7 @@ class TamaraAdapter
         }
         $response = $this->client->getPaymentTypes($countryCode, $currencyCode);
         if (!$response->isSuccess()) {
-            $errorLogs = [$response->getContent()];
+            $errorLogs = ["Tamara" => $response->getContent()];
             $this->logger->debug($errorLogs);
             return [];
         }
@@ -244,7 +244,7 @@ class TamaraAdapter
         if (!$result->isSuccess()) {
             $errorLogs = [$result->getContent()];
             $message = $this->getErrorMessageFromResponse($result);
-            $this->logger->debug($errorLogs);
+            $this->logger->debug(["Tamara" => $errorLogs]);
             throw new IntegrationException(__($message));
         }
 
@@ -264,7 +264,7 @@ class TamaraAdapter
         try {
             $authoriseMessage = $this->notificationService->processAuthoriseNotification();
         } catch (\Exception $exception) {
-            $this->logger->debug([$exception->getMessage()]);
+            $this->logger->debug(["Tamara" => $exception->getMessage()]);
 
             return false;
         }
@@ -274,7 +274,7 @@ class TamaraAdapter
            $response = $this->client->authoriseOrder(new AuthoriseOrderRequest($authoriseMessage->getOrderId()));
 
             if (!$response->isSuccess()) {
-                $errorLogs = [$response->getContent()];
+                $errorLogs = ["Tamara" => $response->getContent()];
                 $this->logger->debug($errorLogs);
 
                 return false;
@@ -288,23 +288,19 @@ class TamaraAdapter
             if (!empty($this->checkoutAuthoriseStatus)) {
                 /** @var \Magento\Sales\Model\Order $mageOrder */
                 $mageOrder = $this->mageRepository->get($order->getOrderId());
-                $orderStatusCollection = $this->orderStatusCollectionFactory->create();
-                $orderStatusCollection->joinStates();
-                $orderStatusCollection->addFieldToFilter('main_table.status', $this->checkoutAuthoriseStatus);
-                $stateWillBeUsed = Order::STATE_PROCESSING;
-                foreach ($orderStatusCollection as $item) {
-                    if ($item->getState() == Order::STATE_PROCESSING) {
-                        $stateWillBeUsed = Order::STATE_PROCESSING;
-                        break;
-                    }
-                    $stateWillBeUsed = $item->getState();
-                }
-                $mageOrder->setState($stateWillBeUsed)->setStatus($this->checkoutAuthoriseStatus);
+                $mageOrder->setState(Order::STATE_PROCESSING)->setStatus($this->checkoutAuthoriseStatus);
 
                 //set base amount paid
-                $mageOrder->getPayment()->setAmountPaid($mageOrder->getGrandTotal());
+                $grandTotal = $mageOrder->getGrandTotal();
+                $mageOrder->setTotalDue(0.00);
+                $mageOrder->setTotalPaid($grandTotal);
+                $mageOrder->getPayment()->setAmountPaid($grandTotal);
+                $mageOrder->getPayment()->setAmountAuthorized($grandTotal);
                 $baseAmountPaid = $mageOrder->getBaseGrandTotal();
+                $mageOrder->setBaseTotalDue(0.00);
+                $mageOrder->setBaseTotalPaid($baseAmountPaid);
                 $mageOrder->getPayment()->setBaseAmountPaid($baseAmountPaid);
+                $mageOrder->getPayment()->setBaseAmountAuthorized($baseAmountPaid);
                 $mageOrder->getPayment()->setBaseAmountPaidOnline($baseAmountPaid);
                 $this->orderSender->send($mageOrder);
 
@@ -360,7 +356,7 @@ class TamaraAdapter
 
             if (!$response->isSuccess() && $response->getStatusCode() !== 409) {
                 $errorLogs = $response->getErrors() ?? [$response->getMessage()];
-                $this->logger->debug($errorLogs);
+                $this->logger->debug(["Tamara" => $errorLogs]);
                 throw new IntegrationException(__('Could not capture in tamara, please check log'));
             }
 
@@ -414,7 +410,7 @@ class TamaraAdapter
 
             if (!$response->isSuccess() && $response->getStatusCode() !== 409) {
                 $errorLogs = [$response->getContent()];
-                $this->logger->debug($errorLogs);
+                $this->logger->debug(["Tamara" => $errorLogs]);
                 throw new IntegrationException(__($response->getMessage()));
             }
 
@@ -479,7 +475,7 @@ class TamaraAdapter
 
             if (!$response->isSuccess() && $response->getStatusCode() !== 499) {
                 $errorLogs = [$response->getContent()];
-                $this->logger->debug($errorLogs);
+                $this->logger->debug(["Tamara" => $errorLogs]);
                 throw new IntegrationException(__($response->getMessage()));
             }
 
@@ -542,7 +538,7 @@ class TamaraAdapter
 
             if (!$response->isSuccess()) {
                 $errorLogs = [$response->getContent()];
-                $this->logger->debug($errorLogs);
+                $this->logger->debug(["Tamara" => $errorLogs]);
                 throw new IntegrationException(__($response->getMessage()));
             }
 
@@ -581,7 +577,7 @@ class TamaraAdapter
 
         if (!$response->isSuccess()) {
             $errorLogs = [$response->getContent()];
-            $this->logger->debug($errorLogs);
+            $this->logger->debug(["Tamara" => $errorLogs]);
             throw new IntegrationException(__($response->getMessage()));
         }
 

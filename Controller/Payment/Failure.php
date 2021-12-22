@@ -110,7 +110,7 @@ class Failure extends Action
                 $order->getResource()->save($order);
             } catch (\Exception $e) {
                 $logger = $this->_objectManager->get('TamaraCheckoutLogger');
-                $logger->debug(["Error when process payment failure: " . $e->getMessage()]);
+                $logger->debug(["Tamara - Error when process payment failure: " . $e->getMessage()]);
             }
         }
         $message = __('Your order was failed.');

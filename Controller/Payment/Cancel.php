@@ -110,7 +110,7 @@ class Cancel extends Action
                 $order->getResource()->save($order);
             } catch (\Exception $e) {
                 $logger = $this->_objectManager->get('TamaraCheckoutLogger');
-                $logger->debug(["Error when process payment cancel: " . $e->getMessage()]);
+                $logger->debug(["Tamara - Error when process payment cancel: " . $e->getMessage()]);
             }
         }
 

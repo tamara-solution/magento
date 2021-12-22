@@ -47,6 +47,10 @@ class Available
             return $this->removeTamaraMethod($availableMethods);
         }
 
+        if (!$this->tamaraHelper->isAllowedCurrency($quote->getCurrency()->getQuoteCurrencyCode(), $quote->getStoreId())) {
+            return $this->removeTamaraMethod($availableMethods);
+        }
+
         //Remove Tamara payment for these products
         $excludeProductIds = explode(",", $this->config->getExcludeProductIds($quote->getStoreId()));
         $quoteItems = $quote->getItems();
