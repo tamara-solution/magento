@@ -60,6 +60,14 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/tamara_checkout/trigger_actions</config_path>
                     </field>
+                    <field id="trigger_events" translate="label" type="multiselect" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Trigger events</label>
+                        <source_model>Tamara\Checkout\Model\Config\Source\TriggerEvents\Options</source_model>
+                        <config_path>payment/tamara_checkout/trigger_events</config_path>
+                        <depends>
+                            <field id="trigger_actions">1</field>
+                        </depends>
+                    </field>
                     <field id="is_email_whitelist_enabled" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Enabled whitelist function for Tamara</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

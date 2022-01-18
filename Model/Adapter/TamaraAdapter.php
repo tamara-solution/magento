@@ -361,36 +361,38 @@ class TamaraAdapter
             }
 
             $captureId = $response->getCaptureId();
-            $data['capture_id'] = $captureId;
-            $capture = PaymentHelper::createCaptureFromArray($data);
-            $this->captureRepository->saveCapture($capture);
+            if (!empty($captureId)) {
+                $data['capture_id'] = $captureId;
+                $capture = PaymentHelper::createCaptureFromArray($data);
+                $this->captureRepository->saveCapture($capture);
 
-            $captureItems = [];
-            foreach ($data['items'] as $itemData) {
-                $captureItem = PaymentHelper::createCaptureItemFromArray($itemData);
-                $captureItem->setOrderId($data['order_id']);
-                $captureItem->setCaptureId($captureId);
-                $captureItems[] = $captureItem->toArray();
-            }
+                $captureItems = [];
+                foreach ($data['items'] as $itemData) {
+                    $captureItem = PaymentHelper::createCaptureItemFromArray($itemData);
+                    $captureItem->setOrderId($data['order_id']);
+                    $captureItem->setCaptureId($captureId);
+                    $captureItems[] = $captureItem->toArray();
+                }
 
-            $rows = $this->captureRepository->saveCaptureItems($captureItems);
+                $rows = $this->captureRepository->saveCaptureItems($captureItems);
 
-            if (!$rows) {
-                $this->logger->debug(['Tamara - Cannot save capture items']);
-                $this->logger->debug($captureItems);
-                throw new IntegrationException(__('Cannot save capture items, please check log'));
-            }
+                if (!$rows) {
+                    $this->logger->debug(['Tamara - Cannot save capture items']);
+                    $this->logger->debug($captureItems);
+                    throw new IntegrationException(__('Cannot save capture items, please check log'));
+                }
 
-            $capturedAmount = $order->getOrderCurrency()->formatTxt(
-                $data['total_amount']
-            );
-            $captureComment = __('Tamara - order was captured. The captured amount is %1. Capture id is %2', $capturedAmount, $response->getCaptureId());
-            $order->addStatusHistoryComment($captureComment);
-            $this->mageRepository->save($order);
+                $capturedAmount = $order->getOrderCurrency()->formatTxt(
+                    $data['total_amount']
+                );
+                $captureComment = __('Tamara - order was captured. The captured amount is %1. Capture id is %2', $capturedAmount, $response->getCaptureId());
+                $order->addStatusHistoryComment($captureComment);
+                $this->mageRepository->save($order);
 
-            if ($this->baseConfig->getAutoGenerateInvoice($order->getStoreId()) == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_CAPTURE) {
-                $this->logger->debug(["Tamara - Automatically generate invoice after capture payment"]);
-                $this->tamaraInvoiceHelper->generateInvoice($order->getId());
+                if ($this->baseConfig->getAutoGenerateInvoice($order->getStoreId()) == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_CAPTURE) {
+                    $this->logger->debug(["Tamara - Automatically generate invoice after capture payment"]);
+                    $this->tamaraInvoiceHelper->generateInvoice($order->getId());
+                }
             }
         } catch (\Exception $e) {
             $this->logger->debug(["Tamara - " . $e->getMessage()]);

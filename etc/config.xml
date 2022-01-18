@@ -8,6 +8,7 @@
                 <debug>1</debug>
                 <api_environment>1</api_environment>
                 <trigger_actions>1</trigger_actions>
+                <trigger_events>1,2,3</trigger_events>
                 <send_email_invoice>1</send_email_invoice>
                 <is_email_whitelist_enabled>0</is_email_whitelist_enabled>
                 <block_web_view>0</block_web_view>
