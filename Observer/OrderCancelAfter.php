@@ -55,6 +55,10 @@ class OrderCancelAfter extends AbstractObserver
             $this->logger->debug(['Tamara - Turned off the trigger actions']);
             return;
         }
+        if (!in_array(\Tamara\Checkout\Model\Config\Source\TriggerEvents\Options::CANCEL_ORDER, $this->config->getTriggerEvents($order->getStoreId()))) {
+            $this->logger->debug(['Tamara - Skip trigger cancel event']);
+            return;
+        }
         if ($this->coreRegistry->registry("skip_tamara_cancel") || $this->coreRegistry->registry("cancel_abandoned_order")) {
             $this->logger->debug(['Tamara - Skip tamara cancel']);
             return;

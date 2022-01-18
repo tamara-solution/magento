@@ -33,7 +33,7 @@ class ExtensionVersion extends \Magento\Config\Block\System\Config\Form\Field
         if ($version == \Tamara\Checkout\Helper\Core::UNKNOWN) {
             $version = "Cannot get plugin version from composer";
         }
-        return '<td class="value">' . $version . '</td>';
+        return '<td class="value">Plugin version: ' . $version . ', PHP SDK version: ' . $this->tamaraCoreHelper->getPHPSDKVersion() .'</td>';
     }
 
     public function getVersion()

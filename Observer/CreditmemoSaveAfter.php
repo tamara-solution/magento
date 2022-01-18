@@ -45,6 +45,10 @@ class CreditmemoSaveAfter extends AbstractObserver
             $this->logger->debug(['Tamara - Turned off the trigger actions']);
             return;
         }
+        if (!in_array(\Tamara\Checkout\Model\Config\Source\TriggerEvents\Options::REFUND_ORDER, $this->config->getTriggerEvents($creditMemo->getStoreId()))) {
+            $this->logger->debug(['Tamara - Skip trigger refund event']);
+            return;
+        }
 
         $this->refundHelper->refundOrderByCreditMemo($creditMemo);
         $this->logger->debug(['Tamara - End to creditmemo']);

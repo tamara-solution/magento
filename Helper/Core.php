@@ -136,6 +136,43 @@ class Core extends AbstractHelper
     }
 
     /**
+     * Get PHP SDK version in composer.json
+     */
+    public function getPHPSDKVersion() {
+        $rootPath = $this->getObject(\Magento\Framework\Filesystem\DirectoryList::class)->getRoot();
+        $magentoComposerJsonPath = $rootPath . DIRECTORY_SEPARATOR . "composer.json";
+        $vendorPath = "";
+        if (file_exists($magentoComposerJsonPath)) {
+            $content = file_get_contents($magentoComposerJsonPath);
+            if ($content) {
+                $jsonContent = json_decode($content, true);
+                if (!empty($jsonContent['config']['vendor-dir'])) {
+                    $vendorPath = rtrim($jsonContent['config']['vendor-dir'], DIRECTORY_SEPARATOR);
+                }
+            }
+        }
+        if (empty($vendorPath)) {
+            $vendorPath = $rootPath . DIRECTORY_SEPARATOR . "vendor";
+        }
+        if (is_dir($vendorPath)) {
+            $composerJsonPath = $vendorPath . DIRECTORY_SEPARATOR . "tamara-solution" . DIRECTORY_SEPARATOR . "php-sdk" . DIRECTORY_SEPARATOR . "composer.json";
+        } else {
+            $composerJsonPath = $vendorPath;
+        }
+        if (file_exists($composerJsonPath)) {
+            $content = file_get_contents($composerJsonPath);
+            if ($content) {
+                $jsonContent = json_decode($content, true);
+                if (!empty($jsonContent['version'])) {
+                    return $jsonContent['version'];
+                }
+            }
+        }
+
+        return self::UNKNOWN;
+    }
+
+    /**
      * @param null $moduleName
      * @return string|null
      */

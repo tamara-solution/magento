@@ -66,6 +66,11 @@ class OrderSaveAfter extends AbstractObserver
             return;
         }
 
+        if (!in_array(\Tamara\Checkout\Model\Config\Source\TriggerEvents\Options::CAPTURE_ORDER, $this->config->getTriggerEvents($order->getStoreId()))) {
+            $this->logger->debug(['Tamara - Skip trigger refund event']);
+            return;
+        }
+
         $this->captureOrderWhenChangeStatus($order);
 
         $this->logger->debug(['Tamara - End to order save after event']);

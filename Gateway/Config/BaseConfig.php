@@ -130,6 +130,14 @@ class BaseConfig extends MagentoPaymentConfig
         return $this->getValue('trigger_actions', $storeId);
     }
 
+    public function getTriggerEvents($storeId = null) {
+        $events = $this->getValue('trigger_events', $storeId);
+        if (is_string($events)) {
+            return explode(",", $events);
+        }
+        return [];
+    }
+
     public function getSendEmailInvoice($storeId = null)
     {
         return $this->getValue('send_email_invoice', $storeId);
