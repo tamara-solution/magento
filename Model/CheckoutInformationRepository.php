@@ -51,19 +51,6 @@ class CheckoutInformationRepository implements \Tamara\Checkout\Api\CheckoutInfo
         $successUrl = $paymentController . 'success';
         $cancelUrl = $paymentController . 'cancel';
         $failureUrl = $paymentController . 'failure';
-        if ($this->baseConfig->useMagentoCheckoutSuccessPage($storeId)) {
-            $successUrl = $this->urlBuilder->getUrl('checkout/onepage/success/');
-        } else {
-            if (!empty($this->baseConfig->getMerchantSuccessUrl($storeId))) {
-                $successUrl = $this->baseConfig->getMerchantSuccessUrl($storeId);
-            }
-        }
-        if (!empty($this->baseConfig->getMerchantCancelUrl($storeId))) {
-            $cancelUrl = $this->baseConfig->getMerchantCancelUrl($storeId);
-        }
-        if (!empty($this->baseConfig->getMerchantFailureUrl($storeId))) {
-            $failureUrl = $this->baseConfig->getMerchantFailureUrl($storeId);
-        }
 
         /**
          * @var \Tamara\Checkout\Model\CheckoutInformation $checkoutInformation

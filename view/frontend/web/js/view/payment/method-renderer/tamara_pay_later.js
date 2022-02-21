@@ -145,7 +145,8 @@ define(
 
                     this.getPlaceOrderDeferredObject()
                         .done(
-                            function () {
+                            function (response) {
+                                window.magentoOrderId = response;
                                 self.afterPlaceOrder();
 
                                 if (self.redirectAfterPlaceOrder) {
@@ -179,7 +180,9 @@ define(
                 $.ajax({
                     url: url.build('tamara/payment/placeOrder'),
                     type: 'POST',
-                    data: {},
+                    data: {
+                        'orderId' : window.magentoOrderId
+                    },
                     success: function (response) {
                         fullScreenLoader.stopLoader(true);
                         if (response.success) {
