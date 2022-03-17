@@ -91,8 +91,16 @@ define(
                 return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_later.min_limit);
             },
 
+            getMinLimitAmount: function () {
+                return window.checkoutConfig.payment.tamara_pay_later.min_limit;
+            },
+
             getMaxLimit: function () {
                 return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_later.max_limit);
+            },
+
+            getMaxLimitAmount: function () {
+                return window.checkoutConfig.payment.tamara_pay_later.max_limit;
             },
 
             getGrandTotal: function () {

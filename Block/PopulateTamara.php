@@ -29,8 +29,8 @@ class PopulateTamara extends Template
     }
 
     public function getTamaraConfig() {
-        $tamaraLogo = sprintf('Tamara_Checkout::images/tamara_logo_%s.svg', LocaleHelper::getCurrentLanguage());
-        $output['tamaraLogoImageUrl'] = $this->getViewFileUrl($tamaraLogo);
+        $tamaraLogo = sprintf('https://cdn.tamara.co/assets/svg/tamara-know-more-%s.svg', LocaleHelper::getCurrentLanguage());
+        $output['tamaraLogoImageUrl'] = $tamaraLogo;
         $output['tamaraCartLogo'] = $this->getViewFileUrl('Tamara_Checkout::images/cart.svg');
         $output['tamaraAboutLink'] = $this->config->getLinkAboutTamara();
         return $output;

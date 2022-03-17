@@ -30,8 +30,8 @@ class Success extends Template
     public function getTamaraConfig() {
         $orderId = $this->getData('order_id');
         $tamaraOrderId = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId)->getTamaraOrderId();
-        $successLogo = sprintf('Tamara_Checkout::images/logo_%s.svg', LocaleHelper::getCurrentLanguage());
-        $output['tamaraSuccessLogo'] = $this->getViewFileUrl($successLogo);
+        $successLogo = sprintf('https://cdn.tamara.co/assets/svg/tamara-logo-badge-%s.svg', LocaleHelper::getCurrentLanguage());
+        $output['tamaraSuccessLogo'] = $successLogo;
         $output['tamaraLoginLink'] = $this->config->getLinkLoginTamara() . '/orders/' . $tamaraOrderId . '?locale=' . LocaleHelper::getLocale();
         $output['order_increment_id'] = $this->getData('order_increment_id');
         return $output;

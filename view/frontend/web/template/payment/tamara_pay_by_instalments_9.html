@@ -16,7 +16,7 @@
         <!-- ko if: isTotalAmountInLimit() -->
         <div style="width: 255px; display: inline-block; margin-left: 16px;">
             <a class="tamara-product-widget" data-bind="attr: {'id':'tamara-product-widget-' + getNumberOfInstalments(), 'data-lang': getPaymentLanguage(), 'data-price': getGrandTotal(), 'data-currency': currencyCode, 'data-payment-type': 'installment', 'data-number-of-installments': getNumberOfInstalments(), 'data-inject-template': 'false', 'data-installment-minimum-amount': getMinLimitAmount(), 'href': 'javascript:void(0)'}">
-                <img data-bind="attr: {src: tamaraImageSrc, alt: $t('Tamara'), height: '36', width: '208' }" class="payment-icon" />
+                <img data-bind="attr: {src: tamaraImageSrc, alt: $t('Tamara')}" class="payment-icon" />
             </a>
         </div>
         <!-- /ko -->
