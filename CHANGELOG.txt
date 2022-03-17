@@ -1,3 +1,6 @@
+1.12.23
+    New:
+    + Update new logos
 1.12.22
     New:
     + Return merchant's URLs from API same as checkout info

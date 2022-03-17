@@ -80,6 +80,12 @@ class Success extends Action
             $logger->debug(['Tamara - Success has error' => $e->getMessage()]);
         }
 
+        if (!empty($merchantSuccessUrl = $this->config->getMerchantSuccessUrl($storeId))) {
+            $resultRedirect = $this->resultRedirectFactory->create();
+            $resultRedirect->setUrl($merchantSuccessUrl);
+            return $resultRedirect;
+        }
+
         if ($this->config->useMagentoCheckoutSuccessPage($storeId)) {
             return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success/');
         }
@@ -96,12 +102,6 @@ class Success extends Action
         $quoteId = $this->checkoutSession->getQuoteId();
         if ($quoteId) {
             $this->cartHelper->removeCartAfterSuccess($quoteId);
-        }
-
-        if (!empty($merchantSuccessUrl = $this->config->getMerchantSuccessUrl($storeId))) {
-            $resultRedirect = $this->resultRedirectFactory->create();
-            $resultRedirect->setUrl($merchantSuccessUrl);
-            return $resultRedirect;
         }
 
         $page = $this->_pageFactory->create();
