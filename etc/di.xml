@@ -14,7 +14,28 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="Tamara\Checkout\Model\PayNextMonth" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAYMENT_TYPE_CODE</argument>
+            <argument name="valueHandlerPool" xsi:type="object">TamaraValueHandlerPayNextMonthPool</argument>
+            <argument name="commandPool" xsi:type="object">TamaraCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">TamaraValidatorPool</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Tamara\Checkout\Block\Info</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Create Tamara Pay By Instalments -->
+    <virtualType name="Tamara\Checkout\Model\PayByInstalments2" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE_2</argument>
+            <argument name="valueHandlerPool" xsi:type="object">TamaraValueHandlerPayByInstalments2Pool</argument>
+            <argument name="commandPool" xsi:type="object">TamaraCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">TamaraValidatorPool</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Tamara\Checkout\Block\Info</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="Tamara\Checkout\Model\PayByInstalments" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
             <argument name="code" xsi:type="const">Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE</argument>
@@ -187,6 +208,21 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="TamaraValueHandlerPayNextMonthPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">TamaraConfigValueHandlerPayNextMonth</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TamaraValueHandlerPayByInstalments2Pool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">TamaraConfigValueHandlerPayByInstalments2</item>
+            </argument>
+        </arguments>
+    </virtualType>
     <virtualType name="TamaraValueHandlerPayByInstalmentsPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
         <arguments>
             <argument name="handlers" xsi:type="array">
@@ -264,6 +300,17 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="TamaraConfigValueHandlerPayNextMonth" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">Tamara\Checkout\Gateway\Config\PayNextMonthConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TamaraConfigValueHandlerPayByInstalments2" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">Tamara\Checkout\Gateway\Config\InstalmentConfig2</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="TamaraConfigValueHandlerPayByInstalments" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
         <arguments>
             <argument name="configInterface" xsi:type="object">Tamara\Checkout\Gateway\Config\InstalmentConfig</argument>
@@ -333,6 +380,11 @@
             <argument name="methodCode" xsi:type="const">Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE</argument>
         </arguments>
     </type>
+    <virtualType name="Tamara\Checkout\Gateway\Config\InstalmentConfig2" type="Tamara\Checkout\Gateway\Config\InstalmentConfig">
+        <arguments>
+            <argument name="numberOfInstallments" xsi:type="number">2</argument>
+        </arguments>
+    </virtualType>
     <type name="Tamara\Checkout\Gateway\Config\InstalmentConfig">
         <arguments>
             <argument name="numberOfInstallments" xsi:type="number">3</argument>

@@ -141,7 +141,7 @@ class TamaraAdapterFactory
             $merchantToken = $this->config->getScopeConfig()->getValue('payment/tamara_checkout/merchant_token', $scope, $scopeId);
         }
         if (empty($apiUrl)) {
-            $apiUrl = "";
+            $apiUrl = \Tamara\Checkout\Api\Data\CheckoutInformationInterface::SANDBOX_API_URL;
         }
         if (empty($merchantToken)) {
             $merchantToken = "";

@@ -61,7 +61,8 @@ class ConfigProvider implements ConfigProviderInterface
         $config = [
             'tamara' => [
                 'use_magento_checkout_success' => $this->baseConfig->useMagentoCheckoutSuccessPage(),
-                'locale_code' => $this->getLocale()
+                'locale_code' => $this->getLocale(),
+                'public_key' => $this->baseConfig->getPublicKey()
             ]
         ];
         $storeId = $this->tamaraHelper->getCurrentStore()->getId();
@@ -76,6 +77,12 @@ class ConfigProvider implements ConfigProviderInterface
         foreach ($paymentTypes as $methodCode => $type) {
             $config[$methodCode] = $type;
         }
+        $config['tamara_single_checkout'] = [
+            'cached_time' => false,
+            'has_available_payment_options' => false,
+            'payment_types_name_in_widget' => 'installment',
+            'number_of_installments' => 3
+        ];
         return [
             'payment' => $config
         ];

@@ -28,6 +28,11 @@
                         <validate>required-entry</validate>
                         <backend_model>Tamara\Checkout\Model\Config\Backend\Value</backend_model>
                     </field>
+                    <field id="public_key" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Public key</label>
+                        <config_path>payment/tamara_checkout/public_key</config_path>
+                        <backend_model>Tamara\Checkout\Model\Config\Backend\Value</backend_model>
+                    </field>
                     <field id="phone_verified" translate="label" type="select" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Phone verified</label>
                         <config_path>payment/tamara_checkout/phone_verified</config_path>
@@ -138,17 +143,17 @@
                         <comment>Please select the state of the order when the invoice should be generated automatically</comment>
                     </field>
                     <field id="display_limit_warning" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Display over/under limit amount warning</label>
+                        <label>Display a warning if the payment method is not available</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/tamara_checkout/display_limit_warning</config_path>
-                        <comment>If yes, The extension will display warning message at checkout page if the cart total amount is over / under Tamara limit amount for payment, Otherwise, hide unavailable payment method</comment>
+                        <comment>If yes, The extension will display a warning message on the checkout page if the payment method is not available for the order, Otherwise, the payment method will be hidden</comment>
                     </field>
                 </group>
 
                 <group id="payment_types" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Types</label>
 
-                    <group id="type_pay_later" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <group id="type_pay_later" translate="label" type="text" sortOrder="999" showInDefault="1" showInWebsite="1" showInStore="1">
 
                         <label>Pay later in 30 days</label>
 
@@ -156,13 +161,6 @@
                             <label>Enabled Pay by later</label>
                             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                             <config_path>payment/tamara_pay_later/active</config_path>
-                        </field>
-                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Title</label>
-                            <config_path>payment/tamara_pay_later/title</config_path>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
                         </field>
                         <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                             <label>Payment Action</label>
@@ -183,6 +181,62 @@
                         </field>
                     </group>
 
+                    <group id="type_pay_next_month" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+
+                        <label>Pay next month</label>
+
+                        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled Pay next month</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/tamara_pay_next_month/active</config_path>
+                        </field>
+                        <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Payment Action</label>
+                            <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
+                            <config_path>payment/tamara_pay_next_month/payment_action</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
+                               showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/tamara_pay_next_month/sort_order</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                    </group>
+
+                    <group id="type_pay_by_instalments_2" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+
+                        <label>Pay in 2 instalments</label>
+
+                        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled Pay in 2 instalments</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_2/active</config_path>
+                        </field>
+                        <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Payment Action</label>
+                            <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
+                            <config_path>payment/tamara_pay_by_instalments_2/payment_action</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
+                               showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/tamara_pay_by_instalments_2/sort_order</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                    </group>
+
                     <group id="type_pay_by_instalments" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Pay in 3 instalments</label>
 
@@ -190,13 +244,6 @@
                             <label>Enabled Pay in 3 instalments</label>
                             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                             <config_path>payment/tamara_pay_by_instalments/active</config_path>
-                        </field>
-                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Title</label>
-                            <config_path>payment/tamara_pay_by_instalments/title</config_path>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
                         </field>
                         <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                             <label>Payment Action</label>
@@ -225,13 +272,6 @@
                             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                             <config_path>payment/tamara_pay_by_instalments_4/active</config_path>
                         </field>
-                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Title</label>
-                            <config_path>payment/tamara_pay_by_instalments_4/title</config_path>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
-                        </field>
                         <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                             <label>Payment Action</label>
                             <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
@@ -258,13 +298,6 @@
                             <label>Enabled Pay in 5 instalments</label>
                             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                             <config_path>payment/tamara_pay_by_instalments_5/active</config_path>
-                        </field>
-                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Title</label>
-                            <config_path>payment/tamara_pay_by_instalments_5/title</config_path>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
                         </field>
                         <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                             <label>Payment Action</label>
@@ -293,13 +326,6 @@
                             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                             <config_path>payment/tamara_pay_by_instalments_6/active</config_path>
                         </field>
-                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Title</label>
-                            <config_path>payment/tamara_pay_by_instalments_6/title</config_path>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
-                        </field>
                         <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                             <label>Payment Action</label>
                             <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
@@ -326,13 +352,6 @@
                             <label>Enabled Pay in 7 instalments</label>
                             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                             <config_path>payment/tamara_pay_by_instalments_7/active</config_path>
-                        </field>
-                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Title</label>
-                            <config_path>payment/tamara_pay_by_instalments_7/title</config_path>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
                         </field>
                         <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                             <label>Payment Action</label>
@@ -361,13 +380,6 @@
                             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                             <config_path>payment/tamara_pay_by_instalments_8/active</config_path>
                         </field>
-                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Title</label>
-                            <config_path>payment/tamara_pay_by_instalments_8/title</config_path>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
-                        </field>
                         <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                             <label>Payment Action</label>
                             <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
@@ -394,13 +406,6 @@
                             <label>Enabled Pay in 9 instalments</label>
                             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                             <config_path>payment/tamara_pay_by_instalments_9/active</config_path>
-                        </field>
-                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Title</label>
-                            <config_path>payment/tamara_pay_by_instalments_9/title</config_path>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
                         </field>
                         <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                             <label>Payment Action</label>
@@ -429,13 +434,6 @@
                             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                             <config_path>payment/tamara_pay_by_instalments_10/active</config_path>
                         </field>
-                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Title</label>
-                            <config_path>payment/tamara_pay_by_instalments_10/title</config_path>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
-                        </field>
                         <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                             <label>Payment Action</label>
                             <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
@@ -463,13 +461,6 @@
                             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                             <config_path>payment/tamara_pay_by_instalments_11/active</config_path>
                         </field>
-                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Title</label>
-                            <config_path>payment/tamara_pay_by_instalments_11/title</config_path>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
-                        </field>
                         <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                             <label>Payment Action</label>
                             <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
@@ -496,13 +487,6 @@
                             <label>Enabled Pay in 12 instalments</label>
                             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                             <config_path>payment/tamara_pay_by_instalments_12/active</config_path>
-                        </field>
-                        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Title</label>
-                            <config_path>payment/tamara_pay_by_instalments_12/title</config_path>
-                            <depends>
-                                <field id="active">1</field>
-                            </depends>
                         </field>
                         <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                             <label>Payment Action</label>

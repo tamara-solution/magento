@@ -14,6 +14,14 @@ define(
                 component: 'Tamara_Checkout/js/view/payment/method-renderer/tamara_pay_later'
             },
             {
+                type: 'tamara_pay_next_month',
+                component: 'Tamara_Checkout/js/view/payment/method-renderer/tamara_pay_next_month'
+            },
+            {
+                type: 'tamara_pay_by_instalments_2',
+                component: 'Tamara_Checkout/js/view/payment/method-renderer/tamara_pay_by_instalments_2'
+            },
+            {
                 type: 'tamara_pay_by_instalments',
                 component: 'Tamara_Checkout/js/view/payment/method-renderer/tamara_pay_by_instalments'
             },

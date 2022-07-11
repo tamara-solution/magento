@@ -187,14 +187,22 @@ class TamaraAdapter
             /** @var PaymentType $paymentType */
             foreach ($response->getPaymentTypes() as $paymentType) {
                 $paymentTypeClone = $paymentType;
+                $typeName = "";
                 if ($paymentTypeClone->getName() == \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAY_BY_LATER) {
-                    $paymentTypes[\Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE] = [
-                        'name' => \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE,
+                    $typeName = \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE;
+                }
+                if ($paymentTypeClone->getName() == \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAY_NEXT_MONTH) {
+                    $typeName = \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAYMENT_TYPE_CODE;
+                }
+                if (!empty($typeName)) {
+                    $paymentTypes[$typeName] = [
+                        'name' => $typeName,
                         'min_limit' => $paymentTypeClone->getMinLimit()->getAmount(),
                         'max_limit' => $paymentTypeClone->getMaxLimit()->getAmount(),
                         'currency' => $paymentTypeClone->getMinLimit()->getCurrency(),
                         'description' => $paymentTypeClone->getDescription()
                     ];
+                    continue;
                 }
                 if ($paymentTypeClone->getName() == \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAY_BY_INSTALMENTS) {
                     $description = $paymentTypeClone->getDescription();
@@ -271,6 +279,10 @@ class TamaraAdapter
 
         try {
             // send confirmation to Tamara
+            $order = $this->orderRepository->getTamaraOrderByTamaraOrderId($authoriseMessage->getOrderId());
+            if ($order->getIsAuthorised()) {
+                return true;
+            }
            $response = $this->client->authoriseOrder(new AuthoriseOrderRequest($authoriseMessage->getOrderId()));
 
             if (!$response->isSuccess()) {

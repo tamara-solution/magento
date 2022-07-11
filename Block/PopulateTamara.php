@@ -33,6 +33,13 @@ class PopulateTamara extends Template
         $output['tamaraLogoImageUrl'] = $tamaraLogo;
         $output['tamaraCartLogo'] = $this->getViewFileUrl('Tamara_Checkout::images/cart.svg');
         $output['tamaraAboutLink'] = $this->config->getLinkAboutTamara();
+        $output['tamaraBadgeUrl'] = sprintf('https://cdn.tamara.co/assets/svg/tamara-logo-badge-%s.svg', LocaleHelper::getCurrentLanguage());
+        $currencyCode = $this->helper->getStoreCurrencyCode();
+        if (!empty(\Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$currencyCode])){
+            $output['tamaraCountryCode'] = \Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$currencyCode];
+        } else {
+            $output['tamaraCountryCode'] = "";
+        }
         return $output;
     }
 
@@ -50,5 +57,9 @@ class PopulateTamara extends Template
             return true;
         }
         return false;
+    }
+
+    public function isProductionEnvironment() {
+        return $this->config->isProductionApiEnvironment();
     }
 }

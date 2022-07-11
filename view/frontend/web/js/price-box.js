@@ -2,8 +2,7 @@ define([
     'jquery',
     'Magento_Catalog/js/price-utils',
     'underscore',
-    'mage/template',
-    'jquery/ui'
+    'mage/template'
 ], function ($, utils, _, mageTemplate) {
     'use strict';
 
