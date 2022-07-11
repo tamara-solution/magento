@@ -33,7 +33,7 @@ define(
 
         return Component.extend({
             defaults: {
-                template: 'Tamara_Checkout/payment/tamara_pay_later',
+                template: 'Tamara_Checkout/payment/tamara_pay_next_month',
             },
             tamaraImageSrc: window.populateTamara.tamaraLogoImageUrl,
             tamaraBadgeSrc: window.populateTamara.tamaraBadgeUrl,
@@ -54,13 +54,13 @@ define(
             initObservable: function () {
                 this._super()
                     .observe([
-                        'tamaraPayLater'
+                        'tamaraPayNextMonth'
                     ]);
 
                 return this;
             },
 
-            successPayLater: function () {
+            successPayNextMonth: function () {
                 if (window.checkoutConfig.payment.tamara.use_magento_checkout_success) {
                     window.location.replace(url.build(window.checkoutConfig.defaultSuccessPageUrl));
                 } else {
@@ -69,18 +69,18 @@ define(
                 }
             },
 
-            failedPayLater: function () {
+            failedPayNextMonth: function () {
                 let orderId = window.magentoOrderId;
                 window.location.replace(url.build('tamara/payment/' + orderId + '/failure'));
             },
 
-            cancelPayLater: function () {
+            cancelPayNextMonth: function () {
                 let orderId = window.magentoOrderId;
                 window.location.replace(url.build('tamara/payment/' + orderId + '/cancel'));
             },
 
             getCode: function () {
-                return 'tamara_pay_later';
+                return 'tamara_pay_next_month';
             },
 
             getData: function () {
@@ -90,19 +90,19 @@ define(
             },
 
             getMinLimit: function () {
-                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_later.min_limit);
+                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_next_month.min_limit);
             },
 
             getMinLimitAmount: function () {
-                return window.checkoutConfig.payment.tamara_pay_later.min_limit;
+                return window.checkoutConfig.payment.tamara_pay_next_month.min_limit;
             },
 
             getMaxLimit: function () {
-                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_later.max_limit);
+                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_next_month.max_limit);
             },
 
             getMaxLimitAmount: function () {
-                return window.checkoutConfig.payment.tamara_pay_later.max_limit;
+                return window.checkoutConfig.payment.tamara_pay_next_month.max_limit;
             },
 
             getGrandTotal: function () {
@@ -116,7 +116,7 @@ define(
             },
 
             isTotalAmountInLimit: function () {
-                var tamaraConfig = window.checkoutConfig.payment.tamara_pay_later;
+                var tamaraConfig = window.checkoutConfig.payment.tamara_pay_next_month;
                 var grandTotal = this.getGrandTotal();
                 return !(grandTotal < parseFloat(tamaraConfig.min_limit) || grandTotal > parseFloat(tamaraConfig.max_limit));
             },
@@ -168,10 +168,10 @@ define(
                                 }
                             }
                         ).always(
-                            function () {
-                                self.isPlaceOrderActionAllowed(true);
-                            }
-                        );
+                        function () {
+                            self.isPlaceOrderActionAllowed(true);
+                        }
+                    );
 
                     return true;
                 }
@@ -200,7 +200,7 @@ define(
                     success: function (response) {
                         fullScreenLoader.stopLoader(true);
                         if (response.success) {
-                            jQuery('#order-id-paylater').val(response.orderId);
+                            jQuery('#order-id-pay-next-month').val(response.orderId);
                             window.magentoOrderId = response.orderId;
                             window.location.replace(response.redirectUrl);
                         } else {
@@ -235,7 +235,7 @@ define(
             },
 
             getTitle: function () {
-                return $.mage.__('Pay later within 30 days, interest-free');
+                return $.mage.__('Pay it next month');
             }
         });
     }

@@ -258,4 +258,37 @@ class BaseConfig extends MagentoPaymentConfig
     public function getTamaraCore() {
         return $this->tamaraCore;
     }
+
+    public function getPublicKey($storeId = null) {
+        return $this->getValue('public_key', $storeId);
+    }
+
+    public static function convertPaymentMethodFromMagentoToTamara($paymentMethod) {
+        if (\Tamara\Checkout\Gateway\Config\InstalmentConfig::isInstallmentsPayment($paymentMethod)) {
+            return \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAY_BY_INSTALMENTS;
+        }
+        if ($paymentMethod == \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE) {
+            return \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAY_BY_LATER;
+        }
+        if ($paymentMethod == \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAYMENT_TYPE_CODE) {
+            return \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAY_NEXT_MONTH;
+        }
+        if ($paymentMethod == \Tamara\Checkout\Gateway\Config\SingleCheckoutConfig::PAYMENT_TYPE_CODE) {
+            return \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAY_BY_INSTALMENTS;
+        }
+        throw new \InvalidArgumentException("Tamara payment method is not supported");
+    }
+
+    public static function convertPaymentMethodFromTamaraToMagento($paymentMethod) {
+        if ($paymentMethod == \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAY_BY_LATER) {
+            return \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE;
+        }
+        if ($paymentMethod == \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAY_NEXT_MONTH) {
+            return \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAYMENT_TYPE_CODE;
+        }
+        if ($paymentMethod == \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAY_BY_INSTALMENTS) {
+            return \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE;
+        }
+        throw new \InvalidArgumentException("Tamara payment method is not supported");
+    }
 }

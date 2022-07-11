@@ -55,7 +55,8 @@ class AddressDataBuilder implements BuilderInterface
         $shipping->setPostalCode($shippingAddress->getPostcode());
 
         $billing->setLastName($billingAddress->getLastname());
-        $billing->setLine1($billingAddress->getStreetLine1());
+        $billingAddressLine1 = empty($billingAddress->getStreetLine1()) ? self::EMPTY : $billingAddress->getStreetLine1();
+        $billing->setLine1($billingAddressLine1);
         $billing->setFirstName($billingAddress->getFirstname());
         $billing->setLine2($billingAddress->getStreetLine2() ?? '');
         $billing->setRegion($regionBilling);

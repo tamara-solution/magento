@@ -15,15 +15,25 @@ $availableMethod = $block->getPaymentMethodForPdpWidget($productFinalPrice);
     if ($block->isArabicLanguage()) {
         $lang = 'ar';
     }
+    $currencyCode = $block->getStoreCurrencyCode();
+    $countryCode = "";
+    if (!empty(\Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$currencyCode])){
+        $countryCode = \Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$currencyCode];
+    }
+    if ($block->isProductionApiEnvironment()) {
+        $widgetUrl = "https://cdn.tamara.co/widget/product-widget.min.js";
+    } else {
+        $widgetUrl = "https://cdn-sandbox.tamara.co/widget/product-widget.min.js";
+    }
     ?>
-    <script charset="utf-8" src="https://cdn.tamara.co/widget/product-widget.min.js"></script>
+    <script charset="utf-8" src="<?= $widgetUrl ?>"></script>
     <script>
-        require(['jquery', 'jquery/ui'], function($){
+        require(['jquery'], function($){
             var countExistTamaraProductWidget = 0;
             var existTamaraProductWidget = setInterval(function() {
                 if ($('#tamara-product-widget').length && window.TamaraProductWidget) {
                     $("#tamara-product-widget").empty();
-                    window.TamaraProductWidget.init({ lang: '<?= $lang; ?>' });
+                    window.TamaraProductWidget.init({ lang: '<?= $lang; ?>', currency: '<?= $currencyCode; ?>', publicKey: '<?= $block->getPublicKey(); ?>'});
                     window.TamaraProductWidget.render();
                     clearInterval(existTamaraProductWidget);
                 }
@@ -34,15 +44,22 @@ $availableMethod = $block->getPaymentMethodForPdpWidget($productFinalPrice);
         });
     </script>
 
-    <?php if ($availableMethod['name'] == \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE): ?>
-        <div class="tamara-product-widget" id="tamara-product-widget" data-payment-type="paylater" data-disable-product-limit="true" data-disable-paylater="false" data-pay-later-max-amount="<?= $availableMethod['max_limit'] ?>" data-price="<?= $productFinalPrice; ?>" data-currency="<?= $block->getStoreCurrencyCode(); ?>" data-disable-installment="true"  data-lang="<?= $lang; ?>"></div>
-    <?php else: ?>
-        <?php
-            $numberOfInstallments = \Tamara\Checkout\Gateway\Config\InstalmentConfig::getInstallmentsNumberByPaymentCode($availableMethod['name']);
-        ?>
-        <div class="tamara-product-widget" id="tamara-product-widget" data-disable-paylater="true" data-price="<?= $productFinalPrice; ?>" data-currency="<?= $block->getStoreCurrencyCode(); ?>" data-payment-type="installment" data-lang="<?= $lang; ?>" data-number-of-installments="<?= $numberOfInstallments; ?>" data-installment-minimum-amount="<?= $availableMethod['min_limit']; ?>"></div>
-    <?php endif; ?>
+    <?php
+    $str = '<div id="tamara-product-widget" class="tamara-product-widget" data-lang="'. $lang .'" data-price="'. $productFinalPrice .'" data-installment-available-amount="'. $availableMethod['min_limit'] .'" data-currency="'. $availableMethod['currency'] .'" data-country-code="'. $countryCode .'"';
+    if (\Tamara\Checkout\Gateway\Config\InstalmentConfig::isInstallmentsPayment($availableMethod['name'])) {
+        $str .= (' data-payment-type="installment" data-number-of-installments="'.$availableMethod['number_of_instalments'].'" data-installment-minimum-amount="' .$availableMethod['min_limit']. '" data-installment-maximum-amount="'.$availableMethod['max_limit'].'" data-disable-paylater="true"></div>');
+    } else {
+        if ($availableMethod['name'] == \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE) {
+            $str .= (' data-payment-type="paylater" data-disable-paylater="false" data-disable-product-limit="true" data-disable-installment="true" data-pay-later-max-amount="'. $availableMethod['max_limit'] .'"></div>');
+        } else {
+            if ($availableMethod['name'] == \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAYMENT_TYPE_CODE) {
+                $str .= (' data-payment-type="pay-next-month" data-disable-paylater="true" data-disable-installment="false"></div>');
+            }
+        }
+    }
+    echo $str;
+    ?>
 <?php endif; ?>
 <?php
-    end:
+end:
 ?>

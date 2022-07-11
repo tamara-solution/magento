@@ -11,6 +11,7 @@ class InstalmentConfig extends MagentoPaymentConfig
     const PAYMENT_TYPE_CODE = 'tamara_pay_by_instalments',
           TITLE = 'title',
           ACTIVE = 'active';
+    const PAYMENT_TYPE_CODE_2 = 'tamara_pay_by_instalments_2';
     const PAYMENT_TYPE_CODE_4 = 'tamara_pay_by_instalments_4';
     const PAYMENT_TYPE_CODE_5 = 'tamara_pay_by_instalments_5';
     const PAYMENT_TYPE_CODE_6 = 'tamara_pay_by_instalments_6';

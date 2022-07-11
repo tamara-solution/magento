@@ -3,9 +3,15 @@
 /**
  * @var $block \Tamara\Checkout\Block\PopulateTamara
  */
+
+if ($block->isProductionEnvironment()) {
+    $baseWidgetUrl = "https://cdn.tamara.co/";
+} else {
+    $baseWidgetUrl = "https://cdn-sandbox.tamara.co/";
+}
 ?>
 <script>
     window.populateTamara = <?php /* @escapeNotVerified */ echo \Zend_Json::encode($block->getTamaraConfig()); ?>;
 </script>
-<script charset="utf-8" src="https://cdn.tamara.co/widget/product-widget.min.js"></script>
-<script charset="utf-8" src="https://cdn.tamara.co/widget/installment-plan.min.js"></script>
+<script charset="utf-8" src="<?= $baseWidgetUrl ?>widget/product-widget.min.js"></script>
+<script charset="utf-8" src="<?= $baseWidgetUrl ?>widget/installment-plan.min.js"></script>

@@ -13,7 +13,7 @@
         <label class="label" data-bind="attr: {'for': getCode()}">
             <!-- ko if: isTotalAmountInLimit() -->
             <img data-bind="attr: {src: tamaraBadgeSrc, alt: $t('Tamara')}" class="payment-icon" /><span data-bind="text: getTitle()"></span>
-            <a class="tamara-product-widget" data-bind="attr: {'id':'tamara-product-widget-' + getNumberOfInstalments(), 'data-lang': getPaymentLanguage(), 'data-price': getGrandTotal(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-payment-type': 'installment', 'data-number-of-installments': getNumberOfInstalments(), 'data-inject-template': 'false', 'data-installment-minimum-amount': getMinLimitAmount(), 'data-installment-available-amount': getMinLimitAmount(), 'href': 'javascript:void(0)'}">
+            <a class="tamara-product-widget" data-payment-type="pay-next-month" data-disable-installment="true" data-disable-paylater="true" data-inject-template="false" data-bind="attr: {'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal()}" href="javascript:void(0)">
                 <img data-bind="attr: {src: tamaraImageSrc, alt: $t('Tamara')}" class="payment-icon" />
             </a>
             <!-- /ko -->
@@ -24,7 +24,7 @@
     </div>
 
     <div class="payment-method-content">
-        <div class="message error message-error hidden-error-iframe" data-bind="attr: {'id': 'error-iframe-pay-by-instalments-' + getNumberOfInstalments()}">
+        <div class="message error message-error hidden-error-iframe" id="error-iframe">
         </div>
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
@@ -58,17 +58,11 @@
         </div>
 
         <div class="params">
-            <input type="hidden" data-bind="attr: {'id': 'order-id-pay-by-instalments-' + getNumberOfInstalments()}" value="0" />
-            <input type="hidden" class="render-product-widget" data-bind="visible: renderProductWidget()" />
-            <input type="hidden" class="render-installments-widget" data-bind="visible: renderInstallmentsPlanWidget()" />
+            <input type="hidden" id="order-id-pay-next-month" value="0" />
+            <input class="render-product-widget" data-bind="visible: renderProductWidget()" />
         </div>
 
-        <!-- ko if: (!shouldShowError()) -->
-        <div class="tamara-installment-plan-widget" data-bind="attr: {'id': 'tamara-installment-plan-widget-' + getNumberOfInstalments(), 'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal(), 'data-installment-minimum-amount': getMinLimitAmount(), 'data-installment-maximum-amount': getMaxLimitAmount(), 'data-installment-available-amount': getMinLimitAmount(), 'data-number-of-installments': getNumberOfInstalments()}"
-        ></div>
-        <!-- /ko -->
-
-        <div class="actions-toolbar" style="margin-top: 10px;">
+        <div class="actions-toolbar">
             <div class="primary">
                 <button class="action primary checkout"
                         type="submit"

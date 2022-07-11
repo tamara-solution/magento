@@ -63,7 +63,10 @@ class ItemsDataBuilder implements BuilderInterface
                 $orderItem->setSku($item->getSku());
                 $orderItem->setTotalAmount(new Money($this->calculatePriceItem($item), $currencyCode));
                 $orderItem->setTaxAmount(new Money($item->getTaxAmount(), $currencyCode));
-                $orderItem->setDiscountAmount(new Money($item->getDiscountAmount(), $currencyCode));
+                $discountAmountForItem = floatval($item->getDiscountAmount());
+                if ($discountAmountForItem > 0.00) {
+                    $orderItem->setDiscountAmount(new Money($discountAmountForItem, $currencyCode));
+                }
                 $orderItem->setReferenceId($item->getItemId());
                 $orderItem->setImageUrl($this->getImageUrlFromProductId($item->getProductId()));
                 $orderItemCollection->append($orderItem);

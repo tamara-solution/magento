@@ -11,15 +11,16 @@
                class="radio"
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
         <label class="label" data-bind="attr: {'for': getCode()}">
-            <span data-bind="text: getTitle()"></span>
-        </label>
-        <!-- ko if: isTotalAmountInLimit() -->
-        <div style="width: 255px; display: inline-block; margin-left: 16px;">
-            <a class="tamara-product-widget" data-bind="attr: {'id':'tamara-product-widget-' + getNumberOfInstalments(), 'data-lang': getPaymentLanguage(), 'data-price': getGrandTotal(), 'data-currency': currencyCode, 'data-payment-type': 'installment', 'data-number-of-installments': getNumberOfInstalments(), 'data-inject-template': 'false', 'data-installment-minimum-amount': getMinLimitAmount(), 'href': 'javascript:void(0)'}">
+            <!-- ko if: isTotalAmountInLimit() -->
+            <img data-bind="attr: {src: tamaraBadgeSrc, alt: $t('Tamara')}" class="payment-icon" /><span data-bind="text: getTitle()"></span>
+            <a class="tamara-product-widget" data-bind="attr: {'id':'tamara-product-widget-' + getNumberOfInstalments(), 'data-lang': getPaymentLanguage(), 'data-price': getGrandTotal(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-payment-type': 'installment', 'data-number-of-installments': getNumberOfInstalments(), 'data-inject-template': 'false', 'data-installment-minimum-amount': getMinLimitAmount(), 'data-installment-available-amount': getMinLimitAmount(), 'href': 'javascript:void(0)'}">
                 <img data-bind="attr: {src: tamaraImageSrc, alt: $t('Tamara')}" class="payment-icon" />
             </a>
-        </div>
-        <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko ifnot: isTotalAmountInLimit() -->
+            <img data-bind="attr: {src: tamaraBadgeSrc, alt: $t('Tamara')}" class="payment-icon" /><span data-bind="text: getTitle()"></span>
+            <!-- /ko -->
+        </label>
     </div>
 
     <div class="payment-method-content">
@@ -41,7 +42,7 @@
         </div>
 
         <div data-bind="visible: shouldShowError()">
-            <h4 data-bind="i18n: 'Pay in 3 Instalments information'"></h4>
+            <h4 data-bind="i18n: 'Payment information'"></h4>
             <ul>
                 <li>
                     <span data-bind="text: $t('Min Limit') + ' : ' + getMinLimit()"></span>
@@ -63,7 +64,7 @@
         </div>
 
         <!-- ko if: (!shouldShowError()) -->
-        <div class="tamara-installment-plan-widget" data-bind="attr: {'id': 'tamara-installment-plan-widget-' + getNumberOfInstalments(), 'data-lang': getPaymentLanguage(), 'data-price': getGrandTotal(), 'data-currency': currencyCode, 'data-installment-minimum-amount': getMinLimitAmount(), 'data-installment-maximum-amount': getMaxLimitAmount(), 'data-number-of-installments': getNumberOfInstalments()}"
+        <div class="tamara-installment-plan-widget" data-bind="attr: {'id': 'tamara-installment-plan-widget-' + getNumberOfInstalments(), 'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal(), 'data-installment-minimum-amount': getMinLimitAmount(), 'data-installment-maximum-amount': getMaxLimitAmount(), 'data-installment-available-amount': getMinLimitAmount(), 'data-number-of-installments': getNumberOfInstalments()}"
         ></div>
         <!-- /ko -->
 

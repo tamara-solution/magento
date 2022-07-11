@@ -54,6 +54,9 @@ class Available
         //Remove Tamara payment for these products
         $excludeProductIds = explode(",", $this->config->getExcludeProductIds($quote->getStoreId()));
         $quoteItems = $quote->getItems();
+        if (!is_array($quoteItems)) {
+            return $availableMethods;
+        }
         foreach ($quoteItems as $item) {
             
             /**

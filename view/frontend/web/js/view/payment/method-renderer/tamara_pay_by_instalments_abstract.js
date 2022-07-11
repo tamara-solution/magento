@@ -36,7 +36,9 @@ define(
                 redirectAfterPlaceOrder: false
             },
             tamaraImageSrc: window.populateTamara.tamaraLogoImageUrl,
+            tamaraBadgeSrc: window.populateTamara.tamaraBadgeUrl,
             tamaraLink: window.populateTamara.tamaraAboutLink,
+            countryCode: window.populateTamara.tamaraCountryCode,
             currencyCode: window.checkoutConfig.totalsData.quote_currency_code,
             redirectAfterPlaceOrder: false,
             preventPlaceOrderWhenError: false,
@@ -210,11 +212,17 @@ define(
                 return 'en';
             },
 
+            getPublicKey: function() {
+                return window.checkoutConfig.payment.tamara.public_key;
+            },
+
             renderProductWidget: function () {
+                var self = this;
                 var countExistTamaraProductWidget = 0;
                 var existTamaraPaymentProductWidget = setInterval(function() {
                     if ($('.tamara-product-widget').length) {
                         if (window.TamaraProductWidget) {
+                            window.TamaraProductWidget.init({ lang: self.getPaymentLanguage(), currency: self.currencyCode, publicKey: self.getPublicKey()});
                             window.TamaraProductWidget.render();
                             clearInterval(existTamaraPaymentProductWidget);
                         }
@@ -227,11 +235,13 @@ define(
             },
 
             renderInstallmentsPlanWidget: function (numberOfInstallments) {
+                var self = this;
                 var countExistTamaraInstallmentsPlan = 0;
                 var existTamaraInstallmentsPlan = setInterval(function() {
                     if ($('.tamara-installment-plan-widget').length) {
                         if (window.TamaraInstallmentPlan) {
                             $('.tamara-installment-plan-widget').empty();
+                            window.TamaraInstallmentPlan.init({ lang: self.getPaymentLanguage(), currency: self.currencyCode, publicKey: self.getPublicKey()});
                             window.TamaraInstallmentPlan.render();
                             clearInterval(existTamaraInstallmentsPlan);
                         }
@@ -241,6 +251,10 @@ define(
                     }
                 }, 300);
                 return false;
+            },
+
+            getTitle: function () {
+                return $.mage.__('Split in %1, interest-free').replace('%1', this.getNumberOfInstalments());
             }
         });
     }

@@ -192,4 +192,12 @@ class Popup extends Template
         }
         return true;
     }
+
+    public function getPublicKey() {
+        return $this->config->getPublicKey();
+    }
+    
+    public function isProductionApiEnvironment() {
+        return $this->config->isProductionApiEnvironment();
+    }
 }

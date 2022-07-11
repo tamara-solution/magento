@@ -3,6 +3,8 @@
 namespace Tamara\Checkout\Model\Helper;
 
 use Magento\Sales\Model\Order\Item;
+use Tamara\Checkout\Gateway\Config\PayNextMonthConfig;
+use Tamara\Checkout\Gateway\Config\SingleCheckoutConfig;
 use Tamara\Checkout\Gateway\Config\PayLaterConfig;
 use Tamara\Checkout\Gateway\Config\InstalmentConfig;
 use Tamara\Checkout\Model\CaptureItem;
@@ -21,7 +23,10 @@ use Tamara\Response\Payment\CancelResponse;
 class PaymentHelper
 {
     public const ALLOWED_PAYMENTS = [
+        SingleCheckoutConfig::PAYMENT_TYPE_CODE,
         PayLaterConfig::PAYMENT_TYPE_CODE,
+        PayNextMonthConfig::PAYMENT_TYPE_CODE,
+        InstalmentConfig::PAYMENT_TYPE_CODE_2,
         InstalmentConfig::PAYMENT_TYPE_CODE,
         InstalmentConfig::PAYMENT_TYPE_CODE_4,
         InstalmentConfig::PAYMENT_TYPE_CODE_5,
@@ -185,7 +190,10 @@ class PaymentHelper
             $orderItem->setUnitPrice(new Money($item->getPrice(), $data['currency']));
             $orderItem->setTotalAmount(new Money(self::getItemTotalAmount($item), $data['currency']));
             $orderItem->setTaxAmount(new Money($item->getTaxAmount(), $data['currency']));
-            $orderItem->setDiscountAmount(new Money($item->getDiscountAmount(), $data['currency']));
+            $discountAmountForItem = floatval($item->getDiscountAmount());
+            if ($discountAmountForItem > 0.00) {
+                $orderItem->setDiscountAmount(new Money($discountAmountForItem, $data['currency']));
+            }
             $orderItem->setQuantity($item->getQtyOrdered());
             $itemCollection->append($orderItem);
         }
@@ -222,7 +230,9 @@ class PaymentHelper
         $orderItem->setUnitPrice(new Money($item['unit_price'], $data['currency']));
         $orderItem->setTotalAmount(new Money($item['total_amount'], $data['currency']));
         $orderItem->setTaxAmount(new Money($item['tax_amount'] ?? 0, $data['currency']));
-        $orderItem->setDiscountAmount(new Money($item['discount_amount'] ?? 0, $data['currency']));
+        if (!empty($item['discount_amount'])) {
+            $orderItem->setDiscountAmount(new Money(floatval($item['discount_amount']), $data['currency']));
+        }
         $orderItem->setQuantity($item['quantity']);
         $orderItem->setImageUrl($item['image_url'] ?? '');
 

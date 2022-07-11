@@ -61,18 +61,25 @@ class CommonDataBuilder implements BuilderInterface
         $phoneVerified = $buildSubject['phone_verified'];
         $numberOfInstallments = null;
 
-        $discountName = $order->getCouponCode() ?? 'N/A';
-        $discountAmount = new Discount($discountName, new Money($order->getDiscountAmount(), $currencyCode));
-        $paymentMethod = $order->getPayment()->getMethod();
-        $paymentType = "";
-        if (\Tamara\Checkout\Gateway\Config\InstalmentConfig::isInstallmentsPayment($paymentMethod)) {
-            $paymentType = \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAY_BY_INSTALMENTS;
-            $numberOfInstallments = \Tamara\Checkout\Gateway\Config\InstalmentConfig::getInstallmentsNumberByPaymentCode($paymentMethod);
+        $magentoDiscountAmount = $order->getDiscountAmount();
+        if (is_null($magentoDiscountAmount) || $magentoDiscountAmount < 0.00000001) {
+            $discountName = "";
+            $magentoDiscountAmount = 0.00;
         } else {
-            if ($paymentMethod == \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE) {
-                $paymentType = \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAY_BY_LATER;
+            if (empty($order->getCouponCode())) {
+                $discountName = "N/A";
             } else {
-                throw new \InvalidArgumentException("Tamara payment method is not supported");
+                $discountName = $order->getCouponCode();
+            }
+        }
+        $discountAmount = new Discount($discountName, new Money($magentoDiscountAmount, $currencyCode));
+        $paymentMethod = $order->getPayment()->getMethod();
+        $paymentType = \Tamara\Checkout\Gateway\Config\BaseConfig::convertPaymentMethodFromMagentoToTamara($paymentMethod);
+        if ($paymentType == \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAY_BY_INSTALMENTS) {
+            if ($paymentMethod == \Tamara\Checkout\Gateway\Config\SingleCheckoutConfig::PAYMENT_TYPE_CODE) {
+                $numberOfInstallments = 3;
+            } else {
+                $numberOfInstallments = \Tamara\Checkout\Gateway\Config\InstalmentConfig::getInstallmentsNumberByPaymentCode($paymentMethod);
             }
         }
 

@@ -1,3 +1,17 @@
+2.11.24
+    New:
+    + Add new method pay next month
+    + Add new method pay in 2 installments
+    + Support public key for widgets
+    + Improve discount obj name in payload of checkout request
+    + Improve discount amount of items in payload of checkout request
+    + Skip notification message if an order was authorized
+    + Improve display of configuration on admin page
+    + Support sandbox for the widgets
+    + Remove jquery ui in js dependency
+    + Add Tamara logo to method title
+    + Update new payment method title on checkout page
+    + Don't allow editing of payment method title from admin page
 2.11.23
     New:
     + Update new logos
