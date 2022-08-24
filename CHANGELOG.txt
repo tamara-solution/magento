@@ -1,3 +1,12 @@
+2.11.26
+    New:
+    + Add Pay now
+    + Move widget to below product price
+    + Make the plugin compatible with PHP 8
+2.11.25
+    New:
+    + Add post credit check API
+    + Convert the discount amount to a positive number before sending it to Tamara
 2.11.24
     New:
     + Add new method pay next month

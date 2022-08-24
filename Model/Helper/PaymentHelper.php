@@ -4,6 +4,7 @@ namespace Tamara\Checkout\Model\Helper;
 
 use Magento\Sales\Model\Order\Item;
 use Tamara\Checkout\Gateway\Config\PayNextMonthConfig;
+use Tamara\Checkout\Gateway\Config\PayNowConfig;
 use Tamara\Checkout\Gateway\Config\SingleCheckoutConfig;
 use Tamara\Checkout\Gateway\Config\PayLaterConfig;
 use Tamara\Checkout\Gateway\Config\InstalmentConfig;
@@ -26,6 +27,7 @@ class PaymentHelper
         SingleCheckoutConfig::PAYMENT_TYPE_CODE,
         PayLaterConfig::PAYMENT_TYPE_CODE,
         PayNextMonthConfig::PAYMENT_TYPE_CODE,
+        PayNowConfig::PAYMENT_TYPE_CODE,
         InstalmentConfig::PAYMENT_TYPE_CODE_2,
         InstalmentConfig::PAYMENT_TYPE_CODE,
         InstalmentConfig::PAYMENT_TYPE_CODE_4,

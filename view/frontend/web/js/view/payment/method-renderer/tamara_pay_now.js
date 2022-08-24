@@ -33,7 +33,7 @@ define(
 
         return Component.extend({
             defaults: {
-                template: 'Tamara_Checkout/payment/tamara_pay_next_month',
+                template: 'Tamara_Checkout/payment/tamara_pay_now',
             },
             tamaraImageSrc: window.populateTamara.tamaraLogoImageUrl,
             tamaraBadgeSrc: window.populateTamara.tamaraBadgeUrl,
@@ -54,13 +54,13 @@ define(
             initObservable: function () {
                 this._super()
                     .observe([
-                        'tamaraPayNextMonth'
+                        'tamaraPayNow'
                     ]);
 
                 return this;
             },
 
-            successPayNextMonth: function () {
+            successPayNow: function () {
                 if (window.checkoutConfig.payment.tamara.use_magento_checkout_success) {
                     window.location.replace(url.build(window.checkoutConfig.defaultSuccessPageUrl));
                 } else {
@@ -69,18 +69,18 @@ define(
                 }
             },
 
-            failedPayNextMonth: function () {
+            failedPayNow: function () {
                 let orderId = window.magentoOrderId;
                 window.location.replace(url.build('tamara/payment/' + orderId + '/failure'));
             },
 
-            cancelPayNextMonth: function () {
+            cancelPayNow: function () {
                 let orderId = window.magentoOrderId;
                 window.location.replace(url.build('tamara/payment/' + orderId + '/cancel'));
             },
 
             getCode: function () {
-                return 'tamara_pay_next_month';
+                return 'tamara_pay_now';
             },
 
             getData: function () {
@@ -90,19 +90,19 @@ define(
             },
 
             getMinLimit: function () {
-                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_next_month.min_limit);
+                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_now.min_limit);
             },
 
             getMinLimitAmount: function () {
-                return window.checkoutConfig.payment.tamara_pay_next_month.min_limit;
+                return window.checkoutConfig.payment.tamara_pay_now.min_limit;
             },
 
             getMaxLimit: function () {
-                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_next_month.max_limit);
+                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_now.max_limit);
             },
 
             getMaxLimitAmount: function () {
-                return window.checkoutConfig.payment.tamara_pay_next_month.max_limit;
+                return window.checkoutConfig.payment.tamara_pay_now.max_limit;
             },
 
             getGrandTotal: function () {
@@ -116,7 +116,7 @@ define(
             },
 
             isTotalAmountInLimit: function () {
-                var tamaraConfig = window.checkoutConfig.payment.tamara_pay_next_month;
+                var tamaraConfig = window.checkoutConfig.payment.tamara_pay_now;
                 var grandTotal = this.getGrandTotal();
                 return !(grandTotal < parseFloat(tamaraConfig.min_limit) || grandTotal > parseFloat(tamaraConfig.max_limit));
             },
@@ -203,7 +203,7 @@ define(
                     success: function (response) {
                         fullScreenLoader.stopLoader(true);
                         if (response.success) {
-                            jQuery('#order-id-pay-next-month').val(response.orderId);
+                            jQuery('#order-id-pay-now').val(response.orderId);
                             window.magentoOrderId = response.orderId;
                             window.location.replace(response.redirectUrl);
                         } else {
@@ -219,26 +219,8 @@ define(
                 });
             },
 
-            renderProductWidget: function () {
-                var self = this;
-                var countExistTamaraProductWidget = 0;
-                var existTamaraPaymentProductWidget = setInterval(function() {
-                    if ($('.tamara-product-widget').length) {
-                        if (window.TamaraProductWidget) {
-                            window.TamaraProductWidget.init({ lang: self.getPaymentLanguage(), currency: self.currencyCode, publicKey: self.getPublicKey()});
-                            window.TamaraProductWidget.render();
-                            clearInterval(existTamaraPaymentProductWidget);
-                        }
-                    }
-                    if (++countExistTamaraProductWidget > 33) {
-                        clearInterval(existTamaraPaymentProductWidget);
-                    }
-                }, 300);
-                return false;
-            },
-
             getTitle: function () {
-                return $.mage.__('Pay it next month');
+                return $.mage.__('Pay now using Mada, Apple Pay or Credit card');
             }
         });
     }

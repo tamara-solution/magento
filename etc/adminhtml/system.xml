@@ -148,6 +148,12 @@
                         <config_path>payment/tamara_checkout/display_limit_warning</config_path>
                         <comment>If yes, The extension will display a warning message on the checkout page if the payment method is not available for the order, Otherwise, the payment method will be hidden</comment>
                     </field>
+                    <field id="enable_post_credit_check" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable post credit check</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/tamara_checkout/enable_post_credit_check</config_path>
+                        <comment>If yes, the extension will only show payment methods that the customer is eligible to use</comment>
+                    </field>
                 </group>
 
                 <group id="payment_types" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -203,6 +209,34 @@
                             <label>Sort Order</label>
                             <frontend_class>validate-number</frontend_class>
                             <config_path>payment/tamara_pay_next_month/sort_order</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                    </group>
+
+                    <group id="type_pay_now" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+
+                        <label>Pay now</label>
+
+                        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled Pay now</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/tamara_pay_now/active</config_path>
+                        </field>
+                        <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Payment Action</label>
+                            <source_model>Tamara\Checkout\Model\Adminhtml\Source\PaymentAction</source_model>
+                            <config_path>payment/tamara_pay_now/payment_action</config_path>
+                            <depends>
+                                <field id="active">1</field>
+                            </depends>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
+                               showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/tamara_pay_now/sort_order</config_path>
                             <depends>
                                 <field id="active">1</field>
                             </depends>

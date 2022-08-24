@@ -25,6 +25,17 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="Tamara\Checkout\Model\PayNow" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">Tamara\Checkout\Gateway\Config\PayNowConfig::PAYMENT_TYPE_CODE</argument>
+            <argument name="valueHandlerPool" xsi:type="object">TamaraValueHandlerPayNowPool</argument>
+            <argument name="commandPool" xsi:type="object">TamaraCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">TamaraValidatorPool</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Tamara\Checkout\Block\Info</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Create Tamara Pay By Instalments -->
     <virtualType name="Tamara\Checkout\Model\PayByInstalments2" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
@@ -216,6 +227,14 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="TamaraValueHandlerPayNowPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">TamaraConfigValueHandlerPayNow</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
     <virtualType name="TamaraValueHandlerPayByInstalments2Pool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
         <arguments>
             <argument name="handlers" xsi:type="array">
@@ -303,6 +322,11 @@
     <virtualType name="TamaraConfigValueHandlerPayNextMonth" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
         <arguments>
             <argument name="configInterface" xsi:type="object">Tamara\Checkout\Gateway\Config\PayNextMonthConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TamaraConfigValueHandlerPayNow" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">Tamara\Checkout\Gateway\Config\PayNowConfig</argument>
         </arguments>
     </virtualType>
 

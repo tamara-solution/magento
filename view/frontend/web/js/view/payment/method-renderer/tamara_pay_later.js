@@ -122,6 +122,9 @@ define(
             },
 
             shouldShowError: function () {
+                if (window.checkoutConfig.payment.tamara.enable_post_credit_check) {
+                    return false;
+                }
                 return !this.isTotalAmountInLimit();
             },
 

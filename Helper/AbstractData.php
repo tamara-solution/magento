@@ -158,6 +158,27 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
     }
 
     /**
+     * @param \Tamara\Model\Money $totalAmount
+     * @param string $countryCode
+     * @param null $items
+     * @param null $consumer
+     * @param null $shippingAddress
+     * @param null $riskAssessment
+     * @param array $additionalData
+     * @param int $storeId
+     * @return array
+     * @throws \Tamara\Exception\RequestDispatcherException
+     */
+    public function getPaymentTypesV2(\Tamara\Model\Money $totalAmount, string $countryCode, $items = null,
+        $consumer = null, $shippingAddress = null, $riskAssessment = null, $additionalData = [], $storeId = 0) {
+        $adapter = $this->tamaraAdapterFactory->create($storeId);
+        $request = new \Tamara\Request\Checkout\GetPaymentTypesV2Request(
+            $totalAmount, $countryCode, $items, $consumer, $shippingAddress, $riskAssessment, $additionalData
+        );
+        return $adapter->parsePaymentTypesResponse($adapter->getClient()->getPaymentTypesV2($request));
+    }
+
+    /**
      * @param $currency
      * @param $storeId
      * @return bool
@@ -181,7 +202,7 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
         if ((int)$this->getTamaraConfig()->getValue('allowspecific', $storeId) === 1) {
             $availableCountries = explode(
                 ',',
-                $this->getTamaraConfig()->getValue('specificcountry', $storeId)
+                strval($this->getTamaraConfig()->getValue('specificcountry', $storeId))
             );
 
             if (!in_array($country, $availableCountries)) {

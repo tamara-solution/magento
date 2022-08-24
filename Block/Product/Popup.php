@@ -186,7 +186,7 @@ class Popup extends Template
         if (!$this->config->getEnableTamaraPdpWidget($currentProduct->getStoreId())) {
             return false;
         }
-        $excludeProductIds = explode("," , $this->config->getExcludeProductIds($currentProduct->getStoreId()));
+        $excludeProductIds = explode("," , strval($this->config->getExcludeProductIds($currentProduct->getStoreId())));
         if (in_array($currentProduct->getEntityId(), $excludeProductIds)) {
             return false;
         }
