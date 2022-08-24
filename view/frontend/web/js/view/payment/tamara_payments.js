@@ -18,6 +18,10 @@ define(
                 component: 'Tamara_Checkout/js/view/payment/method-renderer/tamara_pay_next_month'
             },
             {
+                type: 'tamara_pay_now',
+                component: 'Tamara_Checkout/js/view/payment/method-renderer/tamara_pay_now'
+            },
+            {
                 type: 'tamara_pay_by_instalments_2',
                 component: 'Tamara_Checkout/js/view/payment/method-renderer/tamara_pay_by_instalments_2'
             },

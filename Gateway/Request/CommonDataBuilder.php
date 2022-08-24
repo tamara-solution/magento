@@ -60,8 +60,8 @@ class CommonDataBuilder implements BuilderInterface
         $phoneVerified = $buildSubject['phone_verified'];
         $numberOfInstallments = null;
 
-        $magentoDiscountAmount = $order->getDiscountAmount();
-        if (is_null($magentoDiscountAmount) || $magentoDiscountAmount < 0.00000001) {
+        $magentoDiscountAmount = abs(floatval($order->getDiscountAmount()));
+        if ($magentoDiscountAmount < 0.00000001) {
             $discountName = "";
             $magentoDiscountAmount = 0.00;
         } else {

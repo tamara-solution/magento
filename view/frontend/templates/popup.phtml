@@ -54,6 +54,10 @@ $availableMethod = $block->getPaymentMethodForPdpWidget($productFinalPrice);
         } else {
             if ($availableMethod['name'] == \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAYMENT_TYPE_CODE) {
                 $str .= (' data-payment-type="pay-next-month" data-disable-paylater="true" data-disable-installment="false"></div>');
+            } else {
+                if ($availableMethod['name'] == \Tamara\Checkout\Gateway\Config\PayNowConfig::PAYMENT_TYPE_CODE) {
+                    $str .= (' data-payment-type="pay-now" data-disable-paylater="true" data-disable-installment="true"></div>');
+                }
             }
         }
     }

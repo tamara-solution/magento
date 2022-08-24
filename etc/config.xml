@@ -47,6 +47,20 @@
                 <sort_order>1</sort_order>
                 <group>tamara</group>
             </tamara_pay_next_month>
+            <tamara_pay_now>
+                <active>0</active>
+                <model>Tamara\Checkout\Model\PayNow</model>
+                <order_status>pending</order_status>
+                <payment_action>authorize</payment_action>
+                <title>Tamara: pay now</title>
+                <currency>SAR</currency>
+                <order_history_use_phone>1</order_history_use_phone>
+                <can_authorize>1</can_authorize>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>1</can_use_internal>
+                <sort_order>1</sort_order>
+                <group>tamara</group>
+            </tamara_pay_now>
             <tamara_pay_by_instalments>
                 <active>0</active>
                 <model>Tamara\Checkout\Model\PayByInstalments</model>

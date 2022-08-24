@@ -87,7 +87,7 @@ class BaseConfig extends MagentoPaymentConfig
     }
 
     public function getSendEmailWhen($storeId = null) {
-        $valueAsStr = $this->getValue('send_email_when', $storeId);
+        $valueAsStr = strval($this->getValue('send_email_when', $storeId));
         return explode(",",$valueAsStr);
     }
 
@@ -273,6 +273,9 @@ class BaseConfig extends MagentoPaymentConfig
         if ($paymentMethod == \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAYMENT_TYPE_CODE) {
             return \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAY_NEXT_MONTH;
         }
+        if ($paymentMethod == \Tamara\Checkout\Gateway\Config\PayNowConfig::PAYMENT_TYPE_CODE) {
+            return \Tamara\Checkout\Gateway\Config\PayNowConfig::PAY_NOW;
+        }
         if ($paymentMethod == \Tamara\Checkout\Gateway\Config\SingleCheckoutConfig::PAYMENT_TYPE_CODE) {
             return \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAY_BY_INSTALMENTS;
         }
@@ -286,9 +289,16 @@ class BaseConfig extends MagentoPaymentConfig
         if ($paymentMethod == \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAY_NEXT_MONTH) {
             return \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAYMENT_TYPE_CODE;
         }
+        if ($paymentMethod == \Tamara\Checkout\Gateway\Config\PayNowConfig::PAY_NOW) {
+            return \Tamara\Checkout\Gateway\Config\PayNowConfig::PAYMENT_TYPE_CODE;
+        }
         if ($paymentMethod == \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAY_BY_INSTALMENTS) {
             return \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE;
         }
         throw new \InvalidArgumentException("Tamara payment method is not supported");
+    }
+
+    public function getEnablePostCreditCheck($storeId = null) {
+        return boolval($this->getValue('enable_post_credit_check', $storeId));
     }
 }

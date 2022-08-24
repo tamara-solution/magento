@@ -194,6 +194,9 @@ class TamaraAdapter
                 if ($paymentTypeClone->getName() == \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAY_NEXT_MONTH) {
                     $typeName = \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAYMENT_TYPE_CODE;
                 }
+                if ($paymentTypeClone->getName() == \Tamara\Checkout\Gateway\Config\PayNowConfig::PAY_NOW) {
+                    $typeName = \Tamara\Checkout\Gateway\Config\PayNowConfig::PAYMENT_TYPE_CODE;
+                }
                 if (!empty($typeName)) {
                     $paymentTypes[$typeName] = [
                         'name' => $typeName,
