@@ -63,7 +63,7 @@ class ConfigProvider implements ConfigProviderInterface
                 'use_magento_checkout_success' => $this->baseConfig->useMagentoCheckoutSuccessPage(),
                 'locale_code' => $this->getLocale(),
                 'public_key' => $this->baseConfig->getPublicKey(),
-                'enable_post_credit_check' => $this->baseConfig->getEnablePostCreditCheck()
+                'enable_credit_pre_check' => $this->baseConfig->getEnableCreditPreCheck()
             ]
         ];
         $storeId = $this->tamaraHelper->getCurrentStore()->getId();

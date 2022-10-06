@@ -106,6 +106,15 @@ class BaseConfig extends MagentoPaymentConfig
         return $this->getValue('checkout_order_statuses/checkout_cancel_status', $storeId);
     }
 
+    public function getCheckoutExpireStatus($storeId = null)
+    {
+        $value = $this->getValue('checkout_order_statuses/checkout_expire_status', $storeId);
+        if (empty($value)) {
+            return $this->getCheckoutCancelStatus($storeId);
+        }
+        return $value;
+    }
+
     public function getCheckoutFailureStatus($storeId = null)
     {
         return $this->getValue('checkout_order_statuses/checkout_failure_status', $storeId);
@@ -298,7 +307,7 @@ class BaseConfig extends MagentoPaymentConfig
         throw new \InvalidArgumentException("Tamara payment method is not supported");
     }
 
-    public function getEnablePostCreditCheck($storeId = null) {
-        return boolval($this->getValue('enable_post_credit_check', $storeId));
+    public function getEnableCreditPreCheck($storeId = null) {
+        return boolval($this->getValue('enable_credit_pre_check', $storeId));
     }
 }

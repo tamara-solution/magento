@@ -148,11 +148,11 @@
                         <config_path>payment/tamara_checkout/display_limit_warning</config_path>
                         <comment>If yes, The extension will display a warning message on the checkout page if the payment method is not available for the order, Otherwise, the payment method will be hidden</comment>
                     </field>
-                    <field id="enable_post_credit_check" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Enable post credit check</label>
+                    <field id="enable_credit_pre_check" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable credit pre check</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <config_path>payment/tamara_checkout/enable_post_credit_check</config_path>
-                        <comment>If yes, the extension will only show payment methods that the customer is eligible to use</comment>
+                        <config_path>payment/tamara_checkout/enable_credit_pre_check</config_path>
+                        <comment>If yes, the extension will check the credit and only show payment methods that the customer is eligible to use</comment>
                     </field>
                 </group>
 
@@ -549,22 +549,32 @@
                     <field id="checkout_order_created_status" translate="label" type="select" sortOrder="210" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Order status after order created in Magento</label>
                         <source_model>Tamara\Checkout\Model\Config\Source\Order\State\StateNew\Status</source_model>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="checkout_success_status" translate="label" type="select" sortOrder="220" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Order status when checkout is success (after redirect)</label>
                         <source_model>Tamara\Checkout\Model\Config\Source\Order\State\PendingPayment\Status</source_model>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="checkout_cancel_status" translate="label" type="select" sortOrder="230" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Order status when checkout is cancelled</label>
+                        <label>Order status when checkout is canceled by customer</label>
                         <source_model>Tamara\Checkout\Model\Config\Source\Order\State\Cancelled\Status</source_model>
+                        <validate>required-entry</validate>
+                    </field>
+                    <field id="checkout_expire_status" translate="label" type="select" sortOrder="235" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Order status when checkout is expired (abandoned order)</label>
+                        <source_model>Tamara\Checkout\Model\Config\Source\Order\State\Cancelled\Status</source_model>
+                        <comment>If this option is not set, the above status for canceled checkout will be used</comment>
                     </field>
                     <field id="checkout_failure_status" translate="label" type="select" sortOrder="240" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Order status when checkout is failure</label>
                         <source_model>Tamara\Checkout\Model\Config\Source\Order\State\Failure\Status</source_model>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="checkout_authorise_status" translate="label" type="select" sortOrder="250" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Order status when order is authorised</label>
                         <source_model>Tamara\Checkout\Model\Config\Source\Order\State\Processing\Status</source_model>
+                        <validate>required-entry</validate>
                     </field>
                 </group>
 
@@ -574,6 +584,7 @@
                         <label>Which order status do you want to Tamara capture API?</label>
                         <comment>You should set it to the status after the order is shipped</comment>
                         <source_model>Tamara\Checkout\Model\Config\Source\Order\State\Capture\Status</source_model>
+                        <validate>required-entry</validate>
                     </field>
                 </group>
 

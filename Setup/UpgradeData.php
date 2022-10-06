@@ -7,6 +7,12 @@ use Magento\Cms\Model\BlockFactory;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\UpgradeDataInterface;
+use Magento\Sales\Model\Order\Status;
+use Magento\Sales\Model\Order\StatusFactory;
+use Magento\Sales\Model\ResourceModel\Order\Status as StatusResource;
+use Magento\Sales\Model\ResourceModel\Order\StatusFactory as StatusResourceFactory;
+use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Framework\App\ResourceConnection;
 
 class UpgradeData implements UpgradeDataInterface
 {
@@ -31,15 +37,33 @@ class UpgradeData implements UpgradeDataInterface
      */
     private $configWriter;
 
+    /**
+     * Status Factory
+     *
+     * @var StatusFactory
+     */
+    private $statusFactory;
+
+    /**
+     * Status Resource Factory
+     *
+     * @var StatusResourceFactory
+     */
+    private $statusResourceFactory;
+
     public function __construct(BlockFactory $blockFactory, BlockRepositoryInterface $blockRepository,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
+        \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
+        StatusFactory $statusFactory,
+        StatusResourceFactory $statusResourceFactory
     )
     {
         $this->blockFactory = $blockFactory;
         $this->blockRepository = $blockRepository;
         $this->scopeConfig = $scopeConfig;
         $this->configWriter = $configWriter;
+        $this->statusFactory = $statusFactory;
+        $this->statusResourceFactory = $statusResourceFactory;
     }
 
     /**
@@ -71,6 +95,15 @@ class UpgradeData implements UpgradeDataInterface
 
         if (version_compare($context->getVersion(), '1.1.2', '<')) {
             $this->saveApiUrlFromApiEnvironment();
+        }
+
+        if (version_compare($context->getVersion(), '1.1.4', '<')) {
+            $this->updateConfigForCreditPreCheck($setup);
+            $this->convertClosedStatusToCanceledStatusForFailureOrder($setup);
+        }
+
+        if (version_compare($context->getVersion(), '1.1.5', '<')) {
+            $this->addExpiredStatus();
         }
 
         $setup->endSetup();
@@ -191,5 +224,46 @@ class UpgradeData implements UpgradeDataInterface
         } else {
             $this->configWriter->save('payment/tamara_checkout/api_url', \Tamara\Checkout\Api\Data\CheckoutInformationInterface::SANDBOX_API_URL);
         }
+    }
+
+        
+    /**
+     * @param  ModuleDataSetupInterface $setup
+     * @return void
+     */
+    private function updateConfigForCreditPreCheck($setup) {
+        $table = $setup->getTable('core_config_data');
+        $query = "UPDATE `{$table}` SET `path` = 'payment/tamara_checkout/enable_credit_pre_check' WHERE `path` = 'payment/tamara_checkout/enable_post_credit_check';";
+        $setup->getConnection()->query($query);
+    }
+ 
+    /**
+     *
+     * @param  ModuleDataSetupInterface $setup
+     * @return void
+     */
+    private function convertClosedStatusToCanceledStatusForFailureOrder(ModuleDataSetupInterface $setup) {
+        $table = $setup->getTable('core_config_data');
+        $value = \Magento\Sales\Model\Order::STATE_CANCELED;
+        $query = "UPDATE `{$table}` SET `value` = '{$value}' WHERE `path` = 'payment/tamara_checkout/checkout_order_statuses/checkout_failure_status';";
+        $setup->getConnection()->query($query);
+    }
+
+    private function addExpiredStatus() {
+        /** @var StatusResource $statusResource */
+        $statusResource = $this->statusResourceFactory->create();
+
+        /** @var Status $status */
+        $status = $this->statusFactory->create();
+        $status->setData([
+            'status' => \Tamara\Checkout\Model\Config\Source\Order\State\Cancelled\Status::STATUS_EXPIRED,
+            'label' => \Tamara\Checkout\Model\Config\Source\Order\State\Cancelled\Status::STATUS_EXPIRED_LABEL,
+        ]);
+        try {
+            $statusResource->save($status);
+        } catch (AlreadyExistsException $exception) {
+            return;
+        }
+        $status->assignState(\Magento\Sales\Model\Order::STATE_CANCELED, false, true);
     }
 }

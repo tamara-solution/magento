@@ -18,6 +18,7 @@ use Tamara\Checkout\Model\Helper\StoreHelper;
 use Tamara\Client;
 use Tamara\Configuration;
 use Tamara\Exception\RequestDispatcherException;
+use Tamara\Exception\RequestException;
 use Tamara\Model\Checkout\PaymentType;
 use Tamara\Notification\NotificationService;
 use Tamara\Request\Checkout\CreateCheckoutRequest;
@@ -30,9 +31,14 @@ use Tamara\Response\Checkout\GetPaymentTypesResponse;
 
 class TamaraAdapter
 {
-    private const
-        WEBHOOK_URL = 'tamara/payment/webhook',
-        ALLOWED_WEBHOOKS = ['order_expired', 'order_declined'];
+    const API_REQUEST_TIMEOUT = 30; //in seconds
+    const DISABLE_TAMARA_IDENTIFIER = "DISABLE_TAMARA";
+    const DISABLE_TAMARA_CACHE_LIFE_TIME = 900; //15 minutes
+
+    private const WEBHOOK_URL = 'tamara/payment/webhook';
+    const TAMARA_ORDER_EVENT_EXPIRED = 'order_expired';
+    const TAMARA_ORDER_EVENT_DECLINED = 'order_declined';
+    const ALLOWED_WEBHOOKS = [self::TAMARA_ORDER_EVENT_EXPIRED, self::TAMARA_ORDER_EVENT_DECLINED];
     /**
      * @var Client
      */
@@ -115,6 +121,8 @@ class TamaraAdapter
      */
     protected $tamaraTransactionHelper;
 
+    protected $magentoCache;
+
     public function __construct(
         $apiUrl,
         $merchantToken,
@@ -133,13 +141,14 @@ class TamaraAdapter
         \Magento\Sales\Api\OrderManagementInterface $orderManagement,
         \Tamara\Checkout\Gateway\Config\BaseConfig $baseConfig,
         \Tamara\Checkout\Helper\Invoice $tamaraInvoiceHelper,
-        \Tamara\Checkout\Helper\Transaction $tamaraTransactionHelper
+        \Tamara\Checkout\Helper\Transaction $tamaraTransactionHelper,
+        \Magento\Framework\App\CacheInterface $magentoCache
     )
     {
         $this->logger = $logger;
         $this->orderRepository = $orderRepository;
         $this->notificationService = NotificationService::create($notificationToken);
-        $config = Configuration::create($apiUrl, $merchantToken);
+        $config = Configuration::create($apiUrl, $merchantToken, self::API_REQUEST_TIMEOUT);
         $this->client = Client::create($config);
         $this->captureRepository = $captureRepository;
         $this->mageRepository = $mageRepository;
@@ -154,26 +163,38 @@ class TamaraAdapter
         $this->baseConfig = $baseConfig;
         $this->tamaraInvoiceHelper = $tamaraInvoiceHelper;
         $this->tamaraTransactionHelper = $tamaraTransactionHelper;
+        $this->magentoCache = $magentoCache;
     }
 
     /**
      * @param string $countryCode
      * @param string $currencyCode
-     * @return array
-     * @throws RequestDispatcherException
+     * @return array|null
      */
     public function getPaymentTypes(string $countryCode, $currencyCode = '')
     {
+        if ($this->getDisableTamara()) {
+            return [];
+        }
         if (empty($this->baseConfig->getMerchantToken())) {
             return [];
         }
-        $response = $this->client->getPaymentTypes($countryCode, $currencyCode);
-        if (!$response->isSuccess()) {
-            $errorLogs = ["Tamara" => $response->getContent()];
-            $this->logger->debug($errorLogs);
-            return [];
+        try {
+            $response = $this->client->getPaymentTypes($countryCode, $currencyCode);
+            if (!$response->isSuccess()) {
+                $errorLogs = ["Tamara" => $response->getContent()];
+                $this->logger->debug($errorLogs);
+                return [];
+            }
+            return $this->parsePaymentTypesResponse($response);
+        } catch (RequestException $requestException) {
+            $this->logger->debug(["Tamara" => $requestException->getMessage()]);
+            $this->setDisableTamara(true);
+            return null;
+        } catch (\Exception $exception) {
+            $this->logger->debug(["Tamara" => $exception->getMessage()]);
         }
-        return $this->parsePaymentTypesResponse($response);
+        return [];
     }
 
     /**
@@ -588,14 +609,19 @@ class TamaraAdapter
             $scopeId
         );
 
-        $request = new RemoveWebhookRequest($webhookId);
+        try {
+            $request = new RemoveWebhookRequest($webhookId);
 
-        $response = $this->client->removeWebhook($request);
+            $response = $this->client->removeWebhook($request);
 
-        if (!$response->isSuccess()) {
-            $errorLogs = [$response->getContent()];
-            $this->logger->debug(["Tamara" => $errorLogs]);
-            throw new IntegrationException(__($response->getMessage()));
+            if (!$response->isSuccess()) {
+                $errorLogs = [$response->getContent()];
+                $this->logger->debug(["Tamara" => $errorLogs]);
+                throw new IntegrationException(__($response->getMessage()));
+            }
+        } catch (RequestException $exception) {
+            $this->logger->debug(["Tamara" => $exception->getMessage()]);
+            return;
         }
 
         $this->logger->debug(['Tamara - End of delete webhook']);
@@ -636,7 +662,11 @@ class TamaraAdapter
             }
             $this->orderManagement->cancel($order->getOrderId());
 
-            $mageOrder->setState(Order::STATE_CANCELED)->setStatus(Order::STATE_CANCELED);
+            if ($eventType ==  self::TAMARA_ORDER_EVENT_DECLINED) {
+                $mageOrder->setState(Order::STATE_CANCELED)->setStatus($this->baseConfig->getCheckoutFailureStatus($mageOrder->getStoreId()));
+            } else {
+                $mageOrder->setState(Order::STATE_CANCELED)->setStatus($this->baseConfig->getCheckoutExpireStatus($mageOrder->getStoreId()));
+            }
             $comment = sprintf('Tamara - order was %s by webhook', $eventType);
             $mageOrder->addCommentToStatusHistory(__($comment));
             $mageOrder->getResource()->save($mageOrder);
@@ -684,5 +714,19 @@ class TamaraAdapter
      */
     public function getTamaraOrderFromRemote($magentoOrderIncrementId) {
         return $this->getClient()->getOrderByReferenceId(new \Tamara\Request\Order\GetOrderByReferenceIdRequest($magentoOrderIncrementId));
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDisableTamara() {
+        return boolval($this->magentoCache->load(self::DISABLE_TAMARA_IDENTIFIER));
+    }
+
+    /**
+     * @param bool $val
+     */
+    public function setDisableTamara($val) {
+        $this->magentoCache->save(strval(intval($val)), self::DISABLE_TAMARA_IDENTIFIER, [], self::DISABLE_TAMARA_CACHE_LIFE_TIME);
     }
 }

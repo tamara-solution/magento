@@ -105,9 +105,9 @@ class Available
             }
         }
 
-        $isEnabledPostCreditCheck = $this->config->getEnablePostCreditCheck($quote->getStoreId());
-        $availableMethods = $this->filterUnAvailableMethods($availableMethods, $quote, $isEnabledPostCreditCheck);
-        if ($isEnabledPostCreditCheck) {
+        $isEnabledCreditPreCheck = $this->config->getEnableCreditPreCheck($quote->getStoreId());
+        $availableMethods = $this->filterUnAvailableMethods($availableMethods, $quote, $isEnabledCreditPreCheck);
+        if ($isEnabledCreditPreCheck) {
             return $availableMethods;
         }
 
