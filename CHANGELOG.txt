@@ -1,3 +1,8 @@
+1.12.27
+    New:
+    + Change credit pre check label
+    + Improve code - get payment types timeout
+    + Add new expired status for the order that was expired by webhook
 1.12.26
     New:
     + Add Pay now

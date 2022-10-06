@@ -108,10 +108,12 @@ class ScanOrder
             $this->doAction($orderIdsFiltered, 'capture');
 
             //scan refund
-            $orderIds = array_diff($orderIds, $orderIdsFiltered);
-            $magentoOrderCollection = $this->getMagentoOrderCollection($orderIds, $this->config->getOrderStatusShouldBeRefunded());
-            $orderIdsFiltered = $this->getOrderIdsFromCollection($magentoOrderCollection);
-            $this->doAction($orderIdsFiltered, 'refund');
+            if (!empty($refundedStatus = $this->config->getOrderStatusShouldBeRefunded())) {
+                $orderIds = array_diff($orderIds, $orderIdsFiltered);
+                $magentoOrderCollection = $this->getMagentoOrderCollection($orderIds, $refundedStatus);
+                $orderIdsFiltered = $this->getOrderIdsFromCollection($magentoOrderCollection);
+                $this->doAction($orderIdsFiltered, 'refund');
+            }
 
             //scan cancel
             $orderIds = array_diff($orderIds, $orderIdsFiltered);

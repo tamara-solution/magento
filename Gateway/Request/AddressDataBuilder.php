@@ -11,7 +11,7 @@ class AddressDataBuilder implements BuilderInterface
 {
     public const
         SHIPPING_ADDRESS = 'shipping_address',
-        EMPTY = "N/A",
+        EMPTY = "",
         BILLING_ADDRESS = 'billing_address';
 
     public function build(array $buildSubject): array

@@ -87,7 +87,7 @@ define(
             },
 
             shouldShowError: function () {
-                if (window.checkoutConfig.payment.tamara.enable_post_credit_check) {
+                if (window.checkoutConfig.payment.tamara.enable_credit_pre_check) {
                     return false;
                 }
                 return !this.isTotalAmountInLimit();

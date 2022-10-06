@@ -8,6 +8,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
 use Tamara\Checkout\Model\Helper\PaymentHelper;
+use Tamara\Exception\RequestException;
 
 class AbstractData extends \Tamara\Checkout\Helper\Core
 {
@@ -152,7 +153,14 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
         if ($cachedPaymentTypes === false) {
             $adapter = $this->tamaraAdapterFactory->create($storeId);
             $cachedPaymentTypes = $adapter->getPaymentTypes($countryCode, $currencyCode);
-            $this->cachePaymentTypes($cachedPaymentTypes, $countryCode, $currencyCode, $storeId);
+
+            //if there is an error when api call
+            if ($cachedPaymentTypes === null) {
+                $cachedPaymentTypes = [];
+                $this->cachePaymentTypes($cachedPaymentTypes, $countryCode, $currencyCode, $storeId, \Tamara\Checkout\Model\Adapter\TamaraAdapter::DISABLE_TAMARA_CACHE_LIFE_TIME);
+            } else {
+                $this->cachePaymentTypes($cachedPaymentTypes, $countryCode, $currencyCode, $storeId);
+            }
         }
         return $cachedPaymentTypes;
     }
@@ -172,10 +180,22 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
     public function getPaymentTypesV2(\Tamara\Model\Money $totalAmount, string $countryCode, $items = null,
         $consumer = null, $shippingAddress = null, $riskAssessment = null, $additionalData = [], $storeId = 0) {
         $adapter = $this->tamaraAdapterFactory->create($storeId);
-        $request = new \Tamara\Request\Checkout\GetPaymentTypesV2Request(
-            $totalAmount, $countryCode, $items, $consumer, $shippingAddress, $riskAssessment, $additionalData
-        );
-        return $adapter->parsePaymentTypesResponse($adapter->getClient()->getPaymentTypesV2($request));
+        if ($adapter->getDisableTamara()) {
+            return [];
+        }
+        try {
+            $request = new \Tamara\Request\Checkout\GetPaymentTypesV2Request(
+                $totalAmount, $countryCode, $items, $consumer, $shippingAddress, $riskAssessment, $additionalData
+            );
+            $response = $adapter->getClient()->getPaymentTypesV2($request);
+            return $adapter->parsePaymentTypesResponse($response);
+        } catch (RequestException $requestException) {
+            $adapter->setDisableTamara(true);
+            $this->getLogger()->debug(["Tamara" => $requestException->getMessage()]);
+        } catch (\Exception $exception) {
+            $this->getLogger()->debug(["Tamara" => $exception->getMessage()]);
+        }
+        return [];
     }
 
     /**
@@ -241,11 +261,12 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
      * @param $countryCode
      * @param $currencyCode
      * @param int $storeId
+     * @param int $lifeTime
      */
-    private function cachePaymentTypes(array $paymentTypes, $countryCode, $currencyCode, $storeId) {
+    private function cachePaymentTypes(array $paymentTypes, $countryCode, $currencyCode, $storeId, $lifeTime = self::PAYMENT_TYPES_CACHE_LIFE_TIME) {
         $paymentTypesAsStr = json_encode($paymentTypes);
         $this->magentoCache->save($paymentTypesAsStr, $this->getPaymentTypesCacheIdentifier($countryCode, $currencyCode, $storeId), [],
-            self::PAYMENT_TYPES_CACHE_LIFE_TIME);
+            $lifeTime);
     }
 
     /**

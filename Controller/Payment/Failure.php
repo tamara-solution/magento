@@ -105,7 +105,7 @@ class Failure extends Action
                 $this->cartHelper->restoreCartFromOrder($order);
                 $this->coreRegistry->register("skip_tamara_cancel", true);
                 $this->orderManagement->cancel($order->getEntityId());
-                $order->setState(Order::STATE_CLOSED)->setStatus($this->config->getCheckoutFailureStatus($order->getStoreId()));
+                $order->setState(Order::STATE_CANCELED)->setStatus($this->config->getCheckoutFailureStatus($order->getStoreId()));
                 $order->addStatusHistoryComment(__('Tamara - order was failure'));
                 $order->getResource()->save($order);
             } catch (\Exception $e) {
