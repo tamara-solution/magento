@@ -7,8 +7,12 @@ if (!$block->availableToShow()) {
 }
 $productFinalPrice = $block->getCurrentProductPrice();
 $availableMethod = $block->getPaymentMethodForPdpWidget($productFinalPrice);
+$publicKey = $block->getPublicKey();
+$useProductWidgetV1 = false;
+if (empty($publicKey)) {
+    $useProductWidgetV1 = true;
+}
 ?>
-
 <?php if (!empty($availableMethod)): ?>
     <?php
     $lang = 'en';
@@ -17,53 +21,82 @@ $availableMethod = $block->getPaymentMethodForPdpWidget($productFinalPrice);
     }
     $currencyCode = $block->getStoreCurrencyCode();
     $countryCode = "";
-    if (!empty(\Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$currencyCode])){
+    if (!empty(\Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$currencyCode])) {
         $countryCode = \Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$currencyCode];
     }
-    if ($block->isProductionApiEnvironment()) {
-        $widgetUrl = "https://cdn.tamara.co/widget/product-widget.min.js";
-    } else {
-        $widgetUrl = "https://cdn-sandbox.tamara.co/widget/product-widget.min.js";
-    }
     ?>
-    <script charset="utf-8" src="<?= $widgetUrl ?>"></script>
-    <script>
-        require(['jquery'], function($){
-            var countExistTamaraProductWidget = 0;
-            var existTamaraProductWidget = setInterval(function() {
-                if ($('#tamara-product-widget').length && window.TamaraProductWidget) {
-                    $("#tamara-product-widget").empty();
-                    window.TamaraProductWidget.init({ lang: '<?= $lang; ?>', currency: '<?= $currencyCode; ?>', publicKey: '<?= $block->getPublicKey(); ?>'});
-                    window.TamaraProductWidget.render();
-                    clearInterval(existTamaraProductWidget);
-                }
-                if (++countExistTamaraProductWidget > 33) {
-                    clearInterval(existTamaraProductWidget);
-                }
-            }, 300);
-        });
-    </script>
-
-    <?php
-    $str = '<div id="tamara-product-widget" class="tamara-product-widget" data-lang="'. $lang .'" data-price="'. $productFinalPrice .'" data-installment-available-amount="'. $availableMethod['min_limit'] .'" data-currency="'. $availableMethod['currency'] .'" data-country-code="'. $countryCode .'"';
-    if (\Tamara\Checkout\Gateway\Config\InstalmentConfig::isInstallmentsPayment($availableMethod['name'])) {
-        $str .= (' data-payment-type="installment" data-number-of-installments="'.$availableMethod['number_of_instalments'].'" data-installment-minimum-amount="' .$availableMethod['min_limit']. '" data-installment-maximum-amount="'.$availableMethod['max_limit'].'" data-disable-paylater="true"></div>');
-    } else {
-        if ($availableMethod['name'] == \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE) {
-            $str .= (' data-payment-type="paylater" data-disable-paylater="false" data-disable-product-limit="true" data-disable-installment="true" data-pay-later-max-amount="'. $availableMethod['max_limit'] .'"></div>');
+    <?php if ($useProductWidgetV1): ?>
+        <?php
+        if ($block->isProductionApiEnvironment()) {
+            $widgetUrl = "https://cdn.tamara.co/widget/product-widget.min.js";
         } else {
-            if ($availableMethod['name'] == \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAYMENT_TYPE_CODE) {
-                $str .= (' data-payment-type="pay-next-month" data-disable-paylater="true" data-disable-installment="false"></div>');
+            $widgetUrl = "https://cdn-sandbox.tamara.co/widget/product-widget.min.js";
+        }
+        $str = '<div class="tamara-promo-widget-wrapper tamara-product-page"><div class="tamara-product-widget" data-lang="' . $lang . '" data-price="' . $productFinalPrice . '" data-installment-available-amount="' . $availableMethod['min_limit'] . '" data-currency="' . $availableMethod['currency'] . '" data-country-code="' . $countryCode . '"';
+        if (\Tamara\Checkout\Gateway\Config\InstalmentConfig::isInstallmentsPayment($availableMethod['name'])) {
+            $str .= (' data-payment-type="installment" data-number-of-installments="' . $availableMethod['number_of_instalments'] . '" data-installment-minimum-amount="' . $availableMethod['min_limit'] . '" data-installment-maximum-amount="' . $availableMethod['max_limit'] . '" data-disable-paylater="true">');
+        } else {
+            if ($availableMethod['name'] == \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE) {
+                $str .= (' data-payment-type="paylater" data-disable-paylater="false" data-disable-product-limit="true" data-disable-installment="true" data-pay-later-max-amount="' . $availableMethod['max_limit'] . '">');
             } else {
-                if ($availableMethod['name'] == \Tamara\Checkout\Gateway\Config\PayNowConfig::PAYMENT_TYPE_CODE) {
-                    $str .= (' data-payment-type="pay-now" data-disable-paylater="true" data-disable-installment="true"></div>');
+                if ($availableMethod['name'] == \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAYMENT_TYPE_CODE) {
+                    $str .= (' data-payment-type="pay-next-month" data-disable-paylater="true" data-disable-installment="false">');
+                } else {
+                    if ($availableMethod['name'] == \Tamara\Checkout\Gateway\Config\PayNowConfig::PAYMENT_TYPE_CODE) {
+                        $str .= (' data-payment-type="pay-now" data-disable-paylater="true" data-disable-installment="true">');
+                    } else {
+                        $str .= ('>');
+                    }
                 }
             }
         }
-    }
-    echo $str;
-    ?>
+
+        $str .= '</div></div>';
+        echo $str;
+        ?>
+        <script charset="utf-8" defer src="<?= $widgetUrl ?>"></script>
+        <script>
+            require(['jquery'], function ($) {
+                var countExistTamaraProductWidget = 0;
+                var existTamaraProductWidget = setInterval(function () {
+                    if ($('.tamara-promo-widget-wrapper.tamara-product-page .tamara-product-widget').length && window.TamaraProductWidget) {
+                        $(".tamara-promo-widget-wrapper.tamara-product-page .tamara-product-widget").empty();
+                        window.TamaraProductWidget.init({
+                            lang: '<?= $lang; ?>',
+                            currency: '<?= $currencyCode; ?>',
+                            publicKey: '<?= $publicKey; ?>'
+                        });
+                        window.TamaraProductWidget.render();
+                        clearInterval(existTamaraProductWidget);
+                    }
+                    if (++countExistTamaraProductWidget > 33) {
+                        clearInterval(existTamaraProductWidget);
+                    }
+                }, 300);
+            });
+        </script>
+    <?php else: ?>
+        <?php
+        if ($block->isProductionApiEnvironment()) {
+            $widgetUrl = "https://cdn.tamara.co/widget-v2/tamara-widget.js";
+        } else {
+            $widgetUrl = "https://cdn-sandbox.tamara.co/widget-v2/tamara-widget.js";
+        }
+        echo '<div class="tamara-promo-widget-wrapper tamara-product-page"><tamara-widget amount="' . $productFinalPrice . '" inline-type="' . $block->getInlineType() . '"></tamara-widget></div>';
+        ?>
+        <script>
+            var tamaraWidgetConfig = {
+                lang: '<?= $lang; ?>',
+                country: '<?= $countryCode ?>',
+                publicKey: '<?= $publicKey; ?>'
+            }
+        </script>
+        <script charset="utf-8" defer src="<?= $widgetUrl ?>"></script>
+    <?php endif; ?>
 <?php endif; ?>
+
 <?php
-end:
+end: //label go to end of file
 ?>
+
+<div data-t1="3"></div>

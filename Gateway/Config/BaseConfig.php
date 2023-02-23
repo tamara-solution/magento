@@ -55,6 +55,10 @@ class BaseConfig extends MagentoPaymentConfig
         $this->scopeConfig = $scopeConfig;
     }
 
+    public function isEnableTamaraPayment($storeId = null) {
+        return boolval($this->getValue('enable_payment', $storeId));
+    }
+
     public function getMerchantToken($storeId = null) {
         return $this->getValue(self::MERCHANT_TOKEN, $storeId);
     }
@@ -284,9 +288,6 @@ class BaseConfig extends MagentoPaymentConfig
         }
         if ($paymentMethod == \Tamara\Checkout\Gateway\Config\PayNowConfig::PAYMENT_TYPE_CODE) {
             return \Tamara\Checkout\Gateway\Config\PayNowConfig::PAY_NOW;
-        }
-        if ($paymentMethod == \Tamara\Checkout\Gateway\Config\SingleCheckoutConfig::PAYMENT_TYPE_CODE) {
-            return \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAY_BY_INSTALMENTS;
         }
         throw new \InvalidArgumentException("Tamara payment method is not supported");
     }

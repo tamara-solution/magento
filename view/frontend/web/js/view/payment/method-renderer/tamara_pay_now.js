@@ -90,19 +90,19 @@ define(
             },
 
             getMinLimit: function () {
-                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_now.min_limit);
+                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara.payment_types.tamara_pay_now.min_limit);
             },
 
             getMinLimitAmount: function () {
-                return window.checkoutConfig.payment.tamara_pay_now.min_limit;
+                return window.checkoutConfig.payment.tamara.payment_types.tamara_pay_now.min_limit;
             },
 
             getMaxLimit: function () {
-                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_now.max_limit);
+                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara.payment_types.tamara_pay_now.max_limit);
             },
 
             getMaxLimitAmount: function () {
-                return window.checkoutConfig.payment.tamara_pay_now.max_limit;
+                return window.checkoutConfig.payment.tamara.payment_types.tamara_pay_now.max_limit;
             },
 
             getGrandTotal: function () {
@@ -116,20 +116,13 @@ define(
             },
 
             isTotalAmountInLimit: function () {
-                var tamaraConfig = window.checkoutConfig.payment.tamara_pay_now;
+                var tamaraConfig = window.checkoutConfig.payment.tamara.payment_types.tamara_pay_now;
                 var grandTotal = this.getGrandTotal();
                 return !(grandTotal < parseFloat(tamaraConfig.min_limit) || grandTotal > parseFloat(tamaraConfig.max_limit));
             },
 
-            shouldShowError: function () {
-                if (window.checkoutConfig.payment.tamara.enable_credit_pre_check) {
-                    return false;
-                }
-                return !this.isTotalAmountInLimit();
-            },
-
             isPlaceOrderActive: function () {
-                return !!this.isTotalAmountInLimit();
+                return true;
             },
 
             isArabicLanguage: function () {
@@ -219,8 +212,18 @@ define(
                 });
             },
 
-            getTitle: function () {
-                return $.mage.__('Pay now using Mada, Apple Pay or Credit card');
+            getWidgetVersion: function () {
+                return window.checkoutConfig.payment.tamara.widget_version;
+            },
+
+            renderWidgetV2: function () {
+                //render in quote-mixin.js
+                return true;
+            },
+
+            renderWidget: function () {
+                this.renderWidgetV2();
+                return false;
             }
         });
     }

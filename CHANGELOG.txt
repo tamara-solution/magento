@@ -1,3 +1,12 @@
+1.12.28
+    New:
+    + Remove payment types configuration in the admin
+    + Use credit-pre-check on the checkout page
+    + Add Tamara's widget to the cart page
+    + Switch to use widget v2
+    + New template for payment methods
+    + Support to authorize orders on the checkout success page
+    + Add Oman country
 1.12.27
     New:
     + Change credit pre check label

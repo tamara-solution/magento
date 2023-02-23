@@ -25,6 +25,7 @@ use Tamara\Request\Checkout\CreateCheckoutRequest;
 use Tamara\Request\Order\AuthoriseOrderRequest;
 use Tamara\Request\Webhook\RegisterWebhookRequest;
 use Tamara\Request\Webhook\RemoveWebhookRequest;
+use Tamara\Response\Checkout\CheckPaymentOptionsAvailabilityResponse;
 use Tamara\Response\Checkout\CreateCheckoutResponse;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Tamara\Response\Checkout\GetPaymentTypesResponse;
@@ -34,6 +35,7 @@ class TamaraAdapter
     const API_REQUEST_TIMEOUT = 30; //in seconds
     const DISABLE_TAMARA_IDENTIFIER = "DISABLE_TAMARA";
     const DISABLE_TAMARA_CACHE_LIFE_TIME = 900; //15 minutes
+    const IS_SINGLE_CHECKOUT_VERSION_IDENTIFIER = "IS_SINGLE_CHECKOUT_VERSION";
 
     private const WEBHOOK_URL = 'tamara/payment/webhook';
     const TAMARA_ORDER_EVENT_EXPIRED = 'order_expired';

@@ -9,7 +9,7 @@ use Tamara\Checkout\Model\EmailWhiteListFactory;
 
 class Popup extends Template
 {
-    private $registry;
+    protected $registry;
 
     protected $customerSession;
 
@@ -194,10 +194,14 @@ class Popup extends Template
     }
 
     public function getPublicKey() {
-        return $this->config->getPublicKey();
+        return $this->helper->getMerchantPublicKey();
     }
-    
+
     public function isProductionApiEnvironment() {
         return $this->config->isProductionApiEnvironment();
+    }
+
+    public function getInlineType() {
+        return 2; //product widget
     }
 }

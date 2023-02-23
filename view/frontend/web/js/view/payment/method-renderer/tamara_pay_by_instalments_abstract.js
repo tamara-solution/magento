@@ -86,15 +86,8 @@ define(
                 return grandTotal;
             },
 
-            shouldShowError: function () {
-                if (window.checkoutConfig.payment.tamara.enable_credit_pre_check) {
-                    return false;
-                }
-                return !this.isTotalAmountInLimit();
-            },
-
             isPlaceOrderActive: function () {
-                return !!this.isTotalAmountInLimit();
+                return true;
             },
 
             /**
@@ -170,40 +163,6 @@ define(
                 });
             },
 
-            getInstalmentPeriods: function () {
-                let periods = [];
-                let numberOfInstalments = this.getNumberOfInstalments();
-                let grandTotal = this.getGrandTotal() * 100;
-                let mod = grandTotal % numberOfInstalments;
-                let payForEachMonth = (grandTotal - mod) / numberOfInstalments / 100;
-                let dueToDay = parseFloat(((grandTotal - mod)/numberOfInstalments/100) + (mod/100)).toFixed(2);
-
-                periods.push({'label': $.mage.__('Due today'), 'amount': dueToDay, 'formatted_amount': priceUtils.formatPrice(dueToDay)});
-                for(let i = 1; i < numberOfInstalments; i++) {
-                    let label = i;
-                    if (i > 1) {
-                        if (i == 2) {
-                            label = $.mage.__("2 months later");
-                        } else {
-                            let labelTmpl = i + ' months later';
-                            label = $.mage.__(labelTmpl);
-                        }
-                    } else {
-                        label = $.mage.__('1 month later');
-                    }
-                    periods.push({'label': label, 'amount': payForEachMonth, 'formatted_amount': priceUtils.formatPrice(payForEachMonth)});
-                }
-                return periods;
-            },
-
-            getInstalmentPeriodsForArabic: function () {
-                return this.getInstalmentPeriods().reverse();
-            },
-
-            getPeriodTitle: function () {
-                return $.mage.__('3 interest-free installments');
-            },
-
             isArabicLanguage: function () {
                 return (window.checkoutConfig.payment.tamara.locale_code).includes("ar_");
             },
@@ -237,7 +196,7 @@ define(
                 return false;
             },
 
-            renderInstallmentsPlanWidget: function (numberOfInstallments) {
+            renderInstallmentsPlanWidget: function () {
                 var self = this;
                 var countExistTamaraInstallmentsPlan = 0;
                 var existTamaraInstallmentsPlan = setInterval(function() {
@@ -256,8 +215,78 @@ define(
                 return false;
             },
 
-            getTitle: function () {
-                return $.mage.__('Split in %1, interest-free').replace('%1', this.getNumberOfInstalments());
+            getMethodName: function () {
+                return "tamara_pay_by_instalments_" + this.getNumberOfInstalments();
+            },
+
+            getMinLimit: function () {
+                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara.payment_types[this.getMethodName()].min_limit);
+            },
+
+            getMinLimitAmount: function () {
+                return window.checkoutConfig.payment.tamara.payment_types[this.getMethodName()].min_limit;
+            },
+
+            getMaxLimit: function () {
+                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara.payment_types[this.getMethodName()].max_limit);
+            },
+
+            getMaxLimitAmount: function () {
+                return window.checkoutConfig.payment.tamara.payment_types[this.getMethodName()].max_limit;
+            },
+
+            isTotalAmountInLimit: function () {
+                var tamaraConfig = window.checkoutConfig.payment.tamara.payment_types[this.getMethodName()];
+                var grandTotal = this.getGrandTotal();
+
+                return !(grandTotal < parseFloat(tamaraConfig.min_limit) || grandTotal > parseFloat(tamaraConfig.max_limit));
+            },
+
+            getWidgetVersion: function () {
+                return window.checkoutConfig.payment.tamara.widget_version;
+            },
+
+            renderWidgetV2: function () {
+                window.tamaraWidgetConfig = {
+                    "country" : window.checkoutConfig.payment.tamara.country_code,
+                    "lang": window.checkoutConfig.payment.tamara.language,
+                    "publicKey": window.checkoutConfig.payment.tamara.public_key
+                }
+                var self = this;
+                var countExistTamaraWidgetV2 = 0;
+                var existTamaraWidgetV2 = setInterval(function() {
+                    if ($('.tamara-promo-widget-wrapper.tamara-checkout-page.tamara-v2').length) {
+                        $('.tamara-promo-widget-wrapper.tamara-checkout-page.tamara-v2').empty();
+
+                        //append the widget html
+                        let widgetHtml = '<tamara-widget amount="' + self.getGrandTotal() + '" inline-type="3"></tamara-widget>';
+                        $( ".tamara-promo-widget-wrapper.tamara-checkout-page.tamara-v2" ).each(function() {
+                            $(this).append(widgetHtml);
+                        });
+                        if (window.TamaraWidgetV2) {
+                            window.TamaraWidgetV2.refresh();
+                        }
+                        clearInterval(existTamaraWidgetV2);
+                    }
+                    if (++countExistTamaraWidgetV2 > 33) {
+                        clearInterval(existTamaraWidgetV2);
+                    }
+                }, 300);
+                return true;
+            },
+
+            renderWidget: function () {
+                if (this.getWidgetVersion() == 'v1') {
+                    this.renderInstallmentsPlanWidget();
+                } else {
+                    if (this.getWidgetVersion() == 'v2') {
+                        this.renderWidgetV2();
+                    } else {
+                        this.renderInstallmentsPlanWidget();
+                        this.renderWidgetV2();
+                    }
+                }
+                return false;
             }
         });
     }

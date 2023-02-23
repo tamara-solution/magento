@@ -30,27 +30,8 @@ define(
                 return this;
             },
 
-            getMinLimit: function () {
-                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_by_instalments.min_limit);
-            },
-
-            getMinLimitAmount: function () {
-                return window.checkoutConfig.payment.tamara_pay_by_instalments.min_limit;
-            },
-
-            getMaxLimit: function () {
-                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_by_instalments.max_limit);
-            },
-
-            getMaxLimitAmount: function () {
-                return window.checkoutConfig.payment.tamara_pay_by_instalments.max_limit;
-            },
-
-            isTotalAmountInLimit: function () {
-                var tamaraConfig = window.checkoutConfig.payment.tamara_pay_by_instalments;
-                var grandTotal = this.getGrandTotal();
-
-                return !(grandTotal < parseFloat(tamaraConfig.min_limit) || grandTotal > parseFloat(tamaraConfig.max_limit));
+            getMethodName: function () {
+                return "tamara_pay_by_instalments";
             },
 
             getNumberOfInstalments: function() {

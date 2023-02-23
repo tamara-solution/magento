@@ -62,4 +62,16 @@ class PopulateTamara extends Template
     public function isProductionEnvironment() {
         return $this->config->isProductionApiEnvironment();
     }
+
+    /**
+     * @return bool
+     */
+    public function isUseWidgetV1()
+    {
+        return empty($this->helper->getMerchantPublicKey());
+    }
+
+    public function getWidgetVersion() {
+        return $this->helper->getWidgetVersion();
+    }
 }

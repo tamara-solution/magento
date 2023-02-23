@@ -11,12 +11,7 @@
                class="radio"
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
         <label class="label" data-bind="attr: {'for': getCode()}">
-            <!-- ko if: isTotalAmountInLimit() -->
             <img data-bind="attr: {src: tamaraBadgeSrc, alt: $t('Tamara')}" class="payment-icon" /><span data-bind="text: getTitle()"></span>
-            <!-- /ko -->
-            <!-- ko ifnot: isTotalAmountInLimit() -->
-            <img data-bind="attr: {src: tamaraBadgeSrc, alt: $t('Tamara')}" class="payment-icon" /><span data-bind="text: getTitle()"></span>
-            <!-- /ko -->
         </label>
     </div>
 
@@ -36,22 +31,6 @@
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
-        </div>
-
-        <div data-bind="visible: shouldShowError()">
-            <h4 data-bind="i18n: 'Payment information'"></h4>
-            <ul>
-                <li>
-                    <span data-bind="text: $t('Min Limit') + ' : ' + getMinLimit()"></span>
-                </li>
-                <li>
-                    <span data-bind="text: $t('Max Limit') + ' : ' + getMaxLimit()"></span>
-                </li>
-            </ul>
-        </div>
-
-        <div class="message warning message-error" data-bind="visible: shouldShowError()">
-            <span data-bind="i18n: 'The grand total of order is over/under limit of Tamara.'"></span>
         </div>
 
         <div class="params">

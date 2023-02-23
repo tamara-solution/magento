@@ -75,11 +75,7 @@ class CommonDataBuilder implements BuilderInterface
         $paymentMethod = $order->getPayment()->getMethod();
         $paymentType = \Tamara\Checkout\Gateway\Config\BaseConfig::convertPaymentMethodFromMagentoToTamara($paymentMethod);
         if ($paymentType == \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAY_BY_INSTALMENTS) {
-            if ($paymentMethod == \Tamara\Checkout\Gateway\Config\SingleCheckoutConfig::PAYMENT_TYPE_CODE) {
-                $numberOfInstallments = 3;
-            } else {
-                $numberOfInstallments = \Tamara\Checkout\Gateway\Config\InstalmentConfig::getInstallmentsNumberByPaymentCode($paymentMethod);
-            }
+            $numberOfInstallments = \Tamara\Checkout\Gateway\Config\InstalmentConfig::getInstallmentsNumberByPaymentCode($paymentMethod);
         }
 
         return [
