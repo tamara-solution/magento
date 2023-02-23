@@ -106,6 +106,10 @@ class UpgradeData implements UpgradeDataInterface
             $this->addExpiredStatus();
         }
 
+        if (version_compare($context->getVersion(), '1.1.7', '<')) {
+            $this->updateEnableTamaraPaymentConfig($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -265,5 +269,25 @@ class UpgradeData implements UpgradeDataInterface
             return;
         }
         $status->assignState(\Magento\Sales\Model\Order::STATE_CANCELED, false, true);
+    }
+
+    private function updateEnableTamaraPaymentConfig(ModuleDataSetupInterface $setup) {
+        $table = $setup->getTable('core_config_data');
+        $selectQuery = "SELECT * FROM `{$table}` WHERE `path` like '%tamara%active%'  AND `value` = '1'";
+        $rs = $setup->getConnection()->fetchAll($selectQuery);
+        if (!empty($rs)) {
+            $data = [];
+            foreach ($rs as $row) {
+                $data[] = [
+                    'config_id' => NULL,
+                    'scope' => $row['scope'],
+                    'scope_id' => $row['scope_id'],
+                    'path' => 'payment/tamara_checkout/enable_payment',
+                    'value' => '1',
+                    'updated_at' => gmdate('Y-m-d h:i:s \G\M\T', time())
+                ];
+            }
+            $setup->getConnection()->insertOnDuplicate($table, $data);
+        }
     }
 }

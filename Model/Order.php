@@ -168,4 +168,38 @@ class Order extends AbstractModel implements OrderInterface, IdentityInterface
     {
         $this->_init(\Tamara\Checkout\Model\ResourceModel\Order::class);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPaymentType()
+    {
+        return $this->getData(self::PAYMENT_TYPE);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setPaymentType($value)
+    {
+        $this->setData(self::PAYMENT_TYPE, $value);
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getNumberOfInstallments()
+    {
+        return $this->getData(self::NUMBER_OF_INSTALLMENTS);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setNumberOfInstallments($value)
+    {
+        $this->setData(self::NUMBER_OF_INSTALLMENTS, $value);
+        return $this;
+    }
 }

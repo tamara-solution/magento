@@ -228,7 +228,7 @@ class Core extends AbstractHelper
                 }
             }
         } else {
-            $this->storeManager->getStore()->getId();
+            return $this->storeManager->getStore()->getId();
         }
     }
 }

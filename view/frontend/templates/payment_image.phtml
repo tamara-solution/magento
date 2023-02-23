@@ -4,14 +4,33 @@
  * @var $block \Tamara\Checkout\Block\PopulateTamara
  */
 
-if ($block->isProductionEnvironment()) {
-    $baseWidgetUrl = "https://cdn.tamara.co/";
-} else {
-    $baseWidgetUrl = "https://cdn-sandbox.tamara.co/";
-}
+$widgetVersion = $block->getWidgetVersion();
+$isProductionEnvironment = $block->isProductionEnvironment();
 ?>
 <script>
     window.populateTamara = <?php /* @escapeNotVerified */ echo \Zend_Json::encode($block->getTamaraConfig()); ?>;
 </script>
-<script charset="utf-8" src="<?= $baseWidgetUrl ?>widget/product-widget.min.js"></script>
-<script charset="utf-8" src="<?= $baseWidgetUrl ?>widget/installment-plan.min.js"></script>
+<?php if ($widgetVersion == 'v1') : ?>
+    <?php if ($isProductionEnvironment): ?>
+        <script charset="utf-8" defer src="https://cdn.tamara.co/widget/installment-plan.min.js"></script>
+    <?php else: ?>
+        <script charset="utf-8" defer src="https://cdn-sandbox.tamara.co/widget/installment-plan.min.js"></script>
+    <?php endif; ?>
+<?php else: ?>
+    <?php if ($widgetVersion == 'v2') : ?>
+        <?php if ($isProductionEnvironment): ?>
+            <script charset="utf-8" defer src="https://cdn.tamara.co/widget-v2/tamara-widget.js"></script>
+        <?php else: ?>
+            <script charset="utf-8" defer src="https://cdn-sandbox.tamara.co/widget-v2/tamara-widget.js"></script>
+        <?php endif; ?>
+    <?php else: ?>
+        <?php if ($isProductionEnvironment): ?>
+            <script charset="utf-8" defer src="https://cdn.tamara.co/widget-v2/tamara-widget.js"></script>
+            <script charset="utf-8" defer src="https://cdn.tamara.co/widget/installment-plan.min.js"></script>
+        <?php else: ?>
+            <script charset="utf-8" defer src="https://cdn-sandbox.tamara.co/widget-v2/tamara-widget.js"></script>
+            <script charset="utf-8" defer src="https://cdn-sandbox.tamara.co/widget/installment-plan.min.js"></script>
+        <?php endif; ?>
+    <?php endif; ?>
+<?php endif; ?>
+

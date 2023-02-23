@@ -54,6 +54,9 @@ class InstalmentConfig extends MagentoPaymentConfig
      */
     public static function getInstallmentPaymentCode($numberOfInstallments = 3) {
         $numberOfInstallments = intval($numberOfInstallments);
+        if ($numberOfInstallments == 0) {
+            $numberOfInstallments = 3;
+        }
         if ($numberOfInstallments == 3) {
             return self::PAYMENT_TYPE_CODE;
         }

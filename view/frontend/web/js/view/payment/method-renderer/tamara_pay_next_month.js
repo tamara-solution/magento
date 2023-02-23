@@ -90,19 +90,19 @@ define(
             },
 
             getMinLimit: function () {
-                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_next_month.min_limit);
+                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara.payment_types.tamara_pay_next_month.min_limit);
             },
 
             getMinLimitAmount: function () {
-                return window.checkoutConfig.payment.tamara_pay_next_month.min_limit;
+                return window.checkoutConfig.payment.tamara.payment_types.tamara_pay_next_month.min_limit;
             },
 
             getMaxLimit: function () {
-                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara_pay_next_month.max_limit);
+                return priceUtils.formatPrice(window.checkoutConfig.payment.tamara.payment_types.tamara_pay_next_month.max_limit);
             },
 
             getMaxLimitAmount: function () {
-                return window.checkoutConfig.payment.tamara_pay_next_month.max_limit;
+                return window.checkoutConfig.payment.tamara.payment_types.tamara_pay_next_month.max_limit;
             },
 
             getGrandTotal: function () {
@@ -121,15 +121,8 @@ define(
                 return !(grandTotal < parseFloat(tamaraConfig.min_limit) || grandTotal > parseFloat(tamaraConfig.max_limit));
             },
 
-            shouldShowError: function () {
-                if (window.checkoutConfig.payment.tamara.enable_credit_pre_check) {
-                    return false;
-                }
-                return !this.isTotalAmountInLimit();
-            },
-
             isPlaceOrderActive: function () {
-                return !!this.isTotalAmountInLimit();
+                return true;
             },
 
             isArabicLanguage: function () {
@@ -237,8 +230,51 @@ define(
                 return false;
             },
 
-            getTitle: function () {
-                return $.mage.__('Pay it next month');
+            getWidgetVersion: function () {
+                return window.checkoutConfig.payment.tamara.widget_version;
+            },
+
+            renderWidgetV2: function () {
+                window.tamaraWidgetConfig = {
+                    "country" : window.checkoutConfig.payment.tamara.country_code,
+                    "lang": window.checkoutConfig.payment.tamara.language,
+                    "publicKey": window.checkoutConfig.payment.tamara.public_key
+                }
+                var self = this;
+                var countExistTamaraWidgetV2 = 0;
+                var existTamaraWidgetV2 = setInterval(function() {
+                    if ($('.tamara-promo-widget-wrapper.tamara-checkout-page.tamara-v2').length) {
+                        $('.tamara-promo-widget-wrapper.tamara-checkout-page.tamara-v2').empty();
+
+                        //append the widget html
+                        let widgetHtml = '<tamara-widget amount="' + self.getGrandTotal() + '" inline-type="3"></tamara-widget>';
+                        $( ".tamara-promo-widget-wrapper.tamara-checkout-page.tamara-v2" ).each(function() {
+                            $(this).append(widgetHtml);
+                        });
+                        if (window.TamaraWidgetV2) {
+                            window.TamaraWidgetV2.refresh();
+                        }
+                        clearInterval(existTamaraWidgetV2);
+                    }
+                    if (++countExistTamaraWidgetV2 > 33) {
+                        clearInterval(existTamaraWidgetV2);
+                    }
+                }, 300);
+                return true;
+            },
+
+            renderWidget: function () {
+                if (this.getWidgetVersion() == 'v1') {
+                    this.renderProductWidget();
+                } else {
+                    if (this.getWidgetVersion() == 'v2') {
+                        this.renderWidgetV2();
+                    } else {
+                        this.renderProductWidget();
+                        this.renderWidgetV2();
+                    }
+                }
+                return false;
             }
         });
     }
