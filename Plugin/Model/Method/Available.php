@@ -57,11 +57,13 @@ class Available
         $availableMethods,
         \Magento\Quote\Api\Data\CartInterface $quote = null
     ) {
-        if (!$this->isExistingTamaraMethod($availableMethods)) {
+        if (is_null($quote)) {
             return $availableMethods;
         }
-
         if ($this->tamaraHelper->isAdminArea()) {
+            return $this->removeTamaraMethod($availableMethods);
+        }
+        if (!$this->config->isEnableTamaraPayment($quote->getStoreId())) {
             return $this->removeTamaraMethod($availableMethods);
         }
 
@@ -105,33 +107,17 @@ class Available
             }
         }
 
-        $isEnabledCreditPreCheck = $this->config->getEnableCreditPreCheck($quote->getStoreId());
-        $availableMethods = $this->filterUnAvailableMethods($availableMethods, $quote, $isEnabledCreditPreCheck);
-        if ($isEnabledCreditPreCheck) {
-            return $availableMethods;
+        $supportedMethods = $this->tamaraHelper->getPaymentTypesForQuote($quote);
+        if (empty($supportedMethods)) {
+            return $this->removeTamaraMethod($availableMethods);
         }
-
-        //If disable warning message under / over limit
-        if (!$this->config->isDisplayWarningMessageIfOrderOverUnderLimit($quote->getStoreId())) {
-            $quoteTotal = $quote->getGrandTotal();
-            return $this->filterUnderOverLimit($availableMethods, $quoteTotal, $quote->getStoreId());
-        }
-        return $availableMethods;
+        return $this->filterUnsupportedMethods($supportedMethods, $availableMethods);
     }
 
-    private function filterUnAvailableMethods($availableMethods, \Magento\Quote\Api\Data\CartInterface $quote, $isEnabledPostCreditCheck)
-    {
-        $storeId = $quote->getStoreId();
-        $storeCurrency = $this->tamaraHelper->getStoreCurrencyCode($storeId);
-        if ($isEnabledPostCreditCheck) {
-            $paymentTypes = $this->getPaymentTypesForCustomer($quote);
-        } else {
-            $paymentTypes = $this->tamaraHelper->getPaymentTypes(\Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$storeCurrency],
-                $storeCurrency, $storeId);
-        }
+    private function filterUnsupportedMethods($supportedMethods, $availableMethods) {
         foreach ($availableMethods as $key => $method) {
             $methodCode = $method->getCode();
-            if (PaymentHelper::isTamaraPayment($methodCode) && !isset($paymentTypes[$methodCode])) {
+            if (PaymentHelper::isTamaraPayment($methodCode) && !isset($supportedMethods[$methodCode])) {
                 unset($availableMethods[$key]);
             }
         }
@@ -203,53 +189,75 @@ class Available
 
     /**
      * @param \Magento\Quote\Api\Data\CartInterface $quote
-     * @return array
-     * @throws \Tamara\Exception\RequestDispatcherException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return array|null
      */
     private function getPaymentTypesForCustomer(\Magento\Quote\Api\Data\CartInterface $quote) {
-        $riskAssessment = new RiskAssessment(
-            $this->getRiskAssessmentData($quote)
-        );
-        return $this->tamaraHelper->getPaymentTypesV2(
-            new \Tamara\Model\Money(floatval($quote->getGrandTotal()), $this->getCurrencyCodeFromQuote($quote)),
-            $this->getShippingAddressFromQuote($quote)->getCountryId(), $this->getOrderItemCollectionFromQuote($quote),
-            $this->getConsumer($quote), $this->getAddressFromQuote($quote), $riskAssessment,
-            $this->getAdditionalDataFromQuote($quote),
-            $quote->getStoreId()
-        );
-    }
-
-    public function getOrderItemCollectionFromQuote(\Magento\Quote\Api\Data\CartInterface $quote) {
-        $orderItemCollection = new OrderItemCollection();
-        $currencyCode = $this->getCurrencyCodeFromQuote($quote);
-        $items = $quote->getItems();
-        if (!is_null($items)) {
-            foreach ($items as $item) {
-                $orderItem = new OrderItem();
-                $orderItem = $orderItem->setName($item->getName())
-                    ->setReferenceId($item->getItemId())
-                    ->setSku($item->getSku())
-                    ->setType($item->getProductType())
-                    ->setQuantity($item->getQty())
-                    ->setUnitPrice(
-                        new Money(floatval($item->getPrice()), $currencyCode)
-                    )->setTotalAmount(
-                        new Money(floatval($item->getRowTotalInclTax()), $currencyCode)
-                    )->setTaxAmount(
-                        new Money(floatval($item->getTaxAmount()), $currencyCode)
-                    )->setDiscountAmount(
-                        new Money(floatval($item->getDiscountAmount()), $currencyCode)
-                    )->setImageUrl('');
-                $orderItemCollection->append($orderItem);
+        try {
+            $shippingAddress = $this->tamaraHelper->getShippingAddressFromQuote($quote);
+            $reject = false;
+            if (empty($shippingAddress) || empty($shippingAddress->getTelephone()) || empty($shippingAddress->getCountryId())) {
+                $reject = true;
             }
+            if ($reject) {
+                return null;
+            }
+            $riskAssessment = new RiskAssessment(
+                $this->getRiskAssessmentData($quote)
+            );
+            return $this->tamaraHelper->getPaymentTypesV2(
+                new \Tamara\Model\Money(floatval($quote->getGrandTotal()), $this->getCurrencyCodeFromQuote($quote)),
+                $shippingAddress->getCountryId(), $this->getOrderItemCollectionFromQuote($quote),
+                $this->getConsumer($quote), $this->getAddressFromQuote($quote), $riskAssessment,
+                $this->getAdditionalDataFromQuote($quote),
+                $quote->getStoreId()
+            );
+        } catch (\Exception $exception) {
+            return [];
         }
-        return $orderItemCollection;
     }
 
+    /**
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
+     * @return OrderItemCollection|null
+     */
+    public function getOrderItemCollectionFromQuote(\Magento\Quote\Api\Data\CartInterface $quote) {
+        try {
+            $orderItemCollection = new OrderItemCollection();
+            $currencyCode = $this->getCurrencyCodeFromQuote($quote);
+            $items = $quote->getItems();
+            if (!is_null($items)) {
+                foreach ($items as $item) {
+                    $orderItem = new OrderItem();
+                    $orderItem = $orderItem->setName($item->getName())
+                        ->setReferenceId($item->getItemId())
+                        ->setSku($item->getSku())
+                        ->setType($item->getProductType())
+                        ->setQuantity($item->getQty())
+                        ->setUnitPrice(
+                            new Money(floatval($item->getPrice()), $currencyCode)
+                        )->setTotalAmount(
+                            new Money(floatval($item->getRowTotalInclTax()), $currencyCode)
+                        )->setTaxAmount(
+                            new Money(floatval($item->getTaxAmount()), $currencyCode)
+                        )->setDiscountAmount(
+                            new Money(floatval($item->getDiscountAmount()), $currencyCode)
+                        )->setImageUrl('');
+                    $orderItemCollection->append($orderItem);
+                }
+            }
+            return $orderItemCollection;
+        } catch (\Exception $exception) {
+            return null;
+        }
+    }
+
+    /**
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
+     * @return Consumer
+     */
     public function getConsumer(\Magento\Quote\Api\Data\CartInterface $quote) {
         $consumer = new Consumer();
-        $shippingAddress = $this->getShippingAddressFromQuote($quote);
+        $shippingAddress = $this->tamaraHelper->getShippingAddressFromQuote($quote);
         $customerDob = '';
         $isFirstOrder = true;
         if ($quote->getCustomer() && $quote->getCustomer()->getId()) {
@@ -274,80 +282,98 @@ class Available
         return $consumer;
     }
 
+    /**
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
+     * @return array
+     */
     public function getRiskAssessmentData(\Magento\Quote\Api\Data\CartInterface $quote) {
-        $riskAssessmentData = [];
-        $timezone = $this->getMagentoTimezone($quote->getStoreId());
-        if ($quote->getCustomer() && $quote->getCustomer()->getId()) {
-            $customerObj = $quote->getCustomer();
-            $customerDob = $customerObj->getDob();
-            if (!empty($customerDob)) {
-                $customerAge = \DateTime::createFromFormat('Y-m-d', $customerDob, $timezone)
-                    ->diff(new \DateTime('now', $timezone))
-                    ->y;
-                $riskAssessmentData['customer_age'] = $customerAge;
-                $riskAssessmentData['customer_dob'] = \DateTime::createFromFormat('Y-m-d', $customerDob, $timezone)->format('d-m-Y');
-            }
-            $riskAssessmentData['customer_gender'] = ($customerObj->getGender() == 1) ? 'Male' : 'Female';
-            $customerAddresses = $customerObj->getAddresses();
-            if (!is_null($customerAddresses)) {
-                foreach ($customerAddresses as $customerAddress) {
-                    if ($customerAddress->isDefaultShipping()) {
-                        $riskAssessmentData['customer_nationality'] = $customerAddress->getCountryId();
+        try {
+            $riskAssessmentData = [];
+            $timezone = $this->getMagentoTimezone($quote->getStoreId());
+            if ($quote->getCustomer() && $quote->getCustomer()->getId()) {
+                $customerObj = $quote->getCustomer();
+                $customerDob = strval($customerObj->getDob());
+                if (!empty($customerDob)) {
+                    $customerAge = \DateTime::createFromFormat('Y-m-d', $customerDob, $timezone)
+                        ->diff(new \DateTime('now', $timezone))
+                        ->y;
+                    $riskAssessmentData['customer_age'] = $customerAge;
+                    $riskAssessmentData['customer_dob'] = \DateTime::createFromFormat('Y-m-d', $customerDob, $timezone)->format('d-m-Y');
+                }
+                $riskAssessmentData['customer_gender'] = ($customerObj->getGender() == 1) ? 'Male' : 'Female';
+                $customerAddresses = $customerObj->getAddresses();
+                if (!is_null($customerAddresses)) {
+                    foreach ($customerAddresses as $customerAddress) {
+                        if ($customerAddress->isDefaultShipping()) {
+                            $riskAssessmentData['customer_nationality'] = $customerAddress->getCountryId();
+                        }
                     }
                 }
-            }
-            $riskAssessmentData['is_existing_customer'] = true;
-            $riskAssessmentData['is_guest_user'] = false;
+                $riskAssessmentData['is_existing_customer'] = true;
+                $riskAssessmentData['is_guest_user'] = false;
 
-            $riskAssessmentData['account_creation_date'] = \DateTime::createFromFormat('Y-m-d', explode(" ", $customerObj->getCreatedAt())[0], $timezone)
-                ->format('d-m-Y');
-            $magentoOrderCollection = $this->magentoOrderCollectionFactory->create($customerObj->getId());
-            $magentoOrderCollection->setOrder('created_at', \Magento\Framework\Data\Collection::SORT_ORDER_ASC);
-            $hasCompletedOrder = false;
-            $firstOrder = false;
-            $totalOrderCount = 0;
-            $date3monthsAgo = new \DateTime('now', $timezone);
-            $date3monthsAgo->modify('-3 month');
-            $orderCountLast3Months = 0;
-            $orderAmountLast3Months = 0.0;
-            $lastCustomerOrder = null;
-            foreach ($magentoOrderCollection as $customerOrder) {
-                if (!$firstOrder) {
-                    $riskAssessmentData['date_of_first_transaction'] = \DateTime::createFromFormat('Y-m-d', explode(" ", $customerOrder->getCreatedAt())[0], $timezone)
+                $customerObjCreatedAt = strval($customerObj->getCreatedAt());
+                if (!empty($customerObjCreatedAt)) {
+                    $riskAssessmentData['account_creation_date'] = \DateTime::createFromFormat('Y-m-d', explode(" ", $customerObjCreatedAt)[0], $timezone)
                         ->format('d-m-Y');
-                    $firstOrder = true;
                 }
-                if ($customerOrder->getStatus() == "complete") {
-                    $hasCompletedOrder = true;
+                $magentoOrderCollection = $this->magentoOrderCollectionFactory->create($customerObj->getId());
+                $magentoOrderCollection->setOrder('created_at', \Magento\Framework\Data\Collection::SORT_ORDER_ASC);
+                $hasCompletedOrder = false;
+                $firstOrder = false;
+                $totalOrderCount = 0;
+                $date3monthsAgo = new \DateTime('now', $timezone);
+                $date3monthsAgo->modify('-3 month');
+                $orderCountLast3Months = 0;
+                $orderAmountLast3Months = 0.0;
+                $lastCustomerOrder = null;
+                $lastCustomerOrderCreatedAt = "";
+                foreach ($magentoOrderCollection as $customerOrder) {
+                    $customerOrderCreatedAt = strval($customerOrder->getCreatedAt());
+                    if (!$firstOrder) {
+                        $riskAssessmentData['date_of_first_transaction'] = \DateTime::createFromFormat('Y-m-d', explode(" ", $customerOrderCreatedAt)[0], $timezone)
+                            ->format('d-m-Y');
+                        $firstOrder = true;
+                    }
+                    if ($customerOrder->getStatus() == "complete") {
+                        $hasCompletedOrder = true;
+                    }
+                    $orderCreatedDate = \DateTime::createFromFormat('Y-m-d', explode(" ", $customerOrderCreatedAt)[0], $timezone);
+                    if ($orderCreatedDate > $date3monthsAgo) {
+                        $orderCountLast3Months++;
+                        $orderAmountLast3Months += floatval($customerOrder->getGrandTotal());
+                    }
+                    $lastCustomerOrder = $customerOrder;
+                    $lastCustomerOrderCreatedAt = $customerOrderCreatedAt;
+                    $totalOrderCount++;
                 }
-                $orderCreatedDate = \DateTime::createFromFormat('Y-m-d', explode(" ", $customerOrder->getCreatedAt())[0], $timezone);
-                if ($orderCreatedDate > $date3monthsAgo) {
-                    $orderCountLast3Months++;
-                    $orderAmountLast3Months += floatval($customerOrder->getGrandTotal());
-                }
-                $lastCustomerOrder = $customerOrder;
-                $totalOrderCount++;
+                $riskAssessmentData['has_delivered_order'] = $hasCompletedOrder;
+                $riskAssessmentData['total_order_count'] = $totalOrderCount;
+                $riskAssessmentData['order_amount_last3months'] = $orderAmountLast3Months;
+                $riskAssessmentData['order_count_last3months'] = $orderCountLast3Months;
+                $riskAssessmentData['last_order_date'] = \DateTime::createFromFormat('Y-m-d', explode(" ", $lastCustomerOrderCreatedAt)[0], $timezone)
+                    ->format('d-m-Y');
+                $riskAssessmentData['last_order_amount'] = $lastCustomerOrder->getGrandTotal();
+            } else {
+                $shippingAddress = $this->tamaraHelper->getShippingAddressFromQuote($quote);
+                $riskAssessmentData['customer_nationality'] = $shippingAddress->getCountryId();
+                $riskAssessmentData['is_existing_customer'] = false;
+                $riskAssessmentData['is_guest_user'] = true;
             }
-            $riskAssessmentData['has_delivered_order'] = $hasCompletedOrder;
-            $riskAssessmentData['total_order_count'] = $totalOrderCount;
-            $riskAssessmentData['order_amount_last3months'] = $orderAmountLast3Months;
-            $riskAssessmentData['order_count_last3months'] = $orderCountLast3Months;
-            $riskAssessmentData['last_order_date'] = \DateTime::createFromFormat('Y-m-d', explode(" ", $lastCustomerOrder->getCreatedAt())[0], $timezone)
-                ->format('d-m-Y');
-            $riskAssessmentData['last_order_amount'] = $lastCustomerOrder->getGrandTotal();
-        } else {
-            $shippingAddress = $this->getShippingAddressFromQuote($quote);
-            $riskAssessmentData['customer_nationality'] = $shippingAddress->getCountryId();
-            $riskAssessmentData['is_existing_customer'] = false;
-            $riskAssessmentData['is_guest_user'] = true;
-        }
 
-        return $riskAssessmentData;
+            return $riskAssessmentData;
+        } catch (\Exception $exception) {
+            return [];
+        }
     }
 
+    /**
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
+     * @return \Tamara\Model\Order\Address
+     */
     public function getAddressFromQuote(\Magento\Quote\Api\Data\CartInterface $quote) {
         $address = new \Tamara\Model\Order\Address();
-        $shippingAddress = $this->getShippingAddressFromQuote($quote);
+        $shippingAddress = $this->tamaraHelper->getShippingAddressFromQuote($quote);
         $street = $shippingAddress->getStreet();
         $streetClone = array_values($street);
         $address = $address->setFirstName(strval($shippingAddress->getFirstname()))
@@ -373,36 +399,22 @@ class Available
 
     /**
      * @param \Magento\Quote\Api\Data\CartInterface $quote
-     * @return \Magento\Quote\Api\Data\AddressInterface|null
+     * @return array
      */
-    public function getShippingAddressFromQuote(\Magento\Quote\Api\Data\CartInterface $quote) {
-        $shippingAddress = $quote->getShippingAddress();
-        if (!$shippingAddress || !$shippingAddress->getId()) {
-            $shippingAddress = $quote->getBillingAddress();
-        }
-        return $shippingAddress;
-    }
-
     public function getAdditionalDataFromQuote(\Magento\Quote\Api\Data\CartInterface $quote) {
         $additionalData = [];
-        $shippingAddress = $this->getShippingAddressFromQuote($quote);
+        $shippingAddress = $this->tamaraHelper->getShippingAddressFromQuote($quote);
         if ($shippingAddress->getAddressType() == "shipping") {
             $additionalData['delivery_method'] = $shippingAddress->getShippingDescription();
         }
         return $additionalData;
     }
 
+    /**
+     * @param $storeId
+     * @return \DateTimeZone
+     */
     public function getMagentoTimezone($storeId) {
         return new \DateTimeZone($this->timezone->getConfigTimezone('stores', $storeId));
-    }
-
-    public function isExistingTamaraMethod($availableMethods) {
-        foreach ($availableMethods as $key => $method) {
-            if (PaymentHelper::isTamaraPayment($method->getCode())) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

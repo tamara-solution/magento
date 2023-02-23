@@ -11,16 +11,7 @@
                class="radio"
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
         <label class="label" data-bind="attr: {'for': getCode()}">
-            <!-- ko if: isTotalAmountInLimit() -->
             <img data-bind="attr: {src: tamaraBadgeSrc, alt: $t('Tamara')}" class="payment-icon" /><span data-bind="text: getTitle()"></span>
-            <a class="tamara-product-widget" data-payment-type="paylater" data-disable-installment="true" data-disable-paylater="false" data-disable-product-limit="true" data-bind="attr: {'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal(), 'data-inject-template': 'false', 'data-pay-later-max-amount': getMaxLimitAmount(), 'href': 'javascript:void(0)'}">
-                <img data-bind="attr: {src: tamaraImageSrc, alt: $t('Tamara')}" class="payment-icon" />
-            </a>
-            <!-- /ko -->
-            <!-- ko ifnot: isTotalAmountInLimit() -->
-            <img data-bind="attr: {src: tamaraBadgeSrc, alt: $t('Tamara')}" class="payment-icon" />
-            <span data-bind="text: getTitle()"></span>
-            <!-- /ko -->
         </label>
     </div>
 
@@ -42,25 +33,8 @@
             <!--/ko-->
         </div>
 
-        <div data-bind="visible: shouldShowError()">
-            <h4 data-bind="i18n: 'Payment information'"></h4>
-            <ul>
-                <li>
-                    <span data-bind="text: $t('Min Limit') + ' : ' + getMinLimit()"></span>
-                </li>
-                <li>
-                    <span data-bind="text: $t('Max Limit') + ' : ' + getMaxLimit()"></span>
-                </li>
-            </ul>
-        </div>
-
-        <div class="message warning message-error" data-bind="visible: shouldShowError()">
-            <span data-bind="i18n: 'The grand total of order is over/under limit of Tamara.'"></span>
-        </div>
-
         <div class="params">
             <input type="hidden" id="order-id-paylater" value="0" />
-            <input class="render-product-widget" data-bind="visible: renderProductWidget()" />
         </div>
 
         <div class="actions-toolbar">

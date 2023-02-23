@@ -13,7 +13,8 @@ class CountryValidator extends AbstractValidator
         'AED' => 'AE',
         'KWD' => 'KW',
         'BHD' => 'BH',
-        'QAR' => 'QA'
+        'QAR' => 'QA',
+        'OMR' => 'OM'
     ];
 
     protected $tamaraHelper;

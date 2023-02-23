@@ -20,7 +20,7 @@
                 <display_limit_warning>1</display_limit_warning>
             </tamara_checkout>
             <tamara_pay_later>
-                <active>0</active>
+                <active>1</active>
                 <model>TamaraFacade</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
@@ -30,11 +30,11 @@
                 <can_authorize>1</can_authorize>
                 <can_use_checkout>1</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
-                <sort_order>1</sort_order>
+                <sort_order>999</sort_order>
                 <group>tamara</group>
             </tamara_pay_later>
             <tamara_pay_next_month>
-                <active>0</active>
+                <active>1</active>
                 <model>Tamara\Checkout\Model\PayNextMonth</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
@@ -44,11 +44,11 @@
                 <can_authorize>1</can_authorize>
                 <can_use_checkout>1</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
-                <sort_order>1</sort_order>
+                <sort_order>2</sort_order>
                 <group>tamara</group>
             </tamara_pay_next_month>
             <tamara_pay_now>
-                <active>0</active>
+                <active>1</active>
                 <model>Tamara\Checkout\Model\PayNow</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
@@ -62,7 +62,7 @@
                 <group>tamara</group>
             </tamara_pay_now>
             <tamara_pay_by_instalments>
-                <active>0</active>
+                <active>1</active>
                 <model>Tamara\Checkout\Model\PayByInstalments</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
@@ -72,11 +72,11 @@
                 <can_authorize>1</can_authorize>
                 <can_use_checkout>1</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
-                <sort_order>1</sort_order>
+                <sort_order>4</sort_order>
                 <group>tamara</group>
             </tamara_pay_by_instalments>
             <tamara_pay_by_instalments_2>
-                <active>0</active>
+                <active>1</active>
                 <model>Tamara\Checkout\Model\PayByInstalments2</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
@@ -86,11 +86,11 @@
                 <can_authorize>1</can_authorize>
                 <can_use_checkout>1</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
-                <sort_order>1</sort_order>
+                <sort_order>3</sort_order>
                 <group>tamara</group>
             </tamara_pay_by_instalments_2>
             <tamara_pay_by_instalments_4>
-                <active>0</active>
+                <active>1</active>
                 <model>Tamara\Checkout\Model\PayByInstalments4</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
@@ -100,11 +100,11 @@
                 <can_authorize>1</can_authorize>
                 <can_use_checkout>1</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
-                <sort_order>1</sort_order>
+                <sort_order>5</sort_order>
                 <group>tamara</group>
             </tamara_pay_by_instalments_4>
             <tamara_pay_by_instalments_5>
-                <active>0</active>
+                <active>1</active>
                 <model>Tamara\Checkout\Model\PayByInstalments5</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
@@ -114,11 +114,11 @@
                 <can_authorize>1</can_authorize>
                 <can_use_checkout>1</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
-                <sort_order>1</sort_order>
+                <sort_order>6</sort_order>
                 <group>tamara</group>
             </tamara_pay_by_instalments_5>
             <tamara_pay_by_instalments_6>
-                <active>0</active>
+                <active>1</active>
                 <model>Tamara\Checkout\Model\PayByInstalments6</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
@@ -128,11 +128,11 @@
                 <can_authorize>1</can_authorize>
                 <can_use_checkout>1</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
-                <sort_order>1</sort_order>
+                <sort_order>7</sort_order>
                 <group>tamara</group>
             </tamara_pay_by_instalments_6>
             <tamara_pay_by_instalments_7>
-                <active>0</active>
+                <active>1</active>
                 <model>Tamara\Checkout\Model\PayByInstalments7</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
@@ -142,11 +142,11 @@
                 <can_authorize>1</can_authorize>
                 <can_use_checkout>1</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
-                <sort_order>1</sort_order>
+                <sort_order>8</sort_order>
                 <group>tamara</group>
             </tamara_pay_by_instalments_7>
             <tamara_pay_by_instalments_8>
-                <active>0</active>
+                <active>1</active>
                 <model>Tamara\Checkout\Model\PayByInstalments8</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
@@ -156,11 +156,11 @@
                 <can_authorize>1</can_authorize>
                 <can_use_checkout>1</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
-                <sort_order>1</sort_order>
+                <sort_order>9</sort_order>
                 <group>tamara</group>
             </tamara_pay_by_instalments_8>
             <tamara_pay_by_instalments_9>
-                <active>0</active>
+                <active>1</active>
                 <model>Tamara\Checkout\Model\PayByInstalments9</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
@@ -170,11 +170,11 @@
                 <can_authorize>1</can_authorize>
                 <can_use_checkout>1</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
-                <sort_order>1</sort_order>
+                <sort_order>10</sort_order>
                 <group>tamara</group>
             </tamara_pay_by_instalments_9>
             <tamara_pay_by_instalments_10>
-                <active>0</active>
+                <active>1</active>
                 <model>Tamara\Checkout\Model\PayByInstalments10</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
@@ -184,11 +184,11 @@
                 <can_authorize>1</can_authorize>
                 <can_use_checkout>1</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
-                <sort_order>1</sort_order>
+                <sort_order>11</sort_order>
                 <group>tamara</group>
             </tamara_pay_by_instalments_10>
             <tamara_pay_by_instalments_11>
-                <active>0</active>
+                <active>1</active>
                 <model>Tamara\Checkout\Model\PayByInstalments11</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
@@ -198,11 +198,11 @@
                 <can_authorize>1</can_authorize>
                 <can_use_checkout>1</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
-                <sort_order>1</sort_order>
+                <sort_order>12</sort_order>
                 <group>tamara</group>
             </tamara_pay_by_instalments_11>
             <tamara_pay_by_instalments_12>
-                <active>0</active>
+                <active>1</active>
                 <model>Tamara\Checkout\Model\PayByInstalments12</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
@@ -212,7 +212,7 @@
                 <can_authorize>1</can_authorize>
                 <can_use_checkout>1</can_use_checkout>
                 <can_use_internal>1</can_use_internal>
-                <sort_order>1</sort_order>
+                <sort_order>14</sort_order>
                 <group>tamara</group>
             </tamara_pay_by_instalments_12>
 

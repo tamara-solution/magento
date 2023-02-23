@@ -11,15 +11,7 @@
                class="radio"
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
         <label class="label" data-bind="attr: {'for': getCode()}">
-            <!-- ko if: isTotalAmountInLimit() -->
             <img data-bind="attr: {src: tamaraBadgeSrc, alt: $t('Tamara')}" class="payment-icon" /><span data-bind="text: getTitle()"></span>
-            <a class="tamara-product-widget" data-bind="attr: {'id':'tamara-product-widget-' + getNumberOfInstalments(), 'data-lang': getPaymentLanguage(), 'data-price': getGrandTotal(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-payment-type': 'installment', 'data-number-of-installments': getNumberOfInstalments(), 'data-inject-template': 'false', 'data-installment-minimum-amount': getMinLimitAmount(), 'data-installment-available-amount': getMinLimitAmount(), 'href': 'javascript:void(0)'}">
-                <img data-bind="attr: {src: tamaraImageSrc, alt: $t('Tamara')}" class="payment-icon" />
-            </a>
-            <!-- /ko -->
-            <!-- ko ifnot: isTotalAmountInLimit() -->
-            <img data-bind="attr: {src: tamaraBadgeSrc, alt: $t('Tamara')}" class="payment-icon" /><span data-bind="text: getTitle()"></span>
-            <!-- /ko -->
         </label>
     </div>
 
@@ -41,32 +33,31 @@
             <!--/ko-->
         </div>
 
-        <div data-bind="visible: shouldShowError()">
-            <h4 data-bind="i18n: 'Payment information'"></h4>
-            <ul>
-                <li>
-                    <span data-bind="text: $t('Min Limit') + ' : ' + getMinLimit()"></span>
-                </li>
-                <li>
-                    <span data-bind="text: $t('Max Limit') + ' : ' + getMaxLimit()"></span>
-                </li>
-            </ul>
+        <!-- ko if: (getWidgetVersion() == 'v1') -->
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v1">
+            <div class="tamara-installment-plan-widget" data-bind="attr: {'id': 'tamara-installment-plan-widget-' + getNumberOfInstalments(), 'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal(), 'data-installment-minimum-amount': getMinLimitAmount(), 'data-installment-maximum-amount': getMaxLimitAmount(), 'data-installment-available-amount': getMinLimitAmount(), 'data-number-of-installments': getNumberOfInstalments()}"
+            ></div>
         </div>
-
-        <div class="message warning message-error" data-bind="visible: shouldShowError()">
-            <span data-bind="i18n: 'The grand total of order is over/under limit of Tamara.'"></span>
+        <!-- /ko -->
+        <!-- ko if: (getWidgetVersion() == 'v2') -->
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v2">
+            <tamara-widget inline-type="3" data-bind="attr: {'amount' : getGrandTotal()}"></tamara-widget>
         </div>
+        <!-- /ko -->
+        <!-- ko if: (getWidgetVersion() == 'mixed') -->
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v1" data-bind="visible: false">
+            <div class="tamara-installment-plan-widget" data-bind="attr: {'id': 'tamara-installment-plan-widget-' + getNumberOfInstalments(), 'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal(), 'data-installment-minimum-amount': getMinLimitAmount(), 'data-installment-maximum-amount': getMaxLimitAmount(), 'data-installment-available-amount': getMinLimitAmount(), 'data-number-of-installments': getNumberOfInstalments()}"
+            ></div>
+        </div>
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v2" data-bind="visible: false">
+            <tamara-widget inline-type="3" data-bind="attr: {'amount' : getGrandTotal()}"></tamara-widget>
+        </div>
+        <!-- /ko -->
 
         <div class="params">
             <input type="hidden" data-bind="attr: {'id': 'order-id-pay-by-instalments-' + getNumberOfInstalments()}" value="0" />
-            <input type="hidden" class="render-product-widget" data-bind="visible: renderProductWidget()" />
-            <input type="hidden" class="render-installments-widget" data-bind="visible: renderInstallmentsPlanWidget()" />
+            <input type="hidden" class="render-widget" data-bind="visible: renderWidget()" />
         </div>
-
-        <!-- ko if: (!shouldShowError()) -->
-        <div class="tamara-installment-plan-widget" data-bind="attr: {'id': 'tamara-installment-plan-widget-' + getNumberOfInstalments(), 'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal(), 'data-installment-minimum-amount': getMinLimitAmount(), 'data-installment-maximum-amount': getMaxLimitAmount(), 'data-installment-available-amount': getMinLimitAmount(), 'data-number-of-installments': getNumberOfInstalments()}"
-        ></div>
-        <!-- /ko -->
 
         <div class="actions-toolbar" style="margin-top: 10px;">
             <div class="primary">

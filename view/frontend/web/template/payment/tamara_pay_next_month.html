@@ -11,15 +11,7 @@
                class="radio"
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
         <label class="label" data-bind="attr: {'for': getCode()}">
-            <!-- ko if: isTotalAmountInLimit() -->
             <img data-bind="attr: {src: tamaraBadgeSrc, alt: $t('Tamara')}" class="payment-icon" /><span data-bind="text: getTitle()"></span>
-            <a class="tamara-product-widget" data-payment-type="pay-next-month" data-disable-installment="true" data-disable-paylater="true" data-inject-template="false" data-bind="attr: {'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal()}" href="javascript:void(0)">
-                <img data-bind="attr: {src: tamaraImageSrc, alt: $t('Tamara')}" class="payment-icon" />
-            </a>
-            <!-- /ko -->
-            <!-- ko ifnot: isTotalAmountInLimit() -->
-            <img data-bind="attr: {src: tamaraBadgeSrc, alt: $t('Tamara')}" class="payment-icon" /><span data-bind="text: getTitle()"></span>
-            <!-- /ko -->
         </label>
     </div>
 
@@ -41,25 +33,30 @@
             <!--/ko-->
         </div>
 
-        <div data-bind="visible: shouldShowError()">
-            <h4 data-bind="i18n: 'Payment information'"></h4>
-            <ul>
-                <li>
-                    <span data-bind="text: $t('Min Limit') + ' : ' + getMinLimit()"></span>
-                </li>
-                <li>
-                    <span data-bind="text: $t('Max Limit') + ' : ' + getMaxLimit()"></span>
-                </li>
-            </ul>
+        <!-- ko if: (getWidgetVersion() == 'v1') -->
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v1">
+            <div class="tamara-product-widget" data-color-type="default" data-show-border="true" data-payment-type="pay-next-month" data-disable-installment="false" data-disable-paylater="true"
+                 data-bind="attr: {'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal()}"></div>
         </div>
-
-        <div class="message warning message-error" data-bind="visible: shouldShowError()">
-            <span data-bind="i18n: 'The grand total of order is over/under limit of Tamara.'"></span>
+        <!-- /ko -->
+        <!-- ko if: (getWidgetVersion() == 'v2') -->
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v2">
+            <tamara-widget inline-type="3" data-bind="attr: {'amount' : getGrandTotal()}"></tamara-widget>
         </div>
+        <!-- /ko -->
+        <!-- ko if: (getWidgetVersion() == 'mixed') -->
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v1" data-bind="visible: false">
+            <div class="tamara-product-widget" data-color-type="default" data-show-border="true" data-payment-type="pay-next-month" data-disable-installment="false" data-disable-paylater="true"
+                 data-bind="attr: {'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal()}"></div>
+        </div>
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v2" data-bind="visible: false">
+            <tamara-widget inline-type="3" data-bind="attr: {'amount' : getGrandTotal()}"></tamara-widget>
+        </div>
+        <!-- /ko -->
 
         <div class="params">
             <input type="hidden" id="order-id-pay-next-month" value="0" />
-            <input class="render-product-widget" data-bind="visible: renderProductWidget()" />
+            <input type="hidden" class="render-widget" data-bind="visible: renderWidget()" />
         </div>
 
         <div class="actions-toolbar">

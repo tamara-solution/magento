@@ -9,11 +9,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Tamara\Checkout\Gateway\Config\BaseConfig;
 use Tamara\Checkout\Model\Helper\PaymentHelper;
 use Tamara\Exception\RequestException;
+use Tamara\Response\Checkout\CheckPaymentOptionsAvailabilityResponse;
 
 class AbstractData extends \Tamara\Checkout\Helper\Core
 {
     const PAYMENT_TYPES_CACHE_IDENTIFIER = 'payment_types_cache';
     const PAYMENT_TYPES_CACHE_LIFE_TIME = 1800; //30 minutes
+    const SINGLE_CHECKOUT_CACHE_LIFE_TIME = 86400; //1 day
+    const ORDER_PAYMENT_TYPES_CACHE_LIFE_TIME = 300; //5 minutes
 
     /**
      * @var \Magento\Framework\Locale\Resolver
@@ -146,7 +149,6 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
      * @param string $currencyCode
      * @param int $storeId
      * @return array|mixed
-     * @throws \Tamara\Exception\RequestDispatcherException
      */
     public function getPaymentTypes($countryCode = 'SA', $currencyCode = '',  $storeId = 0) {
         $cachedPaymentTypes = $this->getPaymentTypesCached($countryCode, $currencyCode, $storeId);
@@ -175,7 +177,6 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
      * @param array $additionalData
      * @param int $storeId
      * @return array
-     * @throws \Tamara\Exception\RequestDispatcherException
      */
     public function getPaymentTypesV2(\Tamara\Model\Money $totalAmount, string $countryCode, $items = null,
         $consumer = null, $shippingAddress = null, $riskAssessment = null, $additionalData = [], $storeId = 0) {
@@ -196,6 +197,160 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
             $this->getLogger()->debug(["Tamara" => $exception->getMessage()]);
         }
         return [];
+    }
+
+    /**
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
+     * @return \Magento\Quote\Api\Data\AddressInterface|\Magento\Quote\Model\Quote\Address
+     */
+    public function getShippingAddressFromQuote(\Magento\Quote\Api\Data\CartInterface $quote) {
+        $shippingAddress = $quote->getShippingAddress();
+        if (!$shippingAddress || !$shippingAddress->getId()) {
+            $shippingAddress = $quote->getBillingAddress();
+        }
+        return $shippingAddress;
+    }
+
+    /**
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
+     */
+    public function getPaymentTypesForQuote($quote) {
+        $storeId = $quote->getStoreId();
+        $storeCurrency = $this->getStoreCurrencyCode($quote->getStoreId());
+        $shippingAddress = $this->getShippingAddressFromQuote($quote);
+        $countryCode = "";
+        $phoneNumber = "";
+        if (isset(\Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$storeCurrency])) {
+            $countryCode = \Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$storeCurrency];
+        }
+        if ($shippingAddress !== null) {
+            if (!empty($shippingAddress->getCountryId())) {
+                $countryCode = $shippingAddress->getCountryId();
+            }
+            if (!empty($shippingAddress->getTelephone())) {
+                $phoneNumber = strval($shippingAddress->getTelephone());
+            }
+        }
+        if (empty($countryCode)) {
+            return [];
+        }
+        return $this->getPaymentTypesByOrderInfo($countryCode,
+            $storeCurrency, floatval($quote->getGrandTotal()), $phoneNumber , true, $storeId
+        );
+    }
+
+    public function getPaymentTypesByOrderInfo($countryCode, $currencyCode, $orderValue, $phoneNumber, $isVip = true, $storeId = 0) {
+        $cacheKey = $countryCode . $currencyCode . strval($orderValue) . $phoneNumber . strval(intval($isVip)) . strval($storeId);
+        if (($val = $this->magentoCache->load($cacheKey)) !== false) {
+            if (empty($val)) {
+                return [];
+            }
+            return json_decode($val, true);
+        }
+        $paymentTypes = $this->checkPaymentOptionsAvailability($countryCode, $currencyCode, $orderValue, $phoneNumber, $isVip, $storeId)['payment_types'];
+        $this->magentoCache->save(json_encode($paymentTypes), $cacheKey, [], self::ORDER_PAYMENT_TYPES_CACHE_LIFE_TIME);
+        return $paymentTypes;
+    }
+
+    public function checkPaymentOptionsAvailability($countryCode, $currencyCode, $orderValue, $phoneNumber, $isVip = true, $storeId = 0) {
+        $result = [
+            'has_available_payment_options' => false,
+            'single_checkout_enabled' => false,
+            'payment_types' => []
+        ];
+        if (!isset(\Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$currencyCode])
+        || \Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$currencyCode] != $countryCode
+        ) {
+            return $result;
+        }
+        $adapter = $this->tamaraAdapterFactory->create($storeId);
+        if ($adapter->getDisableTamara()) {
+            return $result;
+        }
+        try {
+            $paymentOptionsAvailability = new \Tamara\Model\Checkout\PaymentOptionsAvailability(
+                $countryCode,
+                new \Tamara\Model\Money($orderValue, $currencyCode),
+                $phoneNumber,
+                $isVip
+            );
+            $request = new \Tamara\Request\Checkout\CheckPaymentOptionsAvailabilityRequest($paymentOptionsAvailability);
+            $response = $adapter->getClient()->checkPaymentOptionsAvailability($request);
+            $result = $this->parsePaymentOptionsAvailabilityResponse($response, $currencyCode, $storeId);
+        } catch (RequestException $requestException) {
+            $adapter->setDisableTamara(true);
+        } catch (\Exception $exception) {
+            $this->getLogger()->debug(["Tamara" => $exception->getMessage()]);
+        }
+        if ($this->isSingleCheckoutEnabled($storeId) != $result['single_checkout_enabled']) {
+            $this->setSingleCheckoutEnabled($result['single_checkout_enabled'], \Magento\Store\Model\ScopeInterface::SCOPE_STORES , $storeId);
+        }
+        return $result;
+    }
+
+    /**
+     * @param CheckPaymentOptionsAvailabilityResponse $response
+     * @param $currencyCode
+     * @param $storeId
+     * @return array
+     */
+    public function parsePaymentOptionsAvailabilityResponse($response, $currencyCode, $storeId) {
+        $result = [
+            'has_available_payment_options' => false,
+            'single_checkout_enabled' => false,
+            'payment_types' => []
+        ];
+        if ($response->isSuccess()) {
+            $result['has_available_payment_options'] = $response->hasAvailablePaymentOptions();
+            $result['single_checkout_enabled'] = $response->isSingleCheckoutEnabled();
+            $paymentTypes = [];
+            $allPaymentTypes = $this->getPaymentTypes(\Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$currencyCode],
+                $currencyCode, $storeId);
+            foreach ($response->getAvailablePaymentLabels() as $paymentType) {
+                $typeName = "";
+                if ($paymentType['payment_type'] == \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAY_BY_LATER) {
+                    $typeName = \Tamara\Checkout\Gateway\Config\PayLaterConfig::PAYMENT_TYPE_CODE;
+                }
+                if ($paymentType['payment_type'] == \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAY_NEXT_MONTH) {
+                    $typeName = \Tamara\Checkout\Gateway\Config\PayNextMonthConfig::PAYMENT_TYPE_CODE;
+                }
+                if ($paymentType['payment_type'] == \Tamara\Checkout\Gateway\Config\PayNowConfig::PAY_NOW) {
+                    $typeName = \Tamara\Checkout\Gateway\Config\PayNowConfig::PAYMENT_TYPE_CODE;
+                }
+                if ($paymentType['payment_type'] == \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAY_BY_INSTALMENTS) {
+                    $typeName = \Tamara\Checkout\Gateway\Config\InstalmentConfig::getInstallmentPaymentCode($paymentType['instalment']);
+                }
+                $title = $paymentType['description_ar'];
+                if (!$this->isArabicLanguage()) {
+                    $title = $paymentType['description_en'];
+                }
+                if (!empty($typeName)) {
+                    $paymentTypes[$typeName] = [
+                        'name' => $typeName,
+                        'currency' => $currencyCode,
+                        'description' => $paymentType['description_en'],
+                        'description_ar' => $paymentType['description_ar'],
+                        'min_limit' => 1,
+                        'max_limit' => 999999999,
+                        'title' => $title,
+                        'is_installment' => ($paymentType['payment_type'] == \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAY_BY_INSTALMENTS),
+                        'is_none_validated_method' => false
+                    ];
+                    if (empty($paymentType['instalment'])) {
+                        $paymentTypes[$typeName]['number_of_instalments'] = 3;
+                    } else {
+                        $paymentTypes[$typeName]['number_of_instalments'] = $paymentType['instalment'];
+                    }
+                    if (isset($allPaymentTypes[$typeName])) {
+                        $paymentTypes[$typeName]['min_limit'] = $allPaymentTypes[$typeName]['min_limit'];
+                        $paymentTypes[$typeName]['max_limit'] = $allPaymentTypes[$typeName]['max_limit'];
+                    }
+                }
+            }
+            $result['payment_types'] = $paymentTypes;
+        }
+
+        return $result;
     }
 
     /**
@@ -314,14 +469,95 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
         if ($storeId === null) {
             $storeId = $this->getCurrentStore()->getId();
         }
-        return boolval($this->scopeConfig->getValue(
-            sprintf(\Magento\Payment\Gateway\Config\Config::DEFAULT_PATH_PATTERN, $paymentMethodCode, "active"),
-            ScopeInterface::SCOPE_STORE,
-            $storeId
-        ));
+        return $this->tamaraConfig->isEnableTamaraPayment($storeId);
     }
 
     public function getTamaraConfig() {
         return $this->tamaraConfig;
+    }
+
+    public function isSingleCheckoutEnabled($storeId = null) {
+        if ($storeId === null) {
+            $scope = $this->getCurrentScope();
+            $storeId = $this->getCurrentScopeId();
+        } else {
+            $scope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
+        }
+        return boolval($this->getSingleCheckoutCached($scope, $storeId));
+    }
+
+    private function getSingleCheckoutCached($scope, $scopeId) {
+        return $this->magentoCache->load($this->getSingleCheckoutCacheIdentifier($scope, $scopeId));
+    }
+
+    private function getSingleCheckoutCacheIdentifier($scope, $scopeId) {
+        return 'single_checkout_enabled' . $scope . $scopeId;
+    }
+
+    public function setSingleCheckoutEnabled($singleCheckoutValueCached, $scope, $storeId) {
+        //set cache
+        $this->magentoCache->save(intval($singleCheckoutValueCached),
+            $this->getSingleCheckoutCacheIdentifier($scope, $storeId), [], self::SINGLE_CHECKOUT_CACHE_LIFE_TIME);
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getWidgetVersion() {
+        if (empty($this->getMerchantPublicKey())) {
+            return 'v1';
+        }
+        if ($this->isSingleCheckoutEnabled()) {
+            return 'v2';
+        }
+        $paymentTypesOfStore = $this->getPaymentTypesOfStore();
+        if (is_array($paymentTypesOfStore) && count($paymentTypesOfStore) < 2) {
+            return 'v2';
+        }
+        return 'mixed';
+    }
+
+    public function getMerchantPublicKey($storeId = null) {
+        if ($storeId === null) {
+            $storeId = $this->getCurrentStore()->getId();
+        }
+        $val = $this->getTamaraConfig()->getPublicKey($storeId);
+        if (empty($val)) {
+            $adapter = $this->tamaraAdapterFactory->create($storeId);
+            if ($adapter->getDisableTamara()) {
+                return "";
+            }
+            try {
+                $response = $adapter->getClient()->getMerchantPublicConfigs(new \Tamara\Request\Merchant\GetPublicConfigsRequest());
+                if ($response->isSuccess()) {
+                    $val = $response->getMerchant()->getPublicKey();
+
+                    /**
+                     * @var \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
+                     */
+                    $configWriter = $this->getObject(\Magento\Framework\App\Config\Storage\WriterInterface::class);
+                    $configWriter->save('payment/tamara_checkout/public_key', $val, \Magento\Store\Model\ScopeInterface::SCOPE_STORES, $storeId);
+
+                    //flush cache
+                    $cacheTypeList = $this->getObject(\Magento\Framework\App\Cache\TypeListInterface::class);
+                    $cacheFrontendPool = $this->getObject(\Magento\Framework\App\Cache\Frontend\Pool::class);
+                    $types = array('config');
+                    foreach ($types as $type) {
+                        $cacheTypeList->cleanType($type);
+                    }
+                    foreach ($cacheFrontendPool as $cacheFrontend) {
+                        $cacheFrontend->getBackend()->clean();
+                    }
+                }
+            } catch (RequestException $requestException) {
+                $adapter->setDisableTamara(true);
+                return "";
+            } catch (\Exception $exception) {
+                //pass
+                return "";
+            }
+        }
+        return $val;
     }
 }

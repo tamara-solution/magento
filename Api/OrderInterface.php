@@ -4,6 +4,8 @@ namespace Tamara\Checkout\Api;
 
 interface OrderInterface
 {
+    const PAYMENT_TYPE = 'payment_type';
+    const NUMBER_OF_INSTALLMENTS = 'number_of_installments';
 
     /**
      * @return int
@@ -101,4 +103,25 @@ interface OrderInterface
      */
     public function setRefundedFromConsole($value);
 
+    /**
+     * @return string
+     */
+    public function getPaymentType();
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setPaymentType($value);
+
+    /**
+     * @return int
+     */
+    public function getNumberOfInstallments();
+
+    /**
+     * @param int $value
+     * @return $this
+     */
+    public function setNumberOfInstallments($value);
 }

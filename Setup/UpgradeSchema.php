@@ -43,6 +43,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addConsoleQueryIndex($setup);
         }
 
+        if (version_compare($context->getVersion(), '1.1.6', '<')) {
+            $this->addPaymentTypeColumn($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -310,5 +314,28 @@ class UpgradeSchema implements UpgradeSchemaInterface
     private function addConsoleQueryIndex(SchemaSetupInterface $setup)
     {
         $setup->getConnection()->query("ALTER TABLE {$setup->getTable(InstallSchema::TABLE_ORDERS)} ADD INDEX idx_console_query (is_authorised, created_at)");
+    }
+
+    private function addPaymentTypeColumn(SchemaSetupInterface $setup) {
+        $connection = $setup->getConnection();
+        $columns = [
+            'payment_type' => [
+                'type' => Table::TYPE_TEXT,
+                'nullable' => true,
+                'LENGTH' => 255,
+                'comment' => __('Payment type')
+            ],
+            'number_of_installments' => [
+                'type' => Table::TYPE_INTEGER,
+                'nullable' => true,
+                'comment' => __('Payment type')
+            ]
+        ];
+
+        foreach ($columns as $columnName => $definition) {
+            if (!$connection->tableColumnExists($setup->getTable(InstallSchema::TABLE_ORDERS), $columnName)) {
+                $connection->addColumn($setup->getTable(InstallSchema::TABLE_ORDERS), $columnName, $definition);
+            }
+        }
     }
 }
