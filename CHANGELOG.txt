@@ -1,3 +1,6 @@
+2.11.29
+    New:
+    + Add item URL to the item data
 2.11.28
     New:
     + Remove payment types configuration in the admin

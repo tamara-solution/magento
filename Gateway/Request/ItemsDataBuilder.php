@@ -69,6 +69,8 @@ class ItemsDataBuilder implements BuilderInterface
                 }
                 $orderItem->setReferenceId($item->getItemId());
                 $orderItem->setImageUrl($this->getImageUrlFromProductId($item->getProductId()));
+                $itemUrl = $item->getProduct()->setStoreId($item->getStoreId())->getUrlModel()->getUrlInStore($item->getProduct(), ['_escape' => true]);
+                $orderItem->setItemUrl($itemUrl);
                 $orderItemCollection->append($orderItem);
             }
         }
