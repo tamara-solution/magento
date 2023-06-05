@@ -1,3 +1,6 @@
+2.11.30
+    New:
+    + Add Pay in full widget
 2.11.29
     New:
     + Add item URL to the item data

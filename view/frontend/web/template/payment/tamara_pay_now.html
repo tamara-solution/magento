@@ -21,6 +21,11 @@
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
+
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-cart-snippet-v2">
+            <tamara-widget type="tamara-card-snippet"></tamara-widget>
+        </div>
+
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
             <!-- ko template: getTemplate() --><!-- /ko -->
@@ -35,6 +40,7 @@
 
         <div class="params">
             <input type="hidden" id="order-id-pay-now" value="0" />
+            <input type="hidden" class="render-widget" data-bind="visible: renderWidget()" />
         </div>
 
         <div class="actions-toolbar">
