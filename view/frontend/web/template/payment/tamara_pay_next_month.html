@@ -21,6 +21,26 @@
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
+
+        <!-- ko if: (getWidgetVersion() == 'v1') -->
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v1">
+            <div class="tamara-product-widget" data-color-type="default" data-show-border="true" data-payment-type="pay-next-month" data-disable-installment="false" data-disable-paylater="true"
+                 data-bind="attr: {'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal()}"></div>
+        </div>
+        <!-- /ko -->
+        <!-- ko if: (getWidgetVersion() == 'v2') -->
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v2">
+        </div>
+        <!-- /ko -->
+        <!-- ko if: (getWidgetVersion() == 'mixed') -->
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v1" data-bind="visible: false">
+            <div class="tamara-product-widget" data-color-type="default" data-show-border="true" data-payment-type="pay-next-month" data-disable-installment="false" data-disable-paylater="true"
+                 data-bind="attr: {'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal()}"></div>
+        </div>
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v2" data-bind="visible: false">
+        </div>
+        <!-- /ko -->
+
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
             <!-- ko template: getTemplate() --><!-- /ko -->
@@ -32,27 +52,6 @@
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-
-        <!-- ko if: (getWidgetVersion() == 'v1') -->
-        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v1">
-            <div class="tamara-product-widget" data-color-type="default" data-show-border="true" data-payment-type="pay-next-month" data-disable-installment="false" data-disable-paylater="true"
-                 data-bind="attr: {'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal()}"></div>
-        </div>
-        <!-- /ko -->
-        <!-- ko if: (getWidgetVersion() == 'v2') -->
-        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v2">
-            <tamara-widget inline-type="3" data-bind="attr: {'amount' : getGrandTotal()}"></tamara-widget>
-        </div>
-        <!-- /ko -->
-        <!-- ko if: (getWidgetVersion() == 'mixed') -->
-        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v1" data-bind="visible: false">
-            <div class="tamara-product-widget" data-color-type="default" data-show-border="true" data-payment-type="pay-next-month" data-disable-installment="false" data-disable-paylater="true"
-                 data-bind="attr: {'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal()}"></div>
-        </div>
-        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v2" data-bind="visible: false">
-            <tamara-widget inline-type="3" data-bind="attr: {'amount' : getGrandTotal()}"></tamara-widget>
-        </div>
-        <!-- /ko -->
 
         <div class="params">
             <input type="hidden" id="order-id-pay-next-month" value="0" />

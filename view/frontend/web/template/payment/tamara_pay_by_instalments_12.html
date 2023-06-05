@@ -21,6 +21,26 @@
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
+
+        <!-- ko if: (getWidgetVersion() == 'v1') -->
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v1">
+            <div class="tamara-installment-plan-widget" data-bind="attr: {'id': 'tamara-installment-plan-widget-' + getNumberOfInstalments(), 'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal(), 'data-installment-minimum-amount': getMinLimitAmount(), 'data-installment-maximum-amount': getMaxLimitAmount(), 'data-installment-available-amount': getMinLimitAmount(), 'data-number-of-installments': getNumberOfInstalments()}"
+            ></div>
+        </div>
+        <!-- /ko -->
+        <!-- ko if: (getWidgetVersion() == 'v2') -->
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v2">
+        </div>
+        <!-- /ko -->
+        <!-- ko if: (getWidgetVersion() == 'mixed') -->
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v1" data-bind="visible: false">
+            <div class="tamara-installment-plan-widget" data-bind="attr: {'id': 'tamara-installment-plan-widget-' + getNumberOfInstalments(), 'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal(), 'data-installment-minimum-amount': getMinLimitAmount(), 'data-installment-maximum-amount': getMaxLimitAmount(), 'data-installment-available-amount': getMinLimitAmount(), 'data-number-of-installments': getNumberOfInstalments()}"
+            ></div>
+        </div>
+        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v2" data-bind="visible: false">
+        </div>
+        <!-- /ko -->
+
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
             <!-- ko template: getTemplate() --><!-- /ko -->
@@ -32,27 +52,6 @@
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-
-        <!-- ko if: (getWidgetVersion() == 'v1') -->
-        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v1">
-            <div class="tamara-installment-plan-widget" data-bind="attr: {'id': 'tamara-installment-plan-widget-' + getNumberOfInstalments(), 'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal(), 'data-installment-minimum-amount': getMinLimitAmount(), 'data-installment-maximum-amount': getMaxLimitAmount(), 'data-installment-available-amount': getMinLimitAmount(), 'data-number-of-installments': getNumberOfInstalments()}"
-            ></div>
-        </div>
-        <!-- /ko -->
-        <!-- ko if: (getWidgetVersion() == 'v2') -->
-        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v2">
-            <tamara-widget inline-type="3" data-bind="attr: {'amount' : getGrandTotal()}"></tamara-widget>
-        </div>
-        <!-- /ko -->
-        <!-- ko if: (getWidgetVersion() == 'mixed') -->
-        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v1" data-bind="visible: false">
-            <div class="tamara-installment-plan-widget" data-bind="attr: {'id': 'tamara-installment-plan-widget-' + getNumberOfInstalments(), 'data-lang': getPaymentLanguage(), 'data-currency': currencyCode, 'data-country-code': countryCode, 'data-price': getGrandTotal(), 'data-installment-minimum-amount': getMinLimitAmount(), 'data-installment-maximum-amount': getMaxLimitAmount(), 'data-installment-available-amount': getMinLimitAmount(), 'data-number-of-installments': getNumberOfInstalments()}"
-            ></div>
-        </div>
-        <div class="tamara-promo-widget-wrapper tamara-checkout-page tamara-v2" data-bind="visible: false">
-            <tamara-widget inline-type="3" data-bind="attr: {'amount' : getGrandTotal()}"></tamara-widget>
-        </div>
-        <!-- /ko -->
 
         <div class="params">
             <input type="hidden" data-bind="attr: {'id': 'order-id-pay-by-instalments-' + getNumberOfInstalments()}" value="0" />
