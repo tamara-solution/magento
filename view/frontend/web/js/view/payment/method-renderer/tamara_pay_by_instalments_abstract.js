@@ -201,6 +201,7 @@ define(
                 var countExistTamaraInstallmentsPlan = 0;
                 var existTamaraInstallmentsPlan = setInterval(function() {
                     if ($('.tamara-installment-plan-widget').length) {
+                        $('.tamara-installment-plan-widget').attr('data-price', self.getGrandTotal());
                         if (window.TamaraInstallmentPlan) {
                             $('.tamara-installment-plan-widget').empty();
                             window.TamaraInstallmentPlan.init({ lang: self.getPaymentLanguage(), currency: self.currencyCode, publicKey: self.getPublicKey()});
@@ -276,16 +277,7 @@ define(
             },
 
             renderWidget: function () {
-                if (this.getWidgetVersion() == 'v1') {
-                    this.renderInstallmentsPlanWidget();
-                } else {
-                    if (this.getWidgetVersion() == 'v2') {
-                        this.renderWidgetV2();
-                    } else {
-                        this.renderInstallmentsPlanWidget();
-                        this.renderWidgetV2();
-                    }
-                }
+                //render it in  model/quote-mixin.js
                 return false;
             }
         });

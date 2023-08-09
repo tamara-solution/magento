@@ -14,6 +14,15 @@ class AddressDataBuilder implements BuilderInterface
         EMPTY = "",
         BILLING_ADDRESS = 'billing_address';
 
+    private $tamaraAddressRepository;
+
+    public function __construct(
+        \Tamara\Checkout\Model\AddressRepository $tamaraAddressRepository
+    )
+    {
+        $this->tamaraAddressRepository = $tamaraAddressRepository;
+    }
+
     public function build(array $buildSubject): array
     {
         if (!isset($buildSubject['payment'])
@@ -25,8 +34,31 @@ class AddressDataBuilder implements BuilderInterface
         /** @var PaymentDataObjectInterface $payment */
         $payment = $buildSubject['payment'];
         $order = $payment->getOrder();
-        $shippingAddress = $order->getShippingAddress() ?? $order->getBillingAddress();
+        $shippingAddress = $order->getShippingAddress();
         $billingAddress = $order->getBillingAddress();
+        $useBillingAddress = false;
+        if ($shippingAddress) {
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+            /**
+             * @var \Magento\Sales\Model\Order $magentoOrder
+             */
+            $magentoOrder = $objectManager->create('Magento\Sales\Model\Order')->load($order->getId());
+            $shippingMethod = strval($magentoOrder->getShippingMethod());
+
+            //use click and collect
+            foreach ($this->tamaraAddressRepository->getClickAndCollectMethods() as $method) {
+                if (strpos($shippingMethod, $method) === 0) {
+                    $useBillingAddress = true;
+                    break;
+                }
+            }
+        } else {
+            $useBillingAddress = true;
+        }
+        if ($useBillingAddress) {
+            $shippingAddress = $billingAddress;
+        }
 
         $shipping = new Address();
         $billing = new Address();

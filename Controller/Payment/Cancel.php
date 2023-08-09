@@ -78,17 +78,17 @@ class Cancel extends Action
                     }
                 }
             }
-
             if ($order->getState() != \Magento\Sales\Model\Order::STATE_NEW) {
-                throw new \Exception("Order status does not support");
+                throw new \Exception("Order state does not support");
             }
             $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);
             if ((bool) $tamaraOrder->getIsAuthorised()) {
                 throw new \Exception("Order was authorized");
             } else {
                 $tamaraAdapter = $this->tamaraAdapterFactory->create($order->getStoreId());
-                if ($tamaraAdapter->getTamaraOrderFromRemote($order->getIncrementId())->getStatus() == "approved") {
-                    throw new \Exception("Order was approved");
+                $remoteOrderStatus = $tamaraAdapter->getTamaraOrderFromRemote($order->getIncrementId())->getStatus();
+                if (!in_array($remoteOrderStatus, ['new', 'expired', 'declined'])) {
+                    throw new \Exception("Tamara order status not accepted");
                 }
             }
         } catch (\Exception $exception) {
@@ -103,11 +103,13 @@ class Cancel extends Action
         if ($restoreCart) {
             try {
                 $this->cartHelper->restoreCartFromOrder($order);
-                $this->coreRegistry->register("skip_tamara_cancel", true);
-                $this->orderManagement->cancel($order->getEntityId());
-                $order->setState(Order::STATE_CANCELED)->setStatus($this->config->getCheckoutCancelStatus($order->getStoreId()));
-                $order->addCommentToStatusHistory(__('Tamara - order was canceled'));
-                $order->getResource()->save($order);
+                if ($order->getState() != Order::STATE_CANCELED) {
+                    $this->coreRegistry->register("skip_tamara_cancel", true);
+                    $this->orderManagement->cancel($order->getEntityId());
+                    $order->setState(Order::STATE_CANCELED)->setStatus($this->config->getCheckoutCancelStatus($order->getStoreId()));
+                    $order->addCommentToStatusHistory(__('Tamara - order was canceled by the customer'));
+                    $order->getResource()->save($order);
+                }
             } catch (\Exception $e) {
                 $logger = $this->_objectManager->get('TamaraCheckoutLogger');
                 $logger->debug(["Tamara - Error when process payment cancel: " . $e->getMessage()]);

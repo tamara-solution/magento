@@ -103,11 +103,13 @@ class Failure extends Action
         if ($restoreCart) {
             try {
                 $this->cartHelper->restoreCartFromOrder($order);
-                $this->coreRegistry->register("skip_tamara_cancel", true);
-                $this->orderManagement->cancel($order->getEntityId());
-                $order->setState(Order::STATE_CANCELED)->setStatus($this->config->getCheckoutFailureStatus($order->getStoreId()));
-                $order->addCommentToStatusHistory(__('Tamara - order was failure'));
-                $order->getResource()->save($order);
+                if ($order->getState() != Order::STATE_CANCELED) {
+                    $this->coreRegistry->register("skip_tamara_cancel", true);
+                    $this->orderManagement->cancel($order->getEntityId());
+                    $order->setState(Order::STATE_CANCELED)->setStatus($this->config->getCheckoutFailureStatus($order->getStoreId()));
+                    $order->addCommentToStatusHistory(__('Tamara - order was failure'));
+                    $order->getResource()->save($order);
+                }
             } catch (\Exception $e) {
                 $logger = $this->_objectManager->get('TamaraCheckoutLogger');
                 $logger->debug(["Tamara - Error when process payment failure: " . $e->getMessage()]);

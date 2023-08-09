@@ -51,7 +51,7 @@ class MerchantUrlDataBuilder implements BuilderInterface
         $merchantUrl = new MerchantUrl();
 
         try {
-            $baseUrl = $this->storeManager->getStore()->getBaseUrl(UrlInterface::URL_TYPE_WEB);
+            $baseUrl = $this->storeManager->getStore()->getBaseUrl(UrlInterface::URL_TYPE_LINK);
             $storeId = $this->storeManager->getStore()->getId();
         } catch (NoSuchEntityException $e) {
             return [self::MERCHANT_URL => $merchantUrl];

@@ -22,7 +22,7 @@
                         <backend_model>Tamara\Checkout\Model\Config\Backend\ApiEnvironment</backend_model>
                     </field>
                     <field id="merchant_token" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Merchant Token</label>
+                        <label>Api Token</label>
                         <config_path>payment/tamara_checkout/merchant_token</config_path>
                         <validate>required-entry</validate>
                         <backend_model>Tamara\Checkout\Model\Config\Backend\Value</backend_model>

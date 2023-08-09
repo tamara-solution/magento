@@ -29,22 +29,26 @@ class CommonDataBuilder implements BuilderInterface
         RISK_ASSESSMENT = 'risk_assessment',
         NUMBER_OF_INSTALLMENTS = 'number_of_installments';
 
-    protected $tamaraCoreHelper;
-
     /**
      * @var ProductMetadata
      */
     private $productMetaData;
 
+    private $cartRepository;
+
+    protected $orderHelper;
+
     /**
      * @param ProductMetadata $productMetaData
      */
     public function __construct(ProductMetadata $productMetaData,
-        \Tamara\Checkout\Helper\Core $tamaraCoreHelper
+        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
+        \Tamara\Checkout\Helper\Order $orderHelper
     )
     {
         $this->productMetaData = $productMetaData;
-        $this->tamaraCoreHelper = $tamaraCoreHelper;
+        $this->cartRepository = $cartRepository;
+        $this->orderHelper = $orderHelper;
     }
 
     public function build(array $buildSubject): array
@@ -90,9 +94,9 @@ class CommonDataBuilder implements BuilderInterface
             self::DISCOUNT_AMOUNT => $discountAmount,
             self::COUNTRY_CODE => $order->getBillingAddress()->getCountryId(),
             self::PAYMENT_TYPE => $paymentType,
-            self::PLATFORM => 'Magento Version: ' . $this->productMetaData->getVersion() . ', Plugin Version: ' . $this->tamaraCoreHelper->getPluginVersion(),
+            self::PLATFORM => 'Magento Version: ' . $this->productMetaData->getVersion() . ', Plugin Version: ' . $this->orderHelper->getPluginVersion(),
             self::DESCRIPTION => 'Description',
-            self::RISK_ASSESSMENT => ['phone_verified' => $phoneVerified],
+            self::RISK_ASSESSMENT => array_merge($this->orderHelper->getRiskAssessmentDataFromOrder($order), ['is_phone_verified' => $phoneVerified]),
             self::NUMBER_OF_INSTALLMENTS => $numberOfInstallments
         ];
     }

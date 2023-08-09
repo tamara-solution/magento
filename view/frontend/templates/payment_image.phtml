@@ -8,7 +8,7 @@ $widgetVersion = $block->getWidgetVersion();
 $isProductionEnvironment = $block->isProductionEnvironment();
 ?>
 <script>
-    window.populateTamara = <?php /* @escapeNotVerified */ echo \Zend_Json::encode($block->getTamaraConfig()); ?>;
+    window.populateTamara = <?php /* @escapeNotVerified */ echo \json_encode($block->getTamaraConfig()); ?>;
 </script>
 <?php if ($widgetVersion == 'v1') : ?>
     <?php if ($isProductionEnvironment): ?>
