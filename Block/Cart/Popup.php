@@ -64,4 +64,9 @@ class Popup extends \Tamara\Checkout\Block\Product\Popup
         }
         return true;
     }
+
+    public function getPageType()
+    {
+        return 'cart';
+    }
 }

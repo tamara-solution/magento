@@ -30,6 +30,8 @@ class ConsumerDataBuilder implements BuilderInterface
      */
     private $logger;
 
+    private $tamaraAddressRepository;
+
     /**
      * ConsumerDataBuilder constructor.
      * @param CustomerRepositoryInterface $customerRepository
@@ -39,12 +41,14 @@ class ConsumerDataBuilder implements BuilderInterface
     public function __construct(
         CustomerRepositoryInterface $customerRepository,
         AddressRepositoryInterface $addressRepository,
-        Logger $logger
+        Logger $logger,
+        \Tamara\Checkout\Model\AddressRepository $tamaraAddressRepository
     )
     {
         $this->customerRepository = $customerRepository;
         $this->addressRepository = $addressRepository;
         $this->logger = $logger;
+        $this->tamaraAddressRepository = $tamaraAddressRepository;
     }
 
     public function build(array $buildSubject)
@@ -63,7 +67,31 @@ class ConsumerDataBuilder implements BuilderInterface
 
         try {
             /** @var AddressAdapterInterface $address */
-            $address = $order->getShippingAddress() ?? $order->getBillingAddress();
+            $address = $order->getShippingAddress();
+            $billingAddress = $order->getBillingAddress();
+            $useBillingAddress = false;
+            if ($address) {
+                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+                /**
+                 * @var \Magento\Sales\Model\Order $magentoOrder
+                 */
+                $magentoOrder = $objectManager->create('Magento\Sales\Model\Order')->load($order->getId());
+                $shippingMethod = strval($magentoOrder->getShippingMethod());
+
+                //use click and collect
+                foreach ($this->tamaraAddressRepository->getClickAndCollectMethods() as $method) {
+                    if (strpos($shippingMethod, $method) === 0) {
+                        $useBillingAddress = true;
+                        break;
+                    }
+                }
+            } else {
+                $useBillingAddress = true;
+            }
+            if ($useBillingAddress) {
+                $address = $billingAddress;
+            }
 
             $consumer->setFirstName($address->getFirstname());
             $consumer->setLastName($address->getLastname());

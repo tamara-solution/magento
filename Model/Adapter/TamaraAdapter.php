@@ -309,13 +309,22 @@ class TamaraAdapter
             if ($order->getIsAuthorised()) {
                 return true;
             }
-           $response = $this->client->authoriseOrder(new AuthoriseOrderRequest($authoriseMessage->getOrderId()));
 
-            if (!$response->isSuccess()) {
-                $errorLogs = ["Tamara" => $response->getContent()];
-                $this->logger->debug($errorLogs);
+            $remoteOrder = $this->client->getOrder(new \Tamara\Request\Order\GetOrderRequest($authoriseMessage->getOrderId()));
+            if ($remoteOrder->isSuccess()) {
+                $remoteOrderStatus = $remoteOrder->getStatus();
+                if ($remoteOrderStatus == "expired" || $remoteOrderStatus == "declined") {
+                    throw new \Exception("Order status not accepted for authorization, order status: " . $remoteOrderStatus);
+                }
+                if ($remoteOrder->getStatus() == "new" || $remoteOrder->getStatus() == "approved") {
+                    $response = $this->client->authoriseOrder(new AuthoriseOrderRequest($authoriseMessage->getOrderId()));
 
-                return false;
+                    if (!$response->isSuccess()) {
+                        throw new \Exception(strval($response->getContent()));
+                    }
+                }
+            } else {
+                throw new \Exception(strval($remoteOrder->getContent()));
             }
 
             $tamaraOrderId = $authoriseMessage->getOrderId();
@@ -375,7 +384,7 @@ class TamaraAdapter
             }
 
         } catch (\Exception $exception) {
-            $this->logger->debug(["Tamara - " . $exception->getMessage()]);
+            $this->logger->debug(["Tamara" => "Notification exception: " . $exception->getMessage()]);
             return false;
         }
 
@@ -392,44 +401,46 @@ class TamaraAdapter
             $captureRequest = PaymentHelper::createCaptureRequestFromArray($data);
             $response = $this->client->capture($captureRequest);
 
-            if (!$response->isSuccess()) {
-                $errorLogs = $response->getErrors() ?? [$response->getMessage()];
-                $this->logger->debug(["Tamara" => $errorLogs]);
-                throw new IntegrationException(__('Could not capture in tamara, please check log'));
-            }
+            if ($response->isSuccess()) {
+                $captureId = $response->getCaptureId();
+                if (!empty($captureId)) {
+                    $data['capture_id'] = $captureId;
+                    $capture = PaymentHelper::createCaptureFromArray($data);
+                    $this->captureRepository->saveCapture($capture);
 
-            $captureId = $response->getCaptureId();
-            if (!empty($captureId)) {
-                $data['capture_id'] = $captureId;
-                $capture = PaymentHelper::createCaptureFromArray($data);
-                $this->captureRepository->saveCapture($capture);
+                    $captureItems = [];
+                    foreach ($data['items'] as $itemData) {
+                        $captureItem = PaymentHelper::createCaptureItemFromArray($itemData);
+                        $captureItem->setOrderId($data['order_id']);
+                        $captureItem->setCaptureId($captureId);
+                        $captureItems[] = $captureItem->toArray();
+                    }
 
-                $captureItems = [];
-                foreach ($data['items'] as $itemData) {
-                    $captureItem = PaymentHelper::createCaptureItemFromArray($itemData);
-                    $captureItem->setOrderId($data['order_id']);
-                    $captureItem->setCaptureId($captureId);
-                    $captureItems[] = $captureItem->toArray();
+                    $rows = $this->captureRepository->saveCaptureItems($captureItems);
+
+                    if (!$rows) {
+                        $this->logger->debug(['Tamara - Cannot save capture items']);
+                        $this->logger->debug($captureItems);
+                        throw new IntegrationException(__('Cannot save capture items, please check log'));
+                    }
+
+                    $capturedAmount = $order->getOrderCurrency()->formatTxt(
+                        $data['total_amount']
+                    );
+                    $captureComment = __('Tamara - order was captured. The captured amount is %1. Capture id is %2', $capturedAmount, $response->getCaptureId());
+                    $order->addStatusHistoryComment($captureComment);
+                    $this->mageRepository->save($order);
+
+                    if ($this->baseConfig->getAutoGenerateInvoice($order->getStoreId()) == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_CAPTURE) {
+                        $this->logger->debug(["Tamara - Automatically generate invoice after capture payment"]);
+                        $this->tamaraInvoiceHelper->generateInvoice($order->getId());
+                    }
                 }
-
-                $rows = $this->captureRepository->saveCaptureItems($captureItems);
-
-                if (!$rows) {
-                    $this->logger->debug(['Tamara - Cannot save capture items']);
-                    $this->logger->debug($captureItems);
-                    throw new IntegrationException(__('Cannot save capture items, please check log'));
-                }
-
-                $capturedAmount = $order->getOrderCurrency()->formatTxt(
-                    $data['total_amount']
-                );
-                $captureComment = __('Tamara - order was captured. The captured amount is %1. Capture id is %2', $capturedAmount, $response->getCaptureId());
-                $order->addStatusHistoryComment($captureComment);
-                $this->mageRepository->save($order);
-
-                if ($this->baseConfig->getAutoGenerateInvoice($order->getStoreId()) == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_CAPTURE) {
-                    $this->logger->debug(["Tamara - Automatically generate invoice after capture payment"]);
-                    $this->tamaraInvoiceHelper->generateInvoice($order->getId());
+            } else {
+                if ($response->getStatusCode() !== 409) {
+                    $errorLogs = $response->getErrors() ?? [$response->getMessage()];
+                    $this->logger->debug(["Tamara" => $errorLogs]);
+                    throw new IntegrationException(__('Could not capture in tamara, please check log'));
                 }
             }
         } catch (\Exception $e) {
@@ -448,54 +459,56 @@ class TamaraAdapter
             $refundRequest = PaymentHelper::createRefundRequestFromArray($data);
             $response = $this->client->refund($refundRequest);
 
-            if (!$response->isSuccess()) {
-                $errorLogs = [$response->getContent()];
-                $this->logger->debug(["Tamara" => $errorLogs]);
-                throw new IntegrationException(__($response->getMessage()));
-            }
-
-            $refunds = $response->getRefunds();
-            $refundIds = [];
-            foreach ($refunds as $refund) {
-                $refundIds[$refund->getCaptureId()] = $refund->getRefundId();
-            }
-
-            foreach ($data['refunds'] as $captureId => $refund) {
-                $capture = $this->captureRepository->getCaptureById($captureId);
-                $totalRefundedAmount = $capture->getRefundedAmount() + $refund['refunded_amount'];
-                $capture->setRefundedAmount($totalRefundedAmount);
-                $this->captureRepository->saveCapture($capture);
-
-                $refundModel = PaymentHelper::createRefundFromData(
-                    $captureId,
-                    $refundIds[$captureId],
-                    $refundRequest->toArray(),
-                    $data,
-                    $refund,
-                    $capture['total_amount']
-                );
-
-                $this->refundRepository->save($refundModel);
-            }
-
-            $magentoOrder = $this->mageRepository->get($data['order_id']);
-            $creditMemoRefundedAmount = $magentoOrder->getOrderCurrency()->formatTxt(
-                $data['refund_grand_total']
-            );
-            $refundTransactionId = $magentoOrder->getIncrementId() . '-refund';
-                $refundComment = __('Tamara - order was refunded. The refunded amount is %1.', $creditMemoRefundedAmount);
-            $this->tamaraTransactionHelper->createTransaction($magentoOrder, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND, $refundComment, $refundTransactionId);
-            if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_REFUND_ORDER, $this->baseConfig->getSendEmailWhen($magentoOrder->getStoreId()))) {
-                $magentoOrder->setStatus($this->baseConfig->getOrderStatusShouldBeRefunded($magentoOrder->getStoreId()));
-                try {
-                    $this->orderCommentSender->send($magentoOrder, true, $refundComment);
-                } catch (\Exception $exception) {
-                    $this->logger->debug(["Tamara - Error when sending authorise notification: " . $exception->getMessage()]);
+            if ($response->isSuccess()) {
+                $refunds = $response->getRefunds();
+                $refundIds = [];
+                foreach ($refunds as $refund) {
+                    $refundIds[$refund->getCaptureId()] = $refund->getRefundId();
                 }
-                $magentoOrder->addStatusHistoryComment(
-                    __('Notified customer about order #%1 was refunded.', $magentoOrder->getIncrementId()),
-                    $this->baseConfig->getOrderStatusShouldBeRefunded($magentoOrder->getStoreId())
-                )->setIsCustomerNotified(true)->save();
+
+                foreach ($data['refunds'] as $captureId => $refund) {
+                    $capture = $this->captureRepository->getCaptureById($captureId);
+                    $totalRefundedAmount = $capture->getRefundedAmount() + $refund['refunded_amount'];
+                    $capture->setRefundedAmount($totalRefundedAmount);
+                    $this->captureRepository->saveCapture($capture);
+
+                    $refundModel = PaymentHelper::createRefundFromData(
+                        $captureId,
+                        $refundIds[$captureId],
+                        $refundRequest->toArray(),
+                        $data,
+                        $refund,
+                        $capture['total_amount']
+                    );
+
+                    $this->refundRepository->save($refundModel);
+                }
+
+                $magentoOrder = $this->mageRepository->get($data['order_id']);
+                $creditMemoRefundedAmount = $magentoOrder->getOrderCurrency()->formatTxt(
+                    $data['refund_grand_total']
+                );
+                $refundTransactionId = $magentoOrder->getIncrementId() . '-refund';
+                $refundComment = __('Tamara - order was refunded. The refunded amount is %1.', $creditMemoRefundedAmount);
+                $this->tamaraTransactionHelper->createTransaction($magentoOrder, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND, $refundComment, $refundTransactionId);
+                if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_REFUND_ORDER, $this->baseConfig->getSendEmailWhen($magentoOrder->getStoreId()))) {
+                    $magentoOrder->setStatus($this->baseConfig->getOrderStatusShouldBeRefunded($magentoOrder->getStoreId()));
+                    try {
+                        $this->orderCommentSender->send($magentoOrder, true, $refundComment);
+                    } catch (\Exception $exception) {
+                        $this->logger->debug(["Tamara - Error when sending authorise notification: " . $exception->getMessage()]);
+                    }
+                    $magentoOrder->addStatusHistoryComment(
+                        __('Notified customer about order #%1 was refunded.', $magentoOrder->getIncrementId()),
+                        $this->baseConfig->getOrderStatusShouldBeRefunded($magentoOrder->getStoreId())
+                    )->setIsCustomerNotified(true)->save();
+                }
+            } else {
+                if ($response->getStatusCode() !== 409) {
+                    $errorLogs = [$response->getContent()];
+                    $this->logger->debug(["Tamara" => $errorLogs]);
+                    throw new IntegrationException(__($response->getMessage()));
+                }
             }
         } catch (\Exception $e) {
             $this->logger->debug(["Tamara - " . $e->getMessage()]);
@@ -513,34 +526,36 @@ class TamaraAdapter
             $cancelRequest = PaymentHelper::createCancelRequestFromArray($data);
             $response = $this->client->cancelOrder($cancelRequest);
 
-            if (!$response->isSuccess() && $response->getStatusCode() !== 409) {
-                $errorLogs = [$response->getContent()];
-                $this->logger->debug(["Tamara" => $errorLogs]);
-                throw new IntegrationException(__($response->getMessage()));
-            }
-
-            $cancel = PaymentHelper::createCancelFromResponse($response);
-            $cancel->setOrderId($data['order_id']);
-            $cancel->setRequest($cancelRequest->toArray());
-            $this->cancelRepository->save($cancel);
-            $mageOrder = $this->mageRepository->get($data['order_id']);
-            $canceledAmount = $mageOrder->getOrderCurrency()->formatTxt(
-                $data['total_amount']
-            );
-            $comment = __('Tamara - order was canceled, canceled amount is ' . $canceledAmount);
-            $mageOrder->addStatusHistoryComment(__($comment));
-            $this->mageRepository->save($mageOrder);
-            if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_CANCEL_ORDER, $this->baseConfig->getSendEmailWhen($mageOrder->getStoreId()))) {
-                if (!empty($data['is_authorised'])) {
-                    try {
-                        $this->orderCommentSender->send($mageOrder, true, $comment);
-                    } catch (\Exception $exception) {
-                        $this->logger->debug(["Tamara - Error when sending authorise notification: " . $exception->getMessage()]);
+            if ($response->isSuccess()) {
+                $cancel = PaymentHelper::createCancelFromResponse($response);
+                $cancel->setOrderId($data['order_id']);
+                $cancel->setRequest($cancelRequest->toArray());
+                $this->cancelRepository->save($cancel);
+                $mageOrder = $this->mageRepository->get($data['order_id']);
+                $canceledAmount = $mageOrder->getOrderCurrency()->formatTxt(
+                    $data['total_amount']
+                );
+                $comment = __('Tamara - order was canceled, canceled amount is ' . $canceledAmount);
+                $mageOrder->addStatusHistoryComment(__($comment));
+                $this->mageRepository->save($mageOrder);
+                if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_CANCEL_ORDER, $this->baseConfig->getSendEmailWhen($mageOrder->getStoreId()))) {
+                    if (!empty($data['is_authorised'])) {
+                        try {
+                            $this->orderCommentSender->send($mageOrder, true, $comment);
+                        } catch (\Exception $exception) {
+                            $this->logger->debug(["Tamara - Error when sending authorise notification: " . $exception->getMessage()]);
+                        }
+                        $mageOrder->addStatusHistoryComment(
+                            __('Notified customer about order #%1 was canceled.', $mageOrder->getIncrementId()),
+                            $this->baseConfig->getCheckoutCancelStatus($mageOrder->getStoreId())
+                        )->setIsCustomerNotified(true)->save();
                     }
-                    $mageOrder->addStatusHistoryComment(
-                        __('Notified customer about order #%1 was canceled.', $mageOrder->getIncrementId()),
-                        $this->baseConfig->getCheckoutCancelStatus($mageOrder->getStoreId())
-                    )->setIsCustomerNotified(true)->save();
+                }
+            } else {
+                if ($response->getStatusCode() !== 409) {
+                    $errorLogs = [$response->getContent()];
+                    $this->logger->debug(["Tamara" => $errorLogs]);
+                    throw new IntegrationException(__($response->getMessage()));
                 }
             }
         } catch (\Exception $e) {

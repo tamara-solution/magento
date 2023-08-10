@@ -205,7 +205,24 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
      */
     public function getShippingAddressFromQuote(\Magento\Quote\Api\Data\CartInterface $quote) {
         $shippingAddress = $quote->getShippingAddress();
-        if (!$shippingAddress || !$shippingAddress->getId()) {
+        $useBillingAddress = false;
+        if ($shippingAddress && $shippingAddress->getId()) {
+            $shippingMethod = strval($shippingAddress->getShippingMethod());
+
+            /**
+             * @var \Tamara\Checkout\Model\AddressRepository $tamaraAddressRepositoryObj
+             */
+            $tamaraAddressRepositoryObj = $this->createObject(\Tamara\Checkout\Model\AddressRepository::class);
+            foreach ($tamaraAddressRepositoryObj->getClickAndCollectMethods() as $method) {
+                if ($this->startsWith($shippingMethod, $method)) {
+                    $useBillingAddress = true;
+                    break;
+                }
+            }
+        } else {
+            $useBillingAddress = true;
+        }
+        if ($useBillingAddress) {
             $shippingAddress = $quote->getBillingAddress();
         }
         return $shippingAddress;

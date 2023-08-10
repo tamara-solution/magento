@@ -1,3 +1,12 @@
+1.12.31
+    New:
+    + Add risk assessment data to order data
+    + Compatible with Magento 2.4.6
+    + Support shipping method "Click and Collect"
+    + Update "Merchant Token" label on the extension configuration page
+    + Add some improvements
+    Bug fixed:
+    + Fix the wrong amount on widgets in case complex tax
 1.12.30
     New:
     + Add Pay in full widget

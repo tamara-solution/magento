@@ -102,7 +102,7 @@ class Popup extends Template
          * @var $currentProduct \Magento\Catalog\Model\Product
          */
         if ($currentProduct = $this->getCurrentProduct()) {
-            return $currentProduct->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
+            return floatval($currentProduct->getPriceInfo()->getPrice('final_price')->getAmount()->getValue());
         }
         throw new \Exception(__('Cannot get current product price'));
     }
@@ -203,5 +203,9 @@ class Popup extends Template
 
     public function getInlineType() {
         return 2; //product widget
+    }
+
+    public function getPageType() {
+        return 'product';
     }
 }
