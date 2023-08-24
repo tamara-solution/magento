@@ -166,8 +166,8 @@ class Success extends Action
                         }
                         $order->addCommentToStatusHistory(
                             __('Notified customer about order #%1 was authorised.', $order->getIncrementId()),
-                            $this->config->getCheckoutAuthoriseStatus($order->getStoreId())
-                        )->setIsCustomerNotified(true)->save();
+                            $this->config->getCheckoutAuthoriseStatus($order->getStoreId()),
+                        false)->setIsCustomerNotified(true)->save();
                     }
                     $this->orderRepository->save($order);
 
@@ -183,7 +183,7 @@ class Success extends Action
                 } else {
                     $successStatus = $this->config->getCheckoutSuccessStatus($storeId);
                     $order->setState(Order::STATE_PENDING_PAYMENT)->setStatus($successStatus);
-                    $order->addCommentToStatusHistory(__('Tamara - order checkout success, we will confirm soon'));
+                    $order->addCommentToStatusHistory(__('Tamara - order checkout success, we will confirm soon'), false, false);
                     $order->getResource()->save($order);
                 }
                 //end

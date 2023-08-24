@@ -366,7 +366,7 @@ class TamaraAdapter
                     }
                     $mageOrder->addCommentToStatusHistory(
                         __('Notified customer about order #%1 was authorised.', $mageOrder->getIncrementId()),
-                        $this->baseConfig->getCheckoutAuthoriseStatus($mageOrder->getStoreId())
+                        $this->baseConfig->getCheckoutAuthoriseStatus($mageOrder->getStoreId()), false
                     )->setIsCustomerNotified(true)->save();
                 }
                 $this->mageRepository->save($mageOrder);
@@ -428,7 +428,7 @@ class TamaraAdapter
                         $data['total_amount']
                     );
                     $captureComment = __('Tamara - order was captured. The captured amount is %1. Capture id is %2', $capturedAmount, $response->getCaptureId());
-                    $order->addCommentToStatusHistory($captureComment);
+                    $order->addCommentToStatusHistory($captureComment, false, false);
                     $this->mageRepository->save($order);
 
                     if ($this->baseConfig->getAutoGenerateInvoice($order->getStoreId()) == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_CAPTURE) {
@@ -500,7 +500,7 @@ class TamaraAdapter
                     }
                     $magentoOrder->addCommentToStatusHistory(
                         __('Notified customer about order #%1 was refunded.', $magentoOrder->getIncrementId()),
-                        $this->baseConfig->getOrderStatusShouldBeRefunded($magentoOrder->getStoreId())
+                        $this->baseConfig->getOrderStatusShouldBeRefunded($magentoOrder->getStoreId()), false
                     )->setIsCustomerNotified(true)->save();
                 }
             } else {
@@ -536,7 +536,7 @@ class TamaraAdapter
                     $data['total_amount']
                 );
                 $comment = __('Tamara - order was canceled, canceled amount is ' . $canceledAmount);
-                $mageOrder->addCommentToStatusHistory(__($comment));
+                $mageOrder->addCommentToStatusHistory(__($comment), false, false);
                 $this->mageRepository->save($mageOrder);
                 if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_CANCEL_ORDER, $this->baseConfig->getSendEmailWhen($mageOrder->getStoreId()))) {
                     if (!empty($data['is_authorised'])) {
@@ -547,7 +547,7 @@ class TamaraAdapter
                         }
                         $mageOrder->addCommentToStatusHistory(
                             __('Notified customer about order #%1 was canceled.', $mageOrder->getIncrementId()),
-                            $this->baseConfig->getCheckoutCancelStatus($mageOrder->getStoreId())
+                            $this->baseConfig->getCheckoutCancelStatus($mageOrder->getStoreId()), false
                         )->setIsCustomerNotified(true)->save();
                     }
                 }
@@ -685,7 +685,7 @@ class TamaraAdapter
                 $mageOrder->setState(Order::STATE_CANCELED)->setStatus($this->baseConfig->getCheckoutExpireStatus($mageOrder->getStoreId()));
             }
             $comment = sprintf('Tamara - order was %s by webhook', $eventType);
-            $mageOrder->addCommentToStatusHistory(__($comment));
+            $mageOrder->addCommentToStatusHistory(__($comment), false, false);
             $mageOrder->getResource()->save($mageOrder);
 
         } catch (\Exception $exception) {
