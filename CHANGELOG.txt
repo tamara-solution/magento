@@ -1,3 +1,8 @@
+2.11.32
+    New:
+    + Improve code
+    Bug fixed:
+    + Fix the issue "Requested order doesn't exist" when viewing an order in Magento dashboard
 2.11.31
     New:
     + Add risk assessment data to order data
