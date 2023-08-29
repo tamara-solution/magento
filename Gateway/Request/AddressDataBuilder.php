@@ -89,7 +89,7 @@ class AddressDataBuilder implements BuilderInterface
         $billing->setLastName($billingAddress->getLastname());
         $billingAddressLine1 = empty($billingAddress->getStreetLine1()) ? self::EMPTY : $billingAddress->getStreetLine1();
         $billing->setLine1($billingAddressLine1);
-        $billing->setFirstName($billingAddress->getFirstname());
+        $billing->setFirstName(strval($billingAddress->getFirstname()));
         $billing->setLine2($billingAddress->getStreetLine2() ?? '');
         $billing->setRegion($regionBilling);
         $billingAddressCity = empty($billingAddress->getCity()) ? self::EMPTY : $billingAddress->getCity();

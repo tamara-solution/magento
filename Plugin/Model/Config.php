@@ -20,7 +20,7 @@ class Config
     {
         $groups = $subject->getGroups();
         if (!empty($groups)) {
-            $this->registry->register("tamara_config_groups", $groups);
+            $this->registry->register("tamara_config_groups", $groups, true);
         }
     }
 }

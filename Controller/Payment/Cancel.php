@@ -106,7 +106,7 @@ class Cancel extends Action
                     $this->coreRegistry->register("skip_tamara_cancel", true);
                     $this->orderManagement->cancel($order->getEntityId());
                     $order->setState(Order::STATE_CANCELED)->setStatus($this->config->getCheckoutCancelStatus($order->getStoreId()));
-                    $order->addStatusHistoryComment(__('Tamara - order was canceled by the customer'));
+                    $order->addStatusHistoryComment(__('Tamara - order was canceled by the customer'), false);
                     $order->getResource()->save($order);
                 }
             } catch (\Exception $e) {

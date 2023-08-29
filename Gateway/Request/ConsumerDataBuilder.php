@@ -93,9 +93,9 @@ class ConsumerDataBuilder implements BuilderInterface
                 $address = $billingAddress;
             }
 
-            $consumer->setFirstName($address->getFirstname());
-            $consumer->setLastName($address->getLastname());
-            $consumer->setEmail($address->getEmail());
+            $consumer->setFirstName(strval($address->getFirstname()));
+            $consumer->setLastName(strval($address->getLastname()));
+            $consumer->setEmail(strval($address->getEmail()));
             $consumer->setPhoneNumber($address->getTelephone());
             $consumer->setIsFirstOrder($this->isFirstOrder($order->getCustomerId()));
 

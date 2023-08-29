@@ -17,9 +17,12 @@ class Info
 
     public function afterGetPaymentHtml(\Magento\Sales\Block\Adminhtml\Order\View\Tab\Info $subject, $result)
     {
+        $order = $subject->getOrder();
+        if (!$this->tamaraHelper->isTamaraPayment($order->getPayment()->getMethod())) {
+            return $result;
+        }
         $result = str_replace("Split it up to 4 payments with Tamara, interest-free", "Tamara: split your payments. No hidden fees, no interest!", $result);
         $additionalInfo = "";
-        $order = $subject->getOrder();
         if ($this->tamaraHelper->isSingleCheckoutEnabled($order->getStoreId())) {
             $tamaraOrder = $this->orderRepository->getTamaraOrderByOrderId($order->getId());
             $additionalInfo .= ("<br/>Payment type: " . $tamaraOrder->getPaymentType());

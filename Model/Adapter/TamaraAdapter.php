@@ -428,7 +428,7 @@ class TamaraAdapter
                         $data['total_amount']
                     );
                     $captureComment = __('Tamara - order was captured. The captured amount is %1. Capture id is %2', $capturedAmount, $response->getCaptureId());
-                    $order->addStatusHistoryComment($captureComment);
+                    $order->addStatusHistoryComment($captureComment, false);
                     $this->mageRepository->save($order);
 
                     if ($this->baseConfig->getAutoGenerateInvoice($order->getStoreId()) == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_CAPTURE) {
@@ -536,7 +536,7 @@ class TamaraAdapter
                     $data['total_amount']
                 );
                 $comment = __('Tamara - order was canceled, canceled amount is ' . $canceledAmount);
-                $mageOrder->addStatusHistoryComment(__($comment));
+                $mageOrder->addStatusHistoryComment(__($comment), false);
                 $this->mageRepository->save($mageOrder);
                 if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_CANCEL_ORDER, $this->baseConfig->getSendEmailWhen($mageOrder->getStoreId()))) {
                     if (!empty($data['is_authorised'])) {
@@ -685,7 +685,7 @@ class TamaraAdapter
                 $mageOrder->setState(Order::STATE_CANCELED)->setStatus($this->baseConfig->getCheckoutExpireStatus($mageOrder->getStoreId()));
             }
             $comment = sprintf('Tamara - order was %s by webhook', $eventType);
-            $mageOrder->addStatusHistoryComment(__($comment));
+            $mageOrder->addStatusHistoryComment(__($comment), false);
             $mageOrder->getResource()->save($mageOrder);
 
         } catch (\Exception $exception) {

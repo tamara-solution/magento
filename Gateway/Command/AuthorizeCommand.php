@@ -153,7 +153,7 @@ class AuthorizeCommand implements CommandInterface
                 'redirect_url' => $response['checkout_url'],
             ]);
 
-            $order->addStatusHistoryComment(__('Tamara - order was created, order id: ' . $response['order_id']));
+            $order->addStatusHistoryComment(__('Tamara - order was created, order id: ' . $response['order_id']), false);
             $this->tamaraOrderRepository->save($tamaraOrder);
         } catch (Exception $e) {
             $orderResult->setState(Order::STATE_CANCELED)->setStatus(Order::STATE_CANCELED);
