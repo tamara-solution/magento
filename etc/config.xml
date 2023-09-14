@@ -38,7 +38,7 @@
                 <model>Tamara\Checkout\Model\PayNextMonth</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Tamara: pay it next month</title>
+                <title>Pay it next month with Tamara</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
@@ -52,7 +52,7 @@
                 <model>Tamara\Checkout\Model\PayNow</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Tamara: pay now</title>
+                <title>Pay in full - safe, quick, and hassle-free payments with Tamara</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
@@ -66,7 +66,7 @@
                 <model>Tamara\Checkout\Model\PayByInstalments</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Split into 3 payments, without fees with Tamara</title>
+                <title>Split in 3 payments without interest or hidden fees with Tamara</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
@@ -80,7 +80,7 @@
                 <model>Tamara\Checkout\Model\PayByInstalments2</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Tamara: split in 2, interest-free</title>
+                <title>Split in 2 payments without interest or hidden fees with Tamara</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
@@ -94,7 +94,7 @@
                 <model>Tamara\Checkout\Model\PayByInstalments4</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Split into 4 payments, without fees with Tamara</title>
+                <title>Split in 4 payments without interest or hidden fees with Tamara</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
@@ -108,7 +108,7 @@
                 <model>Tamara\Checkout\Model\PayByInstalments5</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Split into 5 payments, without fees with Tamara</title>
+                <title>Split in 5 payments without interest or hidden fees with Tamara</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
@@ -122,7 +122,7 @@
                 <model>Tamara\Checkout\Model\PayByInstalments6</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Split into 6 payments, without fees with Tamara</title>
+                <title>Split in 6 payments without interest or hidden fees with Tamara</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
@@ -136,7 +136,7 @@
                 <model>Tamara\Checkout\Model\PayByInstalments7</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Split into 7 payments, without fees with Tamara</title>
+                <title>Split in 7 payments without interest or hidden fees with Tamara</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
@@ -150,7 +150,7 @@
                 <model>Tamara\Checkout\Model\PayByInstalments8</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Split into 8 payments, without fees with Tamara</title>
+                <title>Split in 8 payments without interest or hidden fees with Tamara</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
@@ -164,7 +164,7 @@
                 <model>Tamara\Checkout\Model\PayByInstalments9</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Split into 9 payments, without fees with Tamara</title>
+                <title>Split in 9 payments without interest or hidden fees with Tamara</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
@@ -178,7 +178,7 @@
                 <model>Tamara\Checkout\Model\PayByInstalments10</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Split into 10 payments, without fees with Tamara</title>
+                <title>Split in 10 payments without interest or hidden fees with Tamara</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
@@ -192,7 +192,7 @@
                 <model>Tamara\Checkout\Model\PayByInstalments11</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Split into 11 payments, without fees with Tamara</title>
+                <title>Split in 11 payments without interest or hidden fees with Tamara</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>
@@ -206,7 +206,7 @@
                 <model>Tamara\Checkout\Model\PayByInstalments12</model>
                 <order_status>pending</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Split into 12 payments, without fees with Tamara</title>
+                <title>Split in 12 payments without interest or hidden fees with Tamara</title>
                 <currency>SAR</currency>
                 <order_history_use_phone>1</order_history_use_phone>
                 <can_authorize>1</can_authorize>

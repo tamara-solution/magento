@@ -97,6 +97,7 @@ class Success extends Action
             if (!$isAllowed) {
                 return $this->redirectToCartPage();
             }
+            $paymentMethod = null;
             if ($this->tamaraHelper->isSingleCheckoutEnabled($storeId)) {
                 $adapter = $this->tamaraAdapterFactory->create($storeId);
                 $remoteOrder = $adapter->getTamaraOrderFromRemote($order->getIncrementId());
@@ -185,6 +186,10 @@ class Success extends Action
                     $order->setState(Order::STATE_PENDING_PAYMENT)->setStatus($successStatus);
                     $order->addCommentToStatusHistory(__('Tamara - order checkout success, we will confirm soon'), false, false);
                     $order->getResource()->save($order);
+                }
+                if ($paymentMethod !== null && $order->getPayment()->getMethod() != $paymentMethod) {
+                    $adapter = $this->tamaraAdapterFactory->create($storeId);
+                    $adapter->updatePaymentMethodToDbDirectly($orderId, $paymentMethod);
                 }
                 //end
             }

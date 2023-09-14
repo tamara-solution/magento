@@ -12,6 +12,9 @@
         <method name="tamara_pay_next_month">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="tamara_pay_now">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
         <method name="tamara_pay_by_instalments_2">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
