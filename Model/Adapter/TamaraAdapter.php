@@ -330,30 +330,43 @@ class TamaraAdapter
             $tamaraOrderId = $authoriseMessage->getOrderId();
             $order = $this->orderRepository->getTamaraOrderByTamaraOrderId($tamaraOrderId);
             $order->setIsAuthorised(1);
+
+            //set payment method for single checkout
+            $paymentMethod = \Tamara\Checkout\Gateway\Config\BaseConfig::convertPaymentMethodFromTamaraToMagento($remoteOrder->getPaymentType());
+            if ($paymentMethod == \Tamara\Checkout\Gateway\Config\InstalmentConfig::PAYMENT_TYPE_CODE) {
+                $numberOfInstallments = $remoteOrder->getInstalments();
+                if ($numberOfInstallments != 3) {
+                    $paymentMethod = ($paymentMethod . "_" . $numberOfInstallments);
+                }
+            }
+            if ($paymentMethod != $order->getPaymentType()) {
+                $order->setPaymentType($paymentMethod);
+            }
             $this->orderRepository->save($order);
 
+            /** @var \Magento\Sales\Model\Order $mageOrder */
+            $mageOrder = $this->mageRepository->get($order->getOrderId());
             if (!empty($this->checkoutAuthoriseStatus)) {
-                /** @var \Magento\Sales\Model\Order $mageOrder */
-                $mageOrder = $this->mageRepository->get($order->getOrderId());
                 $mageOrder->setState(Order::STATE_PROCESSING)->setStatus($this->checkoutAuthoriseStatus);
+            }
 
-                //set base amount paid
-                $grandTotal = $mageOrder->getGrandTotal();
-                $mageOrder->setTotalDue(0.00);
-                $mageOrder->setTotalPaid($grandTotal);
-                $mageOrder->getPayment()->setAmountPaid($grandTotal);
-                $mageOrder->getPayment()->setAmountAuthorized($grandTotal);
-                $baseAmountPaid = $mageOrder->getBaseGrandTotal();
-                $mageOrder->setBaseTotalDue(0.00);
-                $mageOrder->setBaseTotalPaid($baseAmountPaid);
-                $mageOrder->getPayment()->setBaseAmountPaid($baseAmountPaid);
-                $mageOrder->getPayment()->setBaseAmountAuthorized($baseAmountPaid);
-                $mageOrder->getPayment()->setBaseAmountPaidOnline($baseAmountPaid);
-                $this->orderSender->send($mageOrder);
+            //set base amount paid
+            $grandTotal = $mageOrder->getGrandTotal();
+            $mageOrder->setTotalDue(0.00);
+            $mageOrder->setTotalPaid($grandTotal);
+            $mageOrder->getPayment()->setAmountPaid($grandTotal);
+            $mageOrder->getPayment()->setAmountAuthorized($grandTotal);
+            $baseAmountPaid = $mageOrder->getBaseGrandTotal();
+            $mageOrder->setBaseTotalDue(0.00);
+            $mageOrder->setBaseTotalPaid($baseAmountPaid);
+            $mageOrder->getPayment()->setBaseAmountPaid($baseAmountPaid);
+            $mageOrder->getPayment()->setBaseAmountAuthorized($baseAmountPaid);
+            $mageOrder->getPayment()->setBaseAmountPaidOnline($baseAmountPaid);
+            $this->orderSender->send($mageOrder);
 
-                $authorisedAmount = $mageOrder->getOrderCurrency()->formatTxt(
-                    $mageOrder->getGrandTotal()
-                );
+            $authorisedAmount = $mageOrder->getOrderCurrency()->formatTxt(
+                $mageOrder->getGrandTotal()
+            );
 
                 $authoriseComment = __('Tamara - order was authorised. The authorised amount is %1.', $authorisedAmount);
                 $this->tamaraInvoiceHelper->log(["Create transaction after authorise payment"]);
@@ -371,18 +384,21 @@ class TamaraAdapter
                 }
                 $this->mageRepository->save($mageOrder);
 
-                if ($this->baseConfig->getAutoGenerateInvoice($mageOrder->getStoreId()) == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_AUTHORISE) {
-                    $this->tamaraInvoiceHelper->log(["Automatically generate invoice after authorise payment"]);
-                    $this->tamaraInvoiceHelper->generateInvoice($mageOrder->getId());
-                }
-
-                //create capture transaction
-                $captureComment = __('Magento capture transaction created.');
-                $captureTransactionId = $mageOrder->getIncrementId() . "-" . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE;
-                $this->tamaraTransactionHelper->createTransaction($mageOrder, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE, $captureComment, $captureTransactionId);
-                return true;
+            if ($this->baseConfig->getAutoGenerateInvoice($mageOrder->getStoreId()) == \Tamara\Checkout\Model\Config\Source\AutomaticallyInvoice::GENERATE_AFTER_AUTHORISE) {
+                $this->tamaraInvoiceHelper->log(["Automatically generate invoice after authorise payment"]);
+                $this->tamaraInvoiceHelper->generateInvoice($mageOrder->getId());
             }
 
+            //create capture transaction
+            $captureComment = __('Magento capture transaction created.');
+            $captureTransactionId = $mageOrder->getIncrementId() . "-" . \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE;
+            $this->tamaraTransactionHelper->createTransaction($mageOrder, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE, $captureComment, $captureTransactionId);
+
+            if ($mageOrder->getPayment()->getMethod() != $paymentMethod) {
+
+                //update this after the order model saved
+                $this->updatePaymentMethodToDbDirectly($mageOrder->getId(), $paymentMethod);
+            }
         } catch (\Exception $exception) {
             $this->logger->debug(["Tamara" => "Notification exception: " . $exception->getMessage()]);
             return false;
@@ -745,5 +761,13 @@ class TamaraAdapter
      */
     public function setDisableTamara($val) {
         $this->magentoCache->save(strval(intval($val)), self::DISABLE_TAMARA_IDENTIFIER, [], self::DISABLE_TAMARA_CACHE_LIFE_TIME);
+    }
+
+    public function updatePaymentMethodToDbDirectly($magentoOrderId, $paymentMethod) {
+        $updateSalesOrderPaymentQuery = "UPDATE `". $this->resourceConfig->getTable("sales_order_payment") ."` SET `method` = '". $paymentMethod ."' WHERE `parent_id` = '". $magentoOrderId . "'";
+        $updateSalesOrderGridQuery = "UPDATE `". $this->resourceConfig->getTable("sales_order_grid") ."` SET `payment_method` = '". $paymentMethod ."' WHERE `entity_id` = '". $magentoOrderId. "'";
+        $connection  = $this->resourceConfig->getConnection();
+        $connection->query($updateSalesOrderPaymentQuery);
+        $connection->query($updateSalesOrderGridQuery);
     }
 }

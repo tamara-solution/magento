@@ -547,11 +547,11 @@
     <type name="Magento\Payment\Model\MethodList">
         <plugin name="methodlist" type="Tamara\Checkout\Plugin\Model\Method\Available" sortOrder="1" />
     </type>
-    <type name="Magento\Sales\Block\Adminhtml\Order\View\Tab\Info">
-        <plugin name="update_payment_title" type="Tamara\Checkout\Plugin\Block\Adminhtml\Order\View\Tab\Info" sortOrder="999" />
-    </type>
     <type name="Magento\Payment\Model\Method\Adapter">
         <plugin name="update_payment_method_title" type="Tamara\Checkout\Plugin\Model\Method\Adapter" sortOrder="999" />
+    </type>
+    <type name="Magento\Sales\Model\Order">
+        <plugin name="update_payment_method_for_single_checkout" type="Tamara\Checkout\Plugin\Magento\Sales\Model\Order" sortOrder="999" />
     </type>
 
     <type name="Tamara\Checkout\Plugin\Model\Method\Available">

@@ -1,3 +1,6 @@
+1.12.33
+    Bug fixed:
+    + Fix the issue payment method is not updated after the customer purchases with single checkout
 1.12.32
     New:
     + Improve code
