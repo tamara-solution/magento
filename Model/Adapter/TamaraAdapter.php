@@ -346,8 +346,9 @@ class TamaraAdapter
 
             /** @var \Magento\Sales\Model\Order $mageOrder */
             $mageOrder = $this->mageRepository->get($order->getOrderId());
-            if (!empty($this->checkoutAuthoriseStatus)) {
-                $mageOrder->setState(Order::STATE_PROCESSING)->setStatus($this->checkoutAuthoriseStatus);
+            $authoriseStatus = $this->baseConfig->getCheckoutAuthoriseStatus($mageOrder->getStoreId());
+            if (!empty($authoriseStatus)) {
+                $mageOrder->setState(Order::STATE_PROCESSING)->setStatus($authoriseStatus);
             }
 
             //set base amount paid

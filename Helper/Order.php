@@ -106,10 +106,12 @@ class Order extends AbstractData
             $timezone = $this->getMagentoTimezone($order->getStoreId());
             $customerDob = strval($order->getCustomerDob());
             if (!empty($customerDob)) {
-                $customerAge = DateTime::createFromFormat('Y-m-d H:i:s', $customerDob, $timezone)->diff(new DateTime('now', $timezone))
-                    ->y;
-                $rs['customer_age'] = $customerAge;
-                $rs['customer_dob'] = DateTime::createFromFormat('Y-m-d H:i:s', $customerDob, $timezone)->format('d-m-Y');
+                $customerDobDtObj = DateTime::createFromFormat('Y-m-d H:i:s', $customerDob, $timezone);
+                if ($customerDobDtObj !== false) {
+                    $rs['customer_age'] = $customerDobDtObj->diff(new DateTime('now', $timezone))
+                        ->y;
+                    $rs['customer_dob'] = $customerDobDtObj->format('d-m-Y');
+                }
             }
             $rs['customer_gender'] = ($order->getCustomerGender() == 1) ? 'Male' : 'Female';
 
@@ -127,11 +129,15 @@ class Order extends AbstractData
             }
             $customerObjCreatedAt = strval($customerObj->getCreatedAt());
             if (!empty($customerObjCreatedAt)) {
-                $rs['account_creation_date'] = DateTime::createFromFormat('Y-m-d H:i:s', $customerObjCreatedAt, $timezone)
-                    ->format('d-m-Y');
-                if ($rs['account_creation_date'] != DateTime::createFromFormat('Y-m-d H:i:s', strval($order->getCreatedAt()), $timezone)
-                        ->format('d-m-Y')) {
-                    $rs['is_existing_customer'] = true;
+                $accountCreationDateDtObj = DateTime::createFromFormat('Y-m-d H:i:s', $customerObjCreatedAt, $timezone);
+                if ($accountCreationDateDtObj !== false) {
+                    $rs['account_creation_date'] = $accountCreationDateDtObj->format('d-m-Y');
+                    $orderCreatedAtDtObj = DateTime::createFromFormat('Y-m-d H:i:s', strval($order->getCreatedAt()), $timezone);
+                    if ($orderCreatedAtDtObj !== false) {
+                        if ($rs['account_creation_date'] != $orderCreatedAtDtObj->format('d-m-Y')) {
+                            $rs['is_existing_customer'] = true;
+                        }
+                    }
                 }
             }
             $magentoOrderCollection = $this->magentoOrderCollectionFactory->create($customerObj->getId());
@@ -168,9 +174,12 @@ class Order extends AbstractData
             $lastConsumerOrderCreatedAt = null;
             foreach ($magentoOrderCollection as $consumerOrder) {
                 $consumerOrderCreatedAt = strval($consumerOrder->getCreatedAt());
+                $consumerOrderCreatedAtDtObj = DateTime::createFromFormat('Y-m-d H:i:s', $consumerOrderCreatedAt, $timezone);
                 if (!$firstOrder) {
-                    $rs['date_of_first_transaction'] = DateTime::createFromFormat('Y-m-d H:i:s', $consumerOrderCreatedAt, $timezone)
-                        ->format('d-m-Y');
+                    if ($consumerOrderCreatedAtDtObj !== false) {
+                        $rs['date_of_first_transaction'] = $consumerOrderCreatedAtDtObj
+                            ->format('d-m-Y');
+                    }
                     $firstOrder = true;
                 }
                 if (empty($consumerOrder->getStatus()) || in_array($consumerOrder->getStatus(), self::FAILED_STATUSES)) {
@@ -183,8 +192,7 @@ class Order extends AbstractData
                 }
                 if ($isSuccessfulOrder) {
                     $totalOrderCount++;
-                    $orderCreatedDate = DateTime::createFromFormat('Y-m-d H:i:s', $consumerOrderCreatedAt, $timezone);
-                    if ($orderCreatedDate > $date3monthsAgo) {
+                    if ($consumerOrderCreatedAtDtObj !== false && $consumerOrderCreatedAtDtObj > $date3monthsAgo) {
                         $orderCountLast3Months++;
                         $orderAmountLast3Months += floatval($consumerOrder->getGrandTotal());
                     }
@@ -197,8 +205,10 @@ class Order extends AbstractData
             $rs['order_amount_last3months'] = $orderAmountLast3Months;
             $rs['order_count_last3months'] = $orderCountLast3Months;
             if ($lastConsumerOrderCreatedAt) {
-                $rs['last_order_date'] = DateTime::createFromFormat('Y-m-d H:i:s', $lastConsumerOrderCreatedAt, $timezone)
-                    ->format('d-m-Y');
+                $lastConsumerOrderCreatedAtDtObj = DateTime::createFromFormat('Y-m-d H:i:s', $lastConsumerOrderCreatedAt, $timezone);
+                if ($lastConsumerOrderCreatedAtDtObj !== false) {
+                    $rs['last_order_date'] = $lastConsumerOrderCreatedAtDtObj->format('d-m-Y');
+                }
             }
             if ($lastConsumerOrder) {
                 $rs['last_order_amount'] = floatval($lastConsumerOrder->getGrandTotal());

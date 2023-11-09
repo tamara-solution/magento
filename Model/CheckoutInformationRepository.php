@@ -46,7 +46,10 @@ class CheckoutInformationRepository implements \Tamara\Checkout\Api\CheckoutInfo
         $magentoOrder = $this->orderRepository->get($magentoOrderId);
         $storeId = $magentoOrder->getStoreId();
         $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($magentoOrderId);
-        $baseUrl = $this->storeManager->getStore($storeId)->getBaseUrl();
+        $baseUrl = $this->storeManager->getStore($storeId)->getBaseUrl(UrlInterface::URL_TYPE_LINK);
+        if (!$this->baseConfig->getTamaraCore()->isAnUrl($baseUrl)) {
+            $baseUrl = $this->storeManager->getStore()->getBaseUrl(UrlInterface::URL_TYPE_WEB);
+        }
         $paymentController = $baseUrl . 'tamara/payment/' . $magentoOrderId . '/';
         $successUrl = $paymentController . 'success';
         $cancelUrl = $paymentController . 'cancel';

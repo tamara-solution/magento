@@ -52,6 +52,9 @@ class MerchantUrlDataBuilder implements BuilderInterface
 
         try {
             $baseUrl = $this->storeManager->getStore()->getBaseUrl(UrlInterface::URL_TYPE_LINK);
+            if (!$this->baseConfig->getTamaraCore()->isAnUrl($baseUrl)) {
+                $baseUrl = $this->storeManager->getStore()->getBaseUrl(UrlInterface::URL_TYPE_WEB);
+            }
             $storeId = $this->storeManager->getStore()->getId();
         } catch (NoSuchEntityException $e) {
             return [self::MERCHANT_URL => $merchantUrl];
