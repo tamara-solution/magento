@@ -79,6 +79,9 @@ class InstalmentConfig extends MagentoPaymentConfig
      * @return bool
      */
     public static function isInstallmentsPayment($paymentMethodCode) {
+        if (empty($paymentMethodCode)) {
+            return false;
+        }
         $installmentPattern = "/^(tamara_pay_by_instalments)([_][0-9]+)?$/";
         return boolval(preg_match($installmentPattern, $paymentMethodCode));
     }

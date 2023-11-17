@@ -319,7 +319,7 @@ class TamaraAdapter
                 if ($remoteOrder->getStatus() == "new" || $remoteOrder->getStatus() == "approved") {
                     $response = $this->client->authoriseOrder(new AuthoriseOrderRequest($authoriseMessage->getOrderId()));
 
-                    if (!$response->isSuccess()) {
+                    if (!$response->isSuccess() || $response->getOrderStatus() != "authorised") {
                         throw new \Exception(strval($response->getContent()));
                     }
                 }
