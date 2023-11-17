@@ -539,42 +539,6 @@ class AbstractData extends \Tamara\Checkout\Helper\Core
         if ($storeId === null) {
             $storeId = $this->getCurrentStore()->getId();
         }
-        $val = $this->getTamaraConfig()->getPublicKey($storeId);
-        if (empty($val)) {
-            $adapter = $this->tamaraAdapterFactory->create($storeId);
-            if ($adapter->getDisableTamara()) {
-                return "";
-            }
-            try {
-                $response = $adapter->getClient()->getMerchantPublicConfigs(new \Tamara\Request\Merchant\GetPublicConfigsRequest());
-                if ($response->isSuccess()) {
-                    $val = $response->getMerchant()->getPublicKey();
-
-                    /**
-                     * @var \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
-                     */
-                    $configWriter = $this->getObject(\Magento\Framework\App\Config\Storage\WriterInterface::class);
-                    $configWriter->save('payment/tamara_checkout/public_key', $val, \Magento\Store\Model\ScopeInterface::SCOPE_STORES, $storeId);
-
-                    //flush cache
-                    $cacheTypeList = $this->getObject(\Magento\Framework\App\Cache\TypeListInterface::class);
-                    $cacheFrontendPool = $this->getObject(\Magento\Framework\App\Cache\Frontend\Pool::class);
-                    $types = array('config');
-                    foreach ($types as $type) {
-                        $cacheTypeList->cleanType($type);
-                    }
-                    foreach ($cacheFrontendPool as $cacheFrontend) {
-                        $cacheFrontend->getBackend()->clean();
-                    }
-                }
-            } catch (RequestException $requestException) {
-                $adapter->setDisableTamara(true);
-                return "";
-            } catch (\Exception $exception) {
-                //pass
-                return "";
-            }
-        }
-        return $val;
+        return $this->getTamaraConfig()->getPublicKey($storeId);
     }
 }

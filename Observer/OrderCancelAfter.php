@@ -66,7 +66,12 @@ class OrderCancelAfter extends AbstractObserver
 
         $tamaraAdapter = $this->adapter->create($order->getStoreId());
 
-        $tamaraOrder = $this->orderRepository->getTamaraOrderByOrderId($order->getId());
+        try {
+            $tamaraOrder = $this->orderRepository->getTamaraOrderByOrderId($order->getId());
+        } catch (\Exception $exception) {
+            //Tamara order doesn't exist
+            return;
+        }
 
         $data['tamara_order_id'] = $tamaraOrder->getTamaraOrderId();
         $data['order_id'] = $order->getId();
