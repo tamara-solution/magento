@@ -129,7 +129,7 @@ class Success extends Action
                 $tamaraOrderId = $tamaraOrder->getTamaraOrderId();
                 $response = $client->authoriseOrder(new \Tamara\Request\Order\AuthoriseOrderRequest($tamaraOrderId));
 
-                if ($response->isSuccess() && $response->getOrderStatus() == 'authorised') {
+                if ($response->isSuccess() && in_array($response->getOrderStatus(), ['authorised', 'fully_captured'])) {
                     $tamaraOrder->setIsAuthorised(1);
                     $this->tamaraOrderRepository->save($tamaraOrder);
 
