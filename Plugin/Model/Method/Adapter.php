@@ -18,6 +18,9 @@ class Adapter {
     public function afterGetTitle(\Magento\Payment\Model\Method\Adapter $subject,
         $result
     ) {
+        if (!$this->tamaraHelper->getTamaraConfig()->isEnableTamaraPayment()) {
+            return $result;
+        }
         $quote = $this->checkoutSession->getQuote();
         $paymentCode = $subject->getCode();
         if ($this->tamaraHelper->isTamaraPayment($paymentCode)) {
@@ -30,6 +33,9 @@ class Adapter {
     }
 
     public function afterIsActive(\Magento\Payment\Model\Method\Adapter $subject, $result, $storeId = null) {
+        if (!$this->tamaraHelper->getTamaraConfig()->isEnableTamaraPayment($storeId)) {
+            return $result;
+        }
         $paymentCode = $subject->getCode();
         if ($this->tamaraHelper->isTamaraPayment($paymentCode)) {
             return true;

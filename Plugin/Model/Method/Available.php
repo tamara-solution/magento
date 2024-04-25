@@ -60,10 +60,10 @@ class Available
         if (is_null($quote)) {
             return $availableMethods;
         }
-        if ($this->tamaraHelper->isAdminArea()) {
+        if (!$this->config->isEnableTamaraPayment($quote->getStoreId())) {
             return $this->removeTamaraMethod($availableMethods);
         }
-        if (!$this->config->isEnableTamaraPayment($quote->getStoreId())) {
+        if ($this->tamaraHelper->isAdminArea()) {
             return $this->removeTamaraMethod($availableMethods);
         }
 

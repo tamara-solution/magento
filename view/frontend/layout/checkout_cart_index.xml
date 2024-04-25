@@ -8,7 +8,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
 		<referenceContainer name="cart.summary">
-			<block class="Tamara\Checkout\Block\Cart\Popup" name="tamara.cart.popup" template="Tamara_Checkout::popup.phtml" before="checkout.cart.methods.bottom" cacheable="false">
+			<block class="Tamara\Checkout\Block\Cart\Popup" name="tamara.cart.popup" template="Tamara_Checkout::popup.phtml" before="checkout.cart.methods.bottom" cacheable="true" ifconfig="payment/tamara_checkout/enable_payment">
         </block>
 		</referenceContainer>
     </body>

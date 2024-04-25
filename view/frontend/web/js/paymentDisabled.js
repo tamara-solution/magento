@@ -1,0 +1,1 @@
+window.tamara_checkout_disabled = true

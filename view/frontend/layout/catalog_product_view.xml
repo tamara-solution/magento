@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<body>
+    <referenceContainer name="product.info.main">
+        <block class="Tamara\Checkout\Block\Product\Popup" name="tamara.product.popup" after="product.info.price" template="Tamara_Checkout::popup.phtml" cacheable="true" ifconfig="payment/tamara_checkout/enable_payment">
+        </block>
+    </referenceContainer>
+</body>
+</page>

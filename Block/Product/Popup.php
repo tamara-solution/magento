@@ -57,15 +57,6 @@ class Popup extends Template
         return parent::_toHtml();
     }
 
-    public function isShowPopup(): bool
-    {
-        $whitelistConfig = $this->config->getIsUseWhitelist($this->tamaraHelper->getCurrentStore()->getId());
-        if (!$whitelistConfig) {
-            return true;
-        }
-        return $this->isAllowWhitelistEmail();
-    }
-
     private function isAllowWhitelistEmail(): bool
     {
         $isLogin = $this->customerSession->isLoggedIn();
@@ -189,6 +180,12 @@ class Popup extends Template
         $excludeProductIds = explode("," , strval($this->config->getExcludeProductIds($currentProduct->getStoreId())));
         if (in_array($currentProduct->getEntityId(), $excludeProductIds)) {
             return false;
+        }
+        $whitelistConfig = $this->config->getIsUseWhitelist($this->tamaraHelper->getCurrentStore()->getId());
+        if ($whitelistConfig) {
+            if (!$this->isAllowWhitelistEmail()) {
+                return false;
+            }
         }
         return true;
     }
