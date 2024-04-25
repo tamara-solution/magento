@@ -21,6 +21,11 @@ define([
                     $("#tamara-product-widget").empty();
                     window.TamaraProductWidget.render();
                 }
+
+                if (window.TamaraWidgetV2) {
+                    $("tamara-widget").attr("amount", this.cache.displayPrices.finalPrice.amount);
+                    window.TamaraWidgetV2.refresh();
+                }
             },
         });
     }

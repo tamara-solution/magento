@@ -602,6 +602,10 @@
         <plugin name="csrf_validator_skip" type="Tamara\Checkout\Plugin\CsrfValidatorSkip" />
     </type>
 
+    <type name="Magento\Framework\View\Page\Config\Renderer">
+        <plugin name="tamara_disable_mixin_js" type="Tamara\Checkout\Plugin\Magento\Framework\View\Page\Config\DisableMixinJs" />
+    </type>
+
     <preference for="Tamara\Checkout\Api\OrderInterface" type="Tamara\Checkout\Model\Order" />
     <preference for="Tamara\Checkout\Api\OrderRepositoryInterface" type="Tamara\Checkout\Model\OrderRepository" />
     <preference for="Tamara\Checkout\Api\CaptureRepositoryInterface" type="Tamara\Checkout\Model\CaptureRepository" />

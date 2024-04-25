@@ -46,9 +46,6 @@ class Popup extends \Tamara\Checkout\Block\Product\Popup
      * @return bool
      */
     public function availableToShow() {
-        if (!$this->isShowPopup()) {
-            return false;
-        }
         $quote = $this->getQuote();
         if (!$this->config->getEnableTamaraPdpWidget($quote->getStoreId())) {
             return false;
@@ -60,6 +57,12 @@ class Popup extends \Tamara\Checkout\Block\Product\Popup
                 if (in_array($item->getProduct()->getId(), $excludeProductIds)) {
                     return false;
                 }
+            }
+        }
+        $whitelistConfig = $this->config->getIsUseWhitelist($this->tamaraHelper->getCurrentStore()->getId());
+        if ($whitelistConfig) {
+            if (!$this->isAllowWhitelistEmail()) {
+                return false;
             }
         }
         return true;
