@@ -34,7 +34,6 @@ class Popup extends Template
         BaseConfig $config,
         Session $customerSession,
         EmailWhiteListFactory $whiteListFactory,
-        \Tamara\Checkout\Helper\AbstractData $helper,
         \Tamara\Checkout\Gateway\Config\InstalmentConfig $instalmentConfig,
         \Tamara\Checkout\Gateway\Config\PayLaterConfig $payLaterConfig,
         \Tamara\Checkout\Helper\AbstractData $tamaraHelper,
@@ -46,7 +45,6 @@ class Popup extends Template
         $this->customerSession = $customerSession;
         $this->config = $config;
         $this->whitelistFactory = $whiteListFactory;
-        $this->helper = $helper;
         $this->instalmentConfig = $instalmentConfig;
         $this->payLaterConfig = $payLaterConfig;
         $this->tamaraHelper = $tamaraHelper;
@@ -80,7 +78,7 @@ class Popup extends Template
      */
     public function isArabicLanguage(): bool
     {
-        return $this->helper->isArabicLanguage();
+        return $this->tamaraHelper->isArabicLanguage();
     }
 
     /**
@@ -103,7 +101,7 @@ class Popup extends Template
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getStoreCurrencyCode() {
-        return $this->helper->getStoreCurrencyCode();
+        return $this->tamaraHelper->getStoreCurrencyCode();
     }
 
     /**
@@ -191,7 +189,7 @@ class Popup extends Template
     }
 
     public function getPublicKey() {
-        return $this->helper->getMerchantPublicKey();
+        return $this->tamaraHelper->getMerchantPublicKey();
     }
 
     public function isProductionApiEnvironment() {
