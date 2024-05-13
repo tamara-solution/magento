@@ -17,7 +17,6 @@ class Popup extends \Tamara\Checkout\Block\Product\Popup
         BaseConfig $config,
         Session $customerSession,
         EmailWhiteListFactory $whiteListFactory,
-        \Tamara\Checkout\Helper\AbstractData $helper,
         \Tamara\Checkout\Gateway\Config\InstalmentConfig $instalmentConfig,
         \Tamara\Checkout\Gateway\Config\PayLaterConfig $payLaterConfig,
         \Tamara\Checkout\Helper\AbstractData $tamaraHelper,
@@ -26,7 +25,7 @@ class Popup extends \Tamara\Checkout\Block\Product\Popup
     )
     {
         $this->cart = $cart;
-        parent::__construct($context, $registry, $config, $customerSession, $whiteListFactory, $helper, $instalmentConfig, $payLaterConfig, $tamaraHelper, $data);
+        parent::__construct($context, $registry, $config, $customerSession, $whiteListFactory, $instalmentConfig, $payLaterConfig, $tamaraHelper, $data);
     }
 
     

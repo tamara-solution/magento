@@ -1,3 +1,8 @@
+1.12.38
+    New:
+    + Improve code
+    Bug fixed:
+    + Fix an issue wrong price on the product widget of Arabic language in version 1.12.37
 1.12.37
     New:
     + Improve code
