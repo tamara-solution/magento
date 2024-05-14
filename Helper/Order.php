@@ -108,9 +108,13 @@ class Order extends AbstractData
             if (!empty($customerDob)) {
                 $customerDobDtObj = DateTime::createFromFormat('Y-m-d H:i:s', $customerDob, $timezone);
                 if ($customerDobDtObj !== false) {
-                    $rs['customer_age'] = $customerDobDtObj->diff(new DateTime('now', $timezone))
-                        ->y;
                     $rs['customer_dob'] = $customerDobDtObj->format('d-m-Y');
+                    if (!$this->isValidDateTime($rs['customer_dob'])) {
+                        unset($rs['customer_dob']);
+                    } else {
+                        $rs['customer_age'] = $customerDobDtObj->diff(new DateTime('now', $timezone))
+                            ->y;
+                    }
                 }
             }
             $rs['customer_gender'] = ($order->getCustomerGender() == 1) ? 'Male' : 'Female';
@@ -132,10 +136,17 @@ class Order extends AbstractData
                 $accountCreationDateDtObj = DateTime::createFromFormat('Y-m-d H:i:s', $customerObjCreatedAt, $timezone);
                 if ($accountCreationDateDtObj !== false) {
                     $rs['account_creation_date'] = $accountCreationDateDtObj->format('d-m-Y');
-                    $orderCreatedAtDtObj = DateTime::createFromFormat('Y-m-d H:i:s', strval($order->getCreatedAt()), $timezone);
-                    if ($orderCreatedAtDtObj !== false) {
-                        if ($rs['account_creation_date'] != $orderCreatedAtDtObj->format('d-m-Y')) {
-                            $rs['is_existing_customer'] = true;
+                    if (!$this->isValidDateTime($rs['account_creation_date'])) {
+                        unset($rs['account_creation_date']);
+                    } else {
+                        $orderCreatedAtDtObj = DateTime::createFromFormat('Y-m-d H:i:s', strval($order->getCreatedAt()), $timezone);
+                        if ($orderCreatedAtDtObj !== false) {
+                            $orderCreatedAtDtStr = $orderCreatedAtDtObj->format('d-m-Y');
+                            if (DateTime::createFromFormat('d-m-Y', $orderCreatedAtDtStr) !== false) {
+                                if ($rs['account_creation_date'] != $orderCreatedAtDtStr) {
+                                    $rs['is_existing_customer'] = true;
+                                }
+                            }
                         }
                     }
                 }
@@ -179,6 +190,9 @@ class Order extends AbstractData
                     if ($consumerOrderCreatedAtDtObj !== false) {
                         $rs['date_of_first_transaction'] = $consumerOrderCreatedAtDtObj
                             ->format('d-m-Y');
+                        if (!$this->isValidDateTime($rs['date_of_first_transaction'])) {
+                            unset($rs['date_of_first_transaction']);
+                        }
                     }
                     $firstOrder = true;
                 }
@@ -208,6 +222,9 @@ class Order extends AbstractData
                 $lastConsumerOrderCreatedAtDtObj = DateTime::createFromFormat('Y-m-d H:i:s', $lastConsumerOrderCreatedAt, $timezone);
                 if ($lastConsumerOrderCreatedAtDtObj !== false) {
                     $rs['last_order_date'] = $lastConsumerOrderCreatedAtDtObj->format('d-m-Y');
+                    if (!$this->isValidDateTime($rs['last_order_date'])) {
+                        unset($rs['last_order_date']);
+                    }
                 }
             }
             if ($lastConsumerOrder) {

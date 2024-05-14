@@ -93,38 +93,6 @@ if (empty($publicKey)) {
         </script>
         <script charset="utf-8" defer src="<?= $widgetUrl ?>"></script>
     <?php endif; ?>
-    <script>
-        function updateTamaraWidget(price) {
-            if (window.TamaraProductWidget) {
-                document.getElementsByClassName("tamara-product-widget")[0].setAttribute("data-price", price);
-                document.getElementsByClassName("tamara-product-widget")[0].innerHTML = '';
-                window.TamaraProductWidget.render();
-            }
-            if (window.TamaraWidgetV2) {
-                document.getElementsByTagName("tamara-widget")[0].setAttribute("amount", price);
-                window.TamaraWidgetV2.refresh();
-            }
-        }
-
-        require(['jquery'], function ($) {
-            $('.product-info-main .product-info-price .price-box.price-final_price').
-            on('reloadPrice', function (data) {
-                var that = this;
-                setTimeout(() => {
-                    let price = $(that).find('[data-price-type=finalPrice]').children('span').eq(0).text();
-                    price = price.replace(/[^\d.-]/g, '');
-                    try {
-                        price = Number.parseFloat(price);
-                    } catch (error) {
-                        return;
-                    }
-                    if (price) {
-                        updateTamaraWidget(price);
-                    }
-                }, 50);
-            });
-        });
-    </script>
     <div class="<?php echo 'tamara-page-type-' . $block->getPageType() ?>"></div>
 <?php endif; ?>
 

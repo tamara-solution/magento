@@ -252,4 +252,15 @@ class Core extends AbstractHelper
         }
         return false;
     }
+
+    /**
+     * @param $datetime
+     * @param string $format
+     * @param null $timezone
+     * @return bool
+     */
+    public function isValidDateTime($datetime, $format = "d-m-Y", $timezone = null)
+    {
+        return \DateTime::createFromFormat($format, $datetime, $timezone) !== false;
+    }
 }
