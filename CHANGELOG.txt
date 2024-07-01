@@ -1,3 +1,7 @@
+2.11.40
+    New:
+    + Compatible with Magento 2.4.6 and 2.4.7
+    + Update default config for use_magento_success_page
 2.11.39
     New:
     + Improve code

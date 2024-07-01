@@ -3,7 +3,6 @@
 namespace Tamara\Checkout\Model;
 
 use Magento\Framework\Model\AbstractModel;
-use Zend\Json\Json;
 
 class Refund extends AbstractModel
 {
@@ -145,7 +144,7 @@ class Refund extends AbstractModel
     public function getRequest()
     {
         $data = $this->_getData('request');
-        return Json::decode($data);
+        return json_decode($data, true);
     }
 
     /**
@@ -155,7 +154,7 @@ class Refund extends AbstractModel
     {
         $data = [];
         if (!empty($request)) {
-            $data = Json::encode($request);
+            $data = json_encode($request);
         }
         $this->setData('request', $data);
         return $this;

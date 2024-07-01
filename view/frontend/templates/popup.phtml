@@ -53,28 +53,36 @@ if (empty($publicKey)) {
 
         $str .= '</div></div>';
         echo $str;
+        $scriptString = '
+        require([\'jquery\'], function ($) {
+            var countExistTamaraProductWidget = 0;
+            var existTamaraProductWidget = setInterval(function () {
+                if ($(\'.tamara-promo-widget-wrapper.tamara-product-page .tamara-product-widget\').length && window.TamaraProductWidget) {
+                    $(".tamara-promo-widget-wrapper.tamara-product-page .tamara-product-widget").empty();
+                    window.TamaraProductWidget.init({
+                        lang: \''. $lang .'\',
+                        currency: \''. $currencyCode .'\',
+                        publicKey: \''. $publicKey .'\'
+                    });
+                    window.TamaraProductWidget.render();
+                    clearInterval(existTamaraProductWidget);
+                }
+                if (++countExistTamaraProductWidget > 33) {
+                    clearInterval(existTamaraProductWidget);
+                }
+            }, 300);
+        });
+        ';
         ?>
         <script charset="utf-8" defer src="<?= $widgetUrl ?>"></script>
-        <script>
-            require(['jquery'], function ($) {
-                var countExistTamaraProductWidget = 0;
-                var existTamaraProductWidget = setInterval(function () {
-                    if ($('.tamara-promo-widget-wrapper.tamara-product-page .tamara-product-widget').length && window.TamaraProductWidget) {
-                        $(".tamara-promo-widget-wrapper.tamara-product-page .tamara-product-widget").empty();
-                        window.TamaraProductWidget.init({
-                            lang: '<?= $lang; ?>',
-                            currency: '<?= $currencyCode; ?>',
-                            publicKey: '<?= $publicKey; ?>'
-                        });
-                        window.TamaraProductWidget.render();
-                        clearInterval(existTamaraProductWidget);
-                    }
-                    if (++countExistTamaraProductWidget > 33) {
-                        clearInterval(existTamaraProductWidget);
-                    }
-                }, 300);
-            });
-        </script>
+        <?php if (class_exists('\Magento\Framework\View\Helper\SecureHtmlRenderer')):?>
+            <?php /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */ ?>
+            <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+        <?php else: ?>
+            <script>
+                <?php echo $scriptString; ?>
+            </script>
+        <?php endif; ?>
     <?php else: ?>
         <?php
         if ($block->isProductionApiEnvironment()) {
@@ -83,14 +91,22 @@ if (empty($publicKey)) {
             $widgetUrl = "https://cdn-sandbox.tamara.co/widget-v2/tamara-widget.js";
         }
         echo '<div class="tamara-promo-widget-wrapper tamara-product-page"><tamara-widget amount="' . $productFinalPrice . '" inline-type="' . $block->getInlineType() . '"></tamara-widget></div>';
+        $scriptString = '
+        var tamaraWidgetConfig = {
+                                    lang: \''. $lang .'\',
+                                    country: \''. $countryCode .'\',
+                                    publicKey: \''. $publicKey .'\'
+                                }
+        ';
         ?>
-        <script>
-            var tamaraWidgetConfig = {
-                lang: '<?= $lang; ?>',
-                country: '<?= $countryCode ?>',
-                publicKey: '<?= $publicKey; ?>'
-            }
-        </script>
+        <?php if (class_exists('\Magento\Framework\View\Helper\SecureHtmlRenderer')): ?>
+            <?php /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */ ?>
+            <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+        <?php else: ?>
+            <script>
+                <?php echo $scriptString; ?>
+            </script>
+        <?php endif; ?>
         <script charset="utf-8" defer src="<?= $widgetUrl ?>"></script>
     <?php endif; ?>
     <div class="<?php echo 'tamara-page-type-' . $block->getPageType() ?>"></div>

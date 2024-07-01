@@ -1,3 +1,9 @@
+<?php
+/**
+ * @var $block Tamara\Checkout\Block\Success
+ */
+?>
+
 <div class="tamara-success-title">
     <h2><?php echo __('Thank you!') ?></h2>
 </div>
@@ -7,21 +13,33 @@
     <!-- ko template: getTemplate() --><!-- /ko -->
 </div>
 
-<script>
-    window.successTamara = <?php /* @escapeNotVerified */ echo \json_encode($block->getTamaraConfig()); ?>;
-</script>
-
-<script type="text/x-magento-init">
-    {
-        "#success-area": {
-            "Magento_Ui/js/core/app": {
-                "components": {
-                    "tamara-success": {
-                        "component": "Tamara_Checkout/js/view/success",
-                        "template" : "Tamara_Checkout/success"
-                    }
+<?php
+$scriptString = 'window.successTamara = ';
+$scriptString .= \json_encode($block->getTamaraConfig());
+$scriptString2 = '
+{
+    "#success-area": {
+        "Magento_Ui/js/core/app": {
+            "components": {
+                "tamara-success": {
+                    "component": "Tamara_Checkout/js/view/success",
+                    "template" : "Tamara_Checkout/success"
                 }
             }
         }
     }
-</script>
+}
+';
+?>
+<?php if (class_exists('\Magento\Framework\View\Helper\SecureHtmlRenderer')): ?>
+    <?php /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */ ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', ['type' => 'text/x-magento-init'], $scriptString2, false) ?>
+<?php else: ?>
+    <script>
+        <?php echo $scriptString ?>
+    </script>
+    <script type="text/x-magento-init">
+        <?php echo $scriptString2 ?>
+    </script>
+<?php endif; ?>
