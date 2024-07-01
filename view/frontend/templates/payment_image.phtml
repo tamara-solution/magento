@@ -6,10 +6,17 @@
 
 $widgetVersion = $block->getWidgetVersion();
 $isProductionEnvironment = $block->isProductionEnvironment();
+$scriptString = 'window.populateTamara = ';
+$scriptString .= \json_encode($block->getTamaraConfig());
 ?>
-<script>
-    window.populateTamara = <?php /* @escapeNotVerified */ echo \json_encode($block->getTamaraConfig()); ?>;
-</script>
+<?php if (class_exists('\Magento\Framework\View\Helper\SecureHtmlRenderer')): ?>
+    <?php /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */ ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+<?php else: ?>
+    <script>
+        <?php echo $scriptString; ?>
+    </script>
+<?php endif; ?>
 <?php if ($widgetVersion == 'v1') : ?>
     <?php if ($isProductionEnvironment): ?>
         <script charset="utf-8" defer src="https://cdn.tamara.co/widget/installment-plan.min.js"></script>

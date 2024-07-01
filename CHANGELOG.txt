@@ -1,3 +1,6 @@
+1.12.40
+    New:
+    + Update default config for use_magento_success_page
 1.12.39
     New:
     + Improve code

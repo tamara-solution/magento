@@ -3,7 +3,6 @@
 namespace Tamara\Checkout\Model;
 
 use Magento\Framework\Model\AbstractModel;
-use Zend\Json\Json;
 
 class Capture extends AbstractModel
 {
@@ -166,7 +165,7 @@ class Capture extends AbstractModel
         $data = $this->_getData('shipping_info');
 
         if ($data !== self::EMPTY_STRING) {
-            $data = Json::decode($data);
+            $data = json_decode($data, true);
         }
 
         return $data;
@@ -179,7 +178,7 @@ class Capture extends AbstractModel
     {
         $data = self::EMPTY_STRING;
         if (!empty($shippingInfo) && $shippingInfo !== self::EMPTY_STRING) {
-            $data = Json::encode($shippingInfo);
+            $data = json_encode($shippingInfo);
         }
         $this->setData('shipping_info', $data);
         return $this;

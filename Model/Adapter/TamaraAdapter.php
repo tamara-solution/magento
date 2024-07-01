@@ -505,7 +505,7 @@ class TamaraAdapter
                 $creditMemoRefundedAmount = $magentoOrder->getOrderCurrency()->formatTxt(
                     $data['refund_grand_total']
                 );
-                $refundTransactionId = $magentoOrder->getIncrementId() . '-refund';
+                $refundTransactionId = $magentoOrder->getIncrementId() . '-refund-' . gmdate('Ymd-his', time());
                 $refundComment = __('Tamara - order was refunded. The refunded amount is %1.', $creditMemoRefundedAmount);
                 $this->tamaraTransactionHelper->createTransaction($magentoOrder, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_REFUND, $refundComment, $refundTransactionId);
                 if (in_array(\Tamara\Checkout\Model\Config\Source\EmailTo\Options::SEND_EMAIL_WHEN_REFUND_ORDER, $this->baseConfig->getSendEmailWhen($magentoOrder->getStoreId()))) {
