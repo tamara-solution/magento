@@ -24,7 +24,7 @@ class DisableMixinJs
 
     public function beforeRenderAssets(Renderer $subject, $resultGroups = [])
     {
-        if (!$this->tamaraConfig->isEnableTamaraPayment()) {
+        if (!$this->tamaraConfig->isEnableTamaraPayment() && !$this->tamaraConfig->getTamaraCore()->isAdminArea()) {
             $file = 'Tamara_Checkout::js/paymentDisabled.js';
             $asset = $this->assetRepo->createAsset($file);
             $this->pageAssets->insert($file, $asset, 'requirejs/require.js');

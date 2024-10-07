@@ -67,7 +67,7 @@ Login to your Magento Admin
 
 Navigate to Store > Configuration > Sales > Payment Methods > Tamara Checkout
 
-See full instructions here https://docs.tamara.co/platforms/magento2/config/
+See full instructions here https://docs.tamara.co/docs/magento-configuration
 
 ### API Configuration
 Set the API URL that you get from us for example for SANDBOX https://api-sandbox.tamara.co
