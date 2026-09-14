@@ -1,3 +1,13 @@
+2.13.2
+    New:
+    + Improve order status sync to reconcile pending Magento orders with Tamara (lookup by Tamara order ID first, then reference ID)
+    + Share reconciliation between the success redirect and the cron/console sync command
+    Bug fixed:
+    + Keep the merchant-configured authorise status after a captured order is synchronised
+    + Make local authorisation side effects idempotent (no duplicate emails/transactions on retry)
+    + Defer retry on transient Tamara lookup failures instead of permanently skipping the order
+    + Order the cron queue by main_table.updated_at so failed lookups do not block newer checkouts
+    + Apply expire/failure/cancel Magento statuses for expired, declined, and other terminal Tamara statuses
 2.13.1
     New:
     + Use the Tamara PHP SDK Precheck API to decide checkout eligibility

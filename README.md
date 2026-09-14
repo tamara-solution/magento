@@ -11,11 +11,11 @@ This extension allows you to use tamara as a payment gateway in your Magento sto
 
 If you are using PHP 8.4+
 ```bash
-composer require tamara-solution/magento:^2.13.1 tamara-solution/php-sdk:^3.0.3
+composer require tamara-solution/magento:^2.13.2 tamara-solution/php-sdk:^3.0.3
 ```
 otherwise
 ```bash
-composer require tamara-solution/magento:^2.13.1 tamara-solution/php-sdk:^2.0.11
+composer require tamara-solution/magento:^2.13.2 tamara-solution/php-sdk:^2.0.11
 ```
 
 ```bash
@@ -92,4 +92,13 @@ Enable trigger to Tamara, this option will allow you to automatically trigger Ca
 
 ### Checkout Order Statuses
 
-Here you can specify which statuses you want to update for the order in case of success, failure or cancel from tamara
+Here you can specify which statuses you want to update for the order in case of success, failure, expire or cancel from Tamara.
+
+### Order Status Synchronization
+
+Under **Tamara Checkout > Order Status Synchronization** you can enable a cron that reconciles Magento orders still in `new` / `pending_payment` with their current status on Tamara.
+
+- Looks up the Tamara order by Tamara order ID first, then by Magento increment ID (reference ID) as a fallback
+- Authorises approved orders, synchronises authorised/captured orders, and cancels expired, declined, or cancelled checkouts using the configured Magento statuses
+- Also runs on the payment success redirect so shoppers are not left pending when webhooks are delayed
+- Manual run: `php bin/magento tamara:orders-status-sync --start-time="now"`
