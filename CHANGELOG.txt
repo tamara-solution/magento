@@ -1,3 +1,14 @@
+1.13.2
+    New:
+    + Save Tamara order id, checkout session id, and checkout URL as Magento payment metadata when creating a checkout session
+    + Reconcile pending Magento orders on the Tamara success return URL and via cron (authorise approved, sync authorised/captured, cancel expired/declined/canceled/refunded)
+    + Persist payment type, instalments, Tamara order status, and capture/cancel/refund IDs as Magento order payment metadata after reconciliation
+    + Rename the cancel status setting to "Order status for payment cancelled from Tamara"
+    Bug fixed:
+    + Do not treat refunded/canceled Tamara orders as captured when capture IDs are still present
+    + Avoid re-authorising pending Magento orders (duplicate emails/transactions) when authorise status config is empty
+    + Only permanently cancel Magento on Tamara order-not-found (404); retry on 403 auth errors, timeouts, and 5xx
+    + Cancel Magento and fail the success return on permanent not-found lookups instead of promising a cron retry
 1.13.1
     New:
     + Require tamara-solution/php-sdk ^2.0.11

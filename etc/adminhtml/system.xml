@@ -158,9 +158,10 @@
                         <validate>required-entry</validate>
                     </field>
                     <field id="checkout_cancel_status" translate="label" type="select" sortOrder="230" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Order status when checkout is canceled by customer</label>
+                        <label>Order status for payment cancelled from Tamara</label>
                         <source_model>Tamara\Checkout\Model\Config\Source\Order\State\Cancelled\Status</source_model>
                         <validate>required-entry</validate>
+                        <comment>Used when checkout is canceled by the customer, or when Tamara reports expired, declined, canceled, or refunded</comment>
                     </field>
                     <field id="checkout_expire_status" translate="label" type="select" sortOrder="235" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Order status when checkout is expired (abandoned order)</label>

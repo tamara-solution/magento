@@ -173,6 +173,13 @@ class CheckoutInformationRepository implements \Tamara\Checkout\Api\CheckoutInfo
                 
                 $this->tamaraOrderRepository->save($tamaraOrder);
                 try {
+                    $payment = $magentoOrder->getPayment();
+                    $payment->setAdditionalInformation('tamara_order_id', $response['order_id']);
+                    $payment->setAdditionalInformation('tamara_checkout_session_id', $response['checkout_id']);
+                    // Keep the existing key for backwards compatibility.
+                    $payment->setAdditionalInformation('checkout_id', $response['checkout_id']);
+                    $payment->setAdditionalInformation('tamara_checkout_url', $response['checkout_url']);
+
                     // Add comment to order history
                     $magentoOrder->addStatusHistoryComment(
                         __('Tamara - checkout session was created, order id: ' . $response['order_id']),

@@ -61,6 +61,7 @@
             <argument name="orderRepository" xsi:type="object">Magento\Sales\Api\OrderRepositoryInterface</argument>
             <argument name="config" xsi:type="object">Tamara\Checkout\Gateway\Config\BaseConfig</argument>
             <argument name="tamaraOrderRepository" xsi:type="object">Tamara\Checkout\Api\OrderRepositoryInterface</argument>
+            <argument name="orderReconciliation" xsi:type="object">Tamara\Checkout\Helper\OrderReconciliation</argument>
         </arguments>
     </type>
 

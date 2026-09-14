@@ -25,18 +25,9 @@ class Success extends Action
     private $checkoutSession;
 
     /**
-     * @var \Tamara\Checkout\Model\Adapter\TamaraAdapterFactory
+     * @var \Tamara\Checkout\Helper\OrderReconciliation
      */
-    private $tamaraAdapterFactory;
-
-    protected $tamaraHelper;
-
-    /**
-     * @var \Tamara\Checkout\Helper\Transaction
-     */
-    protected $tamaraTransactionHelper;
-
-    protected $tamaraOrderAuthorizationHelper;
+    private $orderReconciliation;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -46,10 +37,7 @@ class Success extends Action
         BaseConfig $config,
         Session $checkoutSession,
         TamaraOrderRepository $tamaraOrderRepository,
-        \Tamara\Checkout\Model\Adapter\TamaraAdapterFactory $tamaraAdapterFactory,
-        \Tamara\Checkout\Helper\AbstractData $tamaraHelper,
-        \Tamara\Checkout\Helper\Transaction $tamaraTransactionHelper,
-        \Tamara\Checkout\Helper\OrderAuthorization $tamaraOrderAuthorizationHelper
+        \Tamara\Checkout\Helper\OrderReconciliation $orderReconciliation
     ) {
         $this->_pageFactory = $pageFactory;
         parent::__construct($context);
@@ -58,10 +46,7 @@ class Success extends Action
         $this->orderRepository = $orderRepository;
         $this->config = $config;
         $this->tamaraOrderRepository = $tamaraOrderRepository;
-        $this->tamaraAdapterFactory = $tamaraAdapterFactory;
-        $this->tamaraHelper = $tamaraHelper;
-        $this->tamaraTransactionHelper = $tamaraTransactionHelper;
-        $this->tamaraOrderAuthorizationHelper = $tamaraOrderAuthorizationHelper;
+        $this->orderReconciliation = $orderReconciliation;
     }
 
     public function execute()
@@ -79,7 +64,7 @@ class Success extends Action
             $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);
             $isAllowed = false;
             $magentoOrderState = $order->getState();
-            if ($magentoOrderState == \Magento\Sales\Model\Order::STATE_NEW) {
+            if ($this->orderReconciliation->isPendingOrder($order, $tamaraOrder)) {
                 $isAllowed = true;
             }
             if ($magentoOrderState == \Magento\Sales\Model\Order::STATE_PROCESSING || $magentoOrderState == \Magento\Sales\Model\Order::STATE_COMPLETE) {
@@ -93,17 +78,66 @@ class Success extends Action
         } catch (\Exception $exception) {
             return $this->redirectToCartPage();
         }
+        $remoteStatus = null;
         try {
-            if (!(bool) $tamaraOrder->getIsAuthorised()) {
-
-                //authorize order
-                $adapter = $this->tamaraAdapterFactory->create($storeId);
-                $client = $adapter->getClient();
-                $remoteOrder = $client->getOrder(new \Tamara\Request\Order\GetOrderRequest($tamaraOrder->getTamaraOrderId()));
-                $this->tamaraOrderAuthorizationHelper->authorizeOrder($order, $tamaraOrder, $storeId, $remoteOrder);
+            if ($this->orderReconciliation->isPendingOrder($order, $tamaraOrder)) {
+                $remoteStatus = $this->orderReconciliation->reconcile($order, $tamaraOrder);
+                // Reload in case reconcile updated state/status on a different instance path.
+                $order = $this->orderRepository->get($orderId);
             }
         } catch (\Exception $e) {
             $logger->debug(['Tamara - Error when authorize order' => $e->getMessage()], null, true);
+        }
+
+        if ($order->getState() === \Magento\Sales\Model\Order::STATE_CANCELED
+            || in_array($remoteStatus, ['expired', 'declined', 'canceled', 'cancelled', 'refunded', 'not_found'], true)
+        ) {
+            try {
+                $this->cartHelper->restoreCartFromOrder($order);
+            } catch (\Exception $e) {
+                $logger->debug(['Tamara - Error restoring cart after unsuccessful payment' => $e->getMessage()], null, true);
+            }
+            $this->messageManager->addErrorMessage(__('Your order payment was not successful.'));
+            if (!empty($merchantFailureUrl = $this->config->getMerchantFailureUrl($storeId))) {
+                return $this->resultRedirectFactory->create()->setUrl($merchantFailureUrl);
+            }
+            return $this->redirectToCartPage();
+        }
+
+        // Still pending after a transient lookup/status: cron can retry. Do not claim
+        // success as paid, and never promise a retry if the row was permanently skipped.
+        if ($this->orderReconciliation->isPendingOrder($order, $tamaraOrder)) {
+            $tamaraOrder = $this->tamaraOrderRepository->getTamaraOrderByOrderId($orderId);
+            if ($this->orderReconciliation->wasLastLookupPermanentFailure()
+                || (bool) $tamaraOrder->getCanceledFromConsole()
+            ) {
+                $logger->debug([
+                    'Tamara - Success return cannot retry permanently skipped order'
+                        => ['order_id' => $orderId, 'remote_status' => $remoteStatus]
+                ], null, true);
+                try {
+                    $this->cartHelper->restoreCartFromOrder($order);
+                } catch (\Exception $e) {
+                    $logger->debug(['Tamara - Error restoring cart after unsuccessful payment' => $e->getMessage()], null, true);
+                }
+                $this->messageManager->addErrorMessage(__('Your order payment was not successful.'));
+                if (!empty($merchantFailureUrl = $this->config->getMerchantFailureUrl($storeId))) {
+                    return $this->resultRedirectFactory->create()->setUrl($merchantFailureUrl);
+                }
+                return $this->redirectToCartPage();
+            }
+
+            $logger->debug([
+                'Tamara - Success return left order pending; cron will retry reconciliation'
+                    => ['order_id' => $orderId, 'remote_status' => $remoteStatus]
+            ], null, true);
+            $this->messageManager->addNoticeMessage(
+                __('Your payment is being confirmed. You will receive an email once it is complete.')
+            );
+            if (!empty($merchantSuccessUrl = $this->config->getMerchantSuccessUrl($storeId))) {
+                return $this->resultRedirectFactory->create()->setUrl($merchantSuccessUrl);
+            }
+            return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success/');
         }
 
         if (!empty($merchantSuccessUrl = $this->config->getMerchantSuccessUrl($storeId))) {
